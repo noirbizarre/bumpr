@@ -17,9 +17,9 @@ import logging
 from os.path import exists
 
 try:
-    from ConfigParser import RawConfigParser  # pylint: disable:F0401
+    from ConfigParser import RawConfigParser  # pylint: disable=F0401
 except ImportError:
-    from configparser import RawConfigParser  # pylint: disable:F0401
+    from configparser import RawConfigParser  # pylint: disable=F0401
 
 from bumpr.hooks import HOOKS
 from bumpr.version import Version, PARTS
@@ -57,7 +57,7 @@ DEFAULTS = {
 
 class ObjectDict(dict):
     '''A dictionnary with object-like attribute access and depp merge'''
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs):  # pylint: disable=W0231
         self.update(*args, **kwargs)
 
     def __getattr__(self, key):
@@ -119,7 +119,9 @@ class Config(ObjectDict):
             if config.has_option('bumpr', option):
                 self[option] = config.getboolean('bumpr', option)
         if config.has_option('bumpr', 'files'):
+            # pylint: disable=W0201
             self.files = [name.strip() for name in config.get('bumpr', 'files').split('\n') if name.strip()]
+            # pylint: enable=W0201
 
         # Bump and next section
         for section in 'bump', 'prepare':
@@ -145,7 +147,7 @@ class Config(ObjectDict):
                 self[hook.key] = False
 
     def override_from_args(self, args):
-        for arg in 'module', 'vcs', 'attribute', 'verbose', 'dryrun':
+        for arg in 'module', 'vcs', 'attribute', 'verbose', 'dryrun', 'files':
             if arg in args and getattr(args, arg) is not None:
                 self[arg] = getattr(args, arg)
 

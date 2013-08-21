@@ -73,13 +73,13 @@ class ChangelogHook(Hook):
     }
 
     def bump(self, replacements):
-        self.dev_header = self.underline(self.config.prepare)
+        self.dev_header = self.underline(self.config.prepare)  # pylint: disable=W0201
         title = self.config.bump.format(
             version=self.releaser.version,
             date=self.releaser.timestamp,
             **self.releaser.version.__dict__
         )
-        self.bumped_header = self.underline(title)
+        self.bumped_header = self.underline(title)  # pylint: disable=W0201
 
         with codecs.open(self.config.file, 'r', self.releaser.config.encoding) as changelog_file:
             before = changelog_file.read()
