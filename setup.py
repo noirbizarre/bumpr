@@ -66,7 +66,7 @@ setup(
     },
     tests_require=tests_require,
     extras_require = {
-        'tests':  tests_require,
+        'test':  tests_require,
     },
     classifiers=[
         "Development Status :: 4 - Beta",
