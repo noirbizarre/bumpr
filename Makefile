@@ -30,7 +30,7 @@ coverage:
 	@echo 'Running test suite with coverage'
 	@coverage erase
 ifeq ($(PYTHON_VERSION),2.6)
-	@coverage run --rcfile=coverage.rc unit2 discover
+	@coverage run --rcfile=coverage.rc -m unittest2 discover
 else
 	@coverage run --rcfile=coverage.rc -m unittest discover
 endif
