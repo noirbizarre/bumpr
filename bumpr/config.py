@@ -9,8 +9,7 @@ Pymp: Python release bumper
 - Build a source distrbution and upload on PyPI
 - Update version for new develpoment cycle
 '''
-from __future__ import print_function
-from __future__ import unicode_literals
+from __future__ import print_function, unicode_literals
 
 import argparse
 import logging
@@ -146,28 +145,25 @@ class Config(ObjectDict):
                 self[hook.key] = False
 
     def override_from_args(self, args):
-        for arg in 'module', 'suffix', 'vcs', 'attribute', 'verbose':
+        for arg in 'module', 'vcs', 'attribute', 'verbose', 'dryrun':
             if arg in args and getattr(args, arg) is not None:
                 self[arg] = getattr(args, arg)
 
         # Bump
-        if args.part:
+        if args.part is not None:
             self.bump.part = args.part
-        if args.suffix:
+        if args.suffix is not None:
             self.bump.suffix = args.suffix
         if args.unsuffix is not None:
             self.bump.unsuffix = args.unsuffix
 
         # Next
-        if args.prepare_part:
+        if args.prepare_part is not None:
             self.prepare.part = args.prepare_part
-        if args.prepare_suffix:
+        if args.prepare_suffix is not None:
             self.prepare.suffix = args.prepare_suffix
         if args.prepare_unsuffix is not None:
             self.prepare.unsuffix = args.prepare_unsuffix
-
-        self.verbose = not args.quiet
-        self.dryrun = args.dryrun
 
     @classmethod
     def parse_args(cls, args=None):
@@ -200,9 +196,6 @@ class Config(ObjectDict):
             help="Unset suffix")
 
         parser.add_argument('-v', '--verbose', dest='verbose', action='store_true', help="Verbose output")
-        parser.add_argument('-q', dest='quiet', action='store_true',
-                            help="Quiet mode: bumps without confirmation and only"
-                                 "the bumped version number is printed")
         parser.add_argument('-c', '--config', default='bumpr.rc', help='Specify a configuration file')
         parser.add_argument('-d', '--dryrun', action='store_true', help='Do not write anything and display a diff')
 

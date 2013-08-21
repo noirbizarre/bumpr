@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from __future__ import print_function, unicode_literals
 import io
 import sys
 
@@ -132,4 +133,15 @@ class ConfigTest(unittest.TestCase):
         self.assertDictEqual(config, expected)
 
     def test_override_from_args(self):
-        pass
+        config = Config.parse_args(['test', '-M', '-v', '-s', 'test-suffix', '-c', 'fake'])
+
+        expected = deepcopy(DEFAULTS)
+        expected['module'] = 'test'
+        expected['bump']['part'] = Version.MAJOR
+        expected['bump']['suffix'] = 'test-suffix'
+        expected['verbose'] = True
+        for hook in HOOKS:
+            expected[hook.key] = False
+
+        self.assertDictEqual(config, expected)
+
