@@ -1,0 +1,31 @@
+[bumpr]
+module = bumpr
+vcs = git
+commit = true
+tag = true
+tests = tox
+publish = python setup.py register sdist upload
+clean =
+    python setup.py clean
+    rm -rf *egg-info build dist
+files = README.rst
+
+[bump]
+unsuffix = true
+message = Bump version {version}
+
+[prepare]
+patch = true
+suffix = dev
+message = Prepare version {version} for next development cycle
+
+[changelog]
+file = CHANGELOG.rst
+bump = {version} ({date:%Y-%m-%d})
+prepare = Current
+
+[readthedoc]
+id = bumpr
+bump = {version}
+prepare = latest
+

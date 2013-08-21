@@ -1,0 +1,13 @@
+language: python
+python:
+  - 2.6
+  - 2.7
+  - 3.2
+  - 3.3
+install:
+  - pip install -e .[test] --use-mirrors
+  - pip install pep8 python-coveralls
+script:
+  - make coverage pep8
+after_success:
+  - coveralls -c coverage.rc
