@@ -50,7 +50,7 @@ DEFAULTS = {
         'unsuffix': False,
         'suffix': None,
         'part': 'patch',
-        'message': 'Update to version {version} for next develoment cycle',
+        'message': 'Update to version {version} for next development cycle',
     },
 }
 

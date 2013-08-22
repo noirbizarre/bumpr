@@ -1,8 +1,6 @@
 [bumpr]
 file = bumpr/__init__.py
 vcs = git
-commit = true
-tag = true
 tests = tox
 publish = python setup.py register sdist upload
 clean =
@@ -10,14 +8,8 @@ clean =
     rm -rf *egg-info build dist
 files = README.rst
 
-[bump]
-unsuffix = true
-message = Bump version {version}
-
 [prepare]
-patch = true
 suffix = dev
-message = Prepare version {version} for next development cycle
 
 [changelog]
 file = CHANGELOG.rst
@@ -26,6 +18,4 @@ prepare = Current
 
 [readthedoc]
 id = bumpr
-bump = {version}
-prepare = latest
 

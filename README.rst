@@ -49,6 +49,52 @@ or with easy_install:
     $ easy_install bumpr
 
 
+Usage
+=====
+
+You can use directly the command line to setup every parameter:
+
+.. code-block:: console
+
+    $ bumpr fake/__init__.py README.rst -M -ps dev
+
+But Bump'R is designed to work with a configuration file (``bumpr.rc`` by defaults).
+
+.. code-block:: ini
+
+    [bumpr]
+    file = fake/__init__.py
+    vcs = git
+    tests = tox
+    publish = python setup.py sdist register upload
+    clean =
+        python setup.py clean
+        rm -rf *egg-info build dist
+    files = README.rst
+
+    [bump]
+    unsuffix = true
+    message = Bump version {version}
+
+    [prepare]
+    suffix = dev
+    message = Prepare version {version} for next development cycle
+
+    [changelog]
+    file = CHANGELOG.rst
+    bump = {version} ({date:%Y-%m-%d})
+    prepare = In development
+
+    [readthedoc]
+    id = fake
+
+This way you only have to specify which part you want to bump on the command line:
+
+.. code-block:: console
+
+    $ bumpr -M  # Bump the major
+    $ bumpr     # Bump the default part aka. patch
+
 Documentation
 =============
 
