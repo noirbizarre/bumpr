@@ -4,4 +4,4 @@ Changelog
 Current
 -------
 
-- Initial release
+- Initial release. Missing some parts but working!

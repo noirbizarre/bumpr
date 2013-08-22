@@ -8,6 +8,10 @@ clean =
     rm -rf *egg-info build dist
 files = README.rst
 
+[bump]
+unsuffix = true
+message = Self bumped version {version}
+
 [prepare]
 suffix = dev
 
