@@ -56,16 +56,18 @@ class Releaser(object):
         self.clean()
         self.test()
         self.bump()
-        if self.config.vcs:  # Does not make any sense without
+        if self.config.vcs and not self.config.dryrun:  # Does not make any sense without
             self.prepare()
 
-    def execute(self, command):
+    def execute(self, command, dryrun=False):
         if not command:
             return
         for cmd in command.split('\n'):
             if cmd.strip():
                 cmd = cmd.format(version=self.version, date=self.timestamp, **self.version.__dict__).strip()
-                if self.config.verbose:
+                if dryrun:
+                    self.logger.info('dry run execute: {0}'.format(cmd))
+                elif self.config.verbose:
                     subprocess.check_call(cmd.split())
                 else:
                     try:
@@ -150,7 +152,7 @@ class Releaser(object):
         '''Publish the current release to PyPI'''
         if self.config.publish:
             logger.info('Publish')
-            self.execute(self.config.publish)
+            self.execute(self.config.publish, self.config.dryrun)
 
     def commit_bump(self):
         if self.config.vcs:

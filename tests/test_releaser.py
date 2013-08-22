@@ -131,7 +131,21 @@ class ReleaserTest(unittest.TestCase):
 
         with patch.object(releaser, 'execute') as mock:
             releaser.publish()
-            mock.assert_called_with('publish command')
+            mock.assert_called_with('publish command', False)
+
+    def test_publish_dryrun(self):
+        config = Config({
+            'file': 'fake.py',
+            'publish': 'publish command',
+            'dryrun': True,
+        })
+
+        with workspace('fake'):
+            releaser = Releaser(config)
+
+        with patch.object(releaser, 'execute') as mock:
+            releaser.publish()
+            mock.assert_called_with('publish command', True)
 
     def test_clean(self):
         config = Config({
