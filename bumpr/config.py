@@ -33,10 +33,11 @@ DEFAULTS = {
     'vcs': None,
     'commit': True,
     'tag': True,
+    'verbose': False,
     'dryrun': False,
-    'clean': 'python setup.py clean',
+    'clean': None,
     'tests': None,
-    'publish': 'python setup.py sdist',
+    'publish': None,
     'files': [],
 
     'bump': {
@@ -112,16 +113,16 @@ class Config(ObjectDict):
         config.readfp(open(filename))
 
         # Common options
-        for option in 'vcs', 'file', 'regex', 'encoding', 'publish', 'clean', 'tests':
-            if config.has_option('bumpr', option):
-                self[option] = config.get('bumpr', option)
-        for option in 'tag', 'commit':
-            if config.has_option('bumpr', option):
-                self[option] = config.getboolean('bumpr', option)
-        if config.has_option('bumpr', 'files'):
-            # pylint: disable=W0201
-            self.files = [name.strip() for name in config.get('bumpr', 'files').split('\n') if name.strip()]
-            # pylint: enable=W0201
+        if config.has_section('bumpr'):
+            for option in config.options('bumpr'):
+                if option in ('tag', 'commit'):
+                    self[option] = config.getboolean('bumpr', option)
+                elif option is 'files':
+                    # pylint: disable=W0201
+                    self.files = [name.strip() for name in config.get('bumpr', 'files').split('\n') if name.strip()]
+                    # pylint: enable=W0201
+                else:
+                    self[option] = config.get('bumpr', option)
 
         # Bump and next section
         for section in 'bump', 'prepare':

@@ -76,9 +76,6 @@ class ReleaserTest(unittest.TestCase):
         with workspace('fake', '1.2.3.dev') as wksp:
             releaser = Releaser(config)
 
-            # self.assertEqual(releaser.module.__name__, config.module)
-            # self.assertEqual(releaser.module_file, relpath(wksp.module, wksp.root))
-
         self.assertIsInstance(releaser.prev_version, Version)
         self.assertEqual(str(releaser.prev_version), '1.2.3.dev')
 
@@ -158,7 +155,7 @@ class ReleaserTest(unittest.TestCase):
             check_call.assert_called_with(['bumpr', 'test', '1.2'])
 
     def test_execute_quiet(self):
-        config = Config({'file': 'fake.py', 'verbose': False})
+        config = Config({'file': 'fake.py'})
         with workspace('fake') as wksp:
             releaser = Releaser(config)
 
@@ -166,8 +163,31 @@ class ReleaserTest(unittest.TestCase):
             releaser.execute('bumpr test {major}.{minor}')
             check_call.assert_called_with(['bumpr', 'test', '1.2'])
 
-    def test_bump(self):
-        pass
+    def test_commit(self):
+        config = Config({'file': 'fake.py', 'vcs': 'git'})
+        with workspace('fake') as wksp:
+            releaser = Releaser(config)
 
-    def test_prepapre(self):
+        with patch.object(releaser, 'vcs') as vcs:
+            releaser.commit('message')
+            vcs.commit.assert_called_with('message', set())
+
+    def test_release_wihtout_vcs_or_commands(self):
+        with workspace('fake', '1.2.3.dev') as wksp:
+            config = Config({'file': 'fake.py', 'files': [wksp.readme]})
+            releaser = Releaser(config)
+            with patch.object(releaser, 'execute') as execute:
+                with patch.object(releaser, 'prepare') as prepare:
+                    releaser.release()
+                    self.assertFalse(execute.called)
+                    self.assertFalse(prepare.called)
+
+            for filename in wksp.module, wksp.readme:
+                with open(filename) as f:
+                    content = f.read()
+                    self.assertIn('1.2.3', content)
+                    self.assertNotIn('1.2.3.dev', content)
+
+
+    def test_prepare(self):
         pass

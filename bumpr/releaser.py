@@ -56,7 +56,8 @@ class Releaser(object):
         self.clean()
         self.test()
         self.bump()
-        self.prepare()
+        if self.config.vcs:  # Does not make any sense without
+            self.prepare()
 
     def execute(self, command):
         if not command:
@@ -74,7 +75,9 @@ class Releaser(object):
                         print(exception.output)
 
     def test(self):
-        self.execute(self.config.tests)
+        if self.config.tests:
+            logger.info('Running test suite')
+            self.execute(self.config.tests)
 
     def bump(self):
         logger.info('Bump version %s', self.version)
@@ -116,8 +119,9 @@ class Releaser(object):
 
     def clean(self):
         '''Clean the workspace'''
-        logger.info('Cleaning')
-        self.execute(self.config.clean)
+        if self.config.clean:
+            logger.info('Cleaning')
+            self.execute(self.config.clean)
 
     def perform(self, filename, before, after):
         with open(filename, 'wb') as f:
@@ -144,29 +148,32 @@ class Releaser(object):
 
     def publish(self):
         '''Publish the current release to PyPI'''
-        logger.info('Publish')
-        self.execute(self.config.publish)
+        if self.config.publish:
+            logger.info('Publish')
+            self.execute(self.config.publish)
 
     def commit_bump(self):
-        if self.config.commit:
-            self.commit(self.config.bump.message.format(
-                version=self.version,
-                date=self.timestamp,
-                **self.version.__dict__
-            ))
-        if self.config.tag:
-            self.vcs.tag(str(self.version))
+        if self.config.vcs:
+            if self.config.commit:
+                self.commit(self.config.bump.message.format(
+                    version=self.version,
+                    date=self.timestamp,
+                    **self.version.__dict__
+                ))
+            if self.config.tag:
+                self.vcs.tag(str(self.version))
 
     def commit_prepare(self):
-        if self.config.commit:
-            self.commit(self.config.prepare.message.format(
-                version=self.next_version,
-                date=self.timestamp,
-                **self.next_version.__dict__
-            ))
+        if self.config.vcs:
+            if self.config.commit:
+                self.commit(self.config.prepare.message.format(
+                    version=self.next_version,
+                    date=self.timestamp,
+                    **self.next_version.__dict__
+                ))
 
     def commit(self, message):
-        if self.config.commit:
+        if self.config.commit and self.config.vcs:
             logger.info('Commit: %s', message)
             self.vcs.commit(message, self.modified)
             self.modified.clear()
