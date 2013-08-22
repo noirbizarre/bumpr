@@ -93,12 +93,14 @@ class ConfigTest(unittest.TestCase):
         bumprrc = '''\
         [bumpr]
         file = test.py
+        files = README
         [bump]
         message = test
         '''
 
         expected = deepcopy(DEFAULTS)
         expected['file'] = 'test.py'
+        expected['files'] = ['README']
         expected['bump']['message'] = 'test'
         for hook in HOOKS:
             expected[hook.key] = False
@@ -139,6 +141,30 @@ class ConfigTest(unittest.TestCase):
         expected['file'] = 'test.py'
         expected['bump']['part'] = Version.MAJOR
         expected['bump']['suffix'] = 'test-suffix'
+        expected['verbose'] = True
+        for hook in HOOKS:
+            expected[hook.key] = False
+
+        self.assertDictEqual(config, expected)
+
+    def test_override_args_keeps_config_values(self):
+        bumprrc = '''\
+        [bumpr]
+        files = README
+        [bump]
+        message = test
+        '''
+
+        with mock_ini(bumprrc) as mock:
+            with patch('bumpr.config.exists', return_value=True):
+                config = Config.parse_args(['test.py', '-M', '-v', '-s', 'test-suffix', '-c', 'test.rc'])
+
+        expected = deepcopy(DEFAULTS)
+        expected['file'] = 'test.py'
+        expected['files'] = ['README']
+        expected['bump']['part'] = Version.MAJOR
+        expected['bump']['suffix'] = 'test-suffix'
+        expected['bump']['message'] = 'test'
         expected['verbose'] = True
         for hook in HOOKS:
             expected[hook.key] = False

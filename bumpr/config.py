@@ -92,7 +92,7 @@ class ObjectDict(dict):
 
 
 class Config(ObjectDict):
-    def __init__(self, source=None, args=None):
+    def __init__(self, source=None, parsed_args=None):
         super(Config, self).__init__(DEFAULTS)
         for hook in HOOKS:
             self[hook.key] = False
@@ -103,10 +103,10 @@ class Config(ObjectDict):
                     self.merge({hook.key: hook.defaults})
             self.merge(source)
 
-        if args:
-            if 'config' in args and exists(args.config):
-                self.override_from_config(args.config)
-            self.override_from_args(args)
+        if parsed_args:
+            if 'config' in parsed_args and exists(parsed_args.config):
+                self.override_from_config(parsed_args.config)
+            self.override_from_args(parsed_args)
 
     def override_from_config(self, filename):
         config = RawConfigParser()
@@ -117,7 +117,7 @@ class Config(ObjectDict):
             for option in config.options('bumpr'):
                 if option in ('tag', 'commit'):
                     self[option] = config.getboolean('bumpr', option)
-                elif option is 'files':
+                elif option == 'files':
                     # pylint: disable=W0201
                     self.files = [name.strip() for name in config.get('bumpr', 'files').split('\n') if name.strip()]
                     # pylint: enable=W0201
@@ -147,26 +147,26 @@ class Config(ObjectDict):
             else:
                 self[hook.key] = False
 
-    def override_from_args(self, args):
+    def override_from_args(self, parsed_args):
         for arg in 'file', 'vcs', 'verbose', 'dryrun', 'files':
-            if arg in args and getattr(args, arg) is not None:
-                self[arg] = getattr(args, arg)
+            if arg in parsed_args and getattr(parsed_args, arg) not in (None, [], tuple()):
+                self[arg] = getattr(parsed_args, arg)
 
         # Bump
-        if args.part is not None:
-            self.bump.part = args.part
-        if args.suffix is not None:
-            self.bump.suffix = args.suffix
-        if args.unsuffix is not None:
-            self.bump.unsuffix = args.unsuffix
+        if parsed_args.part is not None:
+            self.bump.part = parsed_args.part
+        if parsed_args.suffix is not None:
+            self.bump.suffix = parsed_args.suffix
+        if parsed_args.unsuffix is not None:
+            self.bump.unsuffix = parsed_args.unsuffix
 
         # Next
-        if args.prepare_part is not None:
-            self.prepare.part = args.prepare_part
-        if args.prepare_suffix is not None:
-            self.prepare.suffix = args.prepare_suffix
-        if args.prepare_unsuffix is not None:
-            self.prepare.unsuffix = args.prepare_unsuffix
+        if parsed_args.prepare_part is not None:
+            self.prepare.part = parsed_args.prepare_part
+        if parsed_args.prepare_suffix is not None:
+            self.prepare.suffix = parsed_args.prepare_suffix
+        if parsed_args.prepare_unsuffix is not None:
+            self.prepare.unsuffix = parsed_args.prepare_unsuffix
 
     @classmethod
     def parse_args(cls, args=None):
@@ -205,4 +205,4 @@ class Config(ObjectDict):
         parser.add_argument('-d', '--dryrun', action='store_true', help='Do not write anything and display a diff')
 
         parsed_args = parser.parse_args(args)
-        return cls(args=parsed_args)
+        return cls(parsed_args=parsed_args)

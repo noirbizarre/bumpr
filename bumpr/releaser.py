@@ -66,7 +66,7 @@ class Releaser(object):
             if cmd.strip():
                 cmd = cmd.format(version=self.version, date=self.timestamp, **self.version.__dict__).strip()
                 if dryrun:
-                    self.logger.info('dry run execute: {0}'.format(cmd))
+                    logger.info('dry run execute: {0}'.format(cmd))
                 elif self.config.verbose:
                     subprocess.check_call(cmd.split())
                 else:
