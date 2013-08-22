@@ -68,6 +68,7 @@ setup(
     extras_require = {
         'test':  tests_require,
     },
+    keywords='version bump release tag',
     classifiers=[
         "Development Status :: 4 - Beta",
         "Programming Language :: Python",
