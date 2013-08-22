@@ -11,6 +11,8 @@ import logging
 
 from logging import Formatter, StreamHandler, DEBUG, INFO
 
+RESET_TERM = '\033[0;m'
+
 COLOR_CODES = {
     'red': 31,
     'yellow': 33,
@@ -20,7 +22,12 @@ COLOR_CODES = {
     'bggrey': 100,
 }
 
-RESET_TERM = '\033[0;m'
+LEVEL_COLORS = {
+    'DEBUG': 'bggrey',
+    'WARNING': 'yellow',
+    'ERROR': 'red',
+    'CRITICAL': 'bgred',
+}
 
 
 def ansi(color, text):
@@ -38,16 +45,9 @@ class ANSIFormatter(Formatter):
         msg = record.getMessage()
         if record.levelname == 'INFO':
             return ansi('cyan', '-> ') + msg
-        elif record.levelname == 'WARNING':
-            return ansi('yellow', record.levelname) + ': ' + msg
-        elif record.levelname == 'ERROR':
-            return ansi('red', record.levelname) + ': ' + msg
-        elif record.levelname == 'CRITICAL':
-            return ansi('bgred', record.levelname) + ': ' + msg
-        elif record.levelname == 'DEBUG':
-            return ansi('bggrey', record.levelname) + ': ' + msg
         else:
-            return ansi('white', record.levelname) + ': ' + msg
+            color = LEVEL_COLORS.get(record.levelname, 'white')
+            return ansi(color, record.levelname) + ': ' + msg
 
 
 class TextFormatter(Formatter):

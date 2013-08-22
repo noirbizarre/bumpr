@@ -7,6 +7,7 @@ import logging
 import os
 import subprocess
 import sys
+import re
 
 from datetime import datetime
 from difflib import unified_diff
@@ -15,9 +16,6 @@ from os.path import relpath
 from bumpr.hooks import HOOKS
 from bumpr.vcs import Git, Mercurial, Bazaar
 from bumpr.version import Version
-
-if sys.version_info[0] == 3:
-    unicode = str  # pylint: disable=W0622,C0103
 
 logger = logging.getLogger(__name__)
 
@@ -32,18 +30,13 @@ class Releaser(object):
     def __init__(self, config):
         self.config = config
 
-        root = os.getcwd()
-        if root not in sys.path:
-            sys.path.insert(0, root)
-
-        self.module = __import__(config.module)
-        self.module_file = relpath(self.module.__file__.replace('.pyc', '.py'), root)
-
-        try:
-            version_string = getattr(self.module, config.attribute)
-            self.prev_version = Version.parse(version_string)
-        except:
-            raise ValueError('Version not found in {}'.format(config.module))
+        with open(config.file) as f:
+            match = re.search(config.regex, f.read())
+            try:
+                version_string = match.group('version')
+                self.prev_version = Version.parse(version_string)
+            except:
+                raise ValueError('Version not found in {}'.format(config.file))
 
         self.version = self.prev_version.copy()
         self.version.bump(config.bump.part, config.bump.unsuffix, config.bump.suffix)
@@ -92,13 +85,13 @@ class Releaser(object):
         logger.info('Bump version %s', self.version)
 
         replacements = [
-            (unicode(self.prev_version), unicode(self.version))
+            (str(self.prev_version), str(self.version))
         ]
 
         for hook in self.hooks:
             hook.bump(replacements)
 
-        self.bump_module(self.prev_version, self.version)
+        self.bump_version_file(self.prev_version, self.version)
         self.bump_files(replacements)
         self.commit_bump()
         self.publish()
@@ -112,15 +105,14 @@ class Releaser(object):
         logger.info('Prepare version %s', self.version)
 
         replacements = [
-            (unicode(self.version), unicode(self.next_version))
+            (str(self.version), str(self.next_version))
         ]
 
         for hook in self.hooks:
             hook.prepare(replacements)
 
-        self.bump_module(self.version, self.next_version)
+        self.bump_version_file(self.version, self.next_version)
         self.bump_files(replacements)
-        # self.prepare_changelog()
         self.commit_prepare()
         if self.config.verbose and self.config.dryrun:
             for filename, diff in self.diffs.items():
@@ -140,11 +132,11 @@ class Releaser(object):
             diff = unified_diff(before.split('\n'), after.split('\n'))
             self.diffs[filename] = '\n'.join(diff)
 
-    def bump_module(self, from_version, to_version):
-        with codecs.open(self.module_file, 'r', self.config.encoding) as f:
+    def bump_version_file(self, from_version, to_version):
+        with codecs.open(self.config.file, 'r', self.config.encoding) as f:
             before = f.read()
-            after = before.replace(unicode(from_version), unicode(to_version))
-        self.perform(self.module_file, before, after)
+        after = before.replace(str(from_version), str(to_version))
+        self.perform(self.config.file, before, after)
 
     def bump_files(self, replacements):
         for filename in self.config.files:
@@ -168,7 +160,7 @@ class Releaser(object):
                 **self.version.__dict__
             ))
         if self.config.tag:
-            self.vcs.tag(unicode(self.version))
+            self.vcs.tag(str(self.version))
 
     def commit_prepare(self):
         if self.config.commit:

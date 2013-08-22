@@ -27,12 +27,12 @@ from bumpr.version import Version, PARTS
 logger = logging.getLogger(__name__)
 
 DEFAULTS = {
-    'module': None,
-    'attribute': '__version__',
+    'file': None,
+    'regex': r'(__version__|VERSION)\s*=\s*(\'|")(?P<version>.+?)(\'|")',
     'encoding': 'utf8',
     'vcs': None,
-    'commit': False,
-    'tag': False,
+    'commit': True,
+    'tag': True,
     'dryrun': False,
     'clean': 'python setup.py clean',
     'tests': None,
@@ -112,7 +112,7 @@ class Config(ObjectDict):
         config.readfp(open(filename))
 
         # Common options
-        for option in 'vcs', 'module', 'attribute', 'encoding', 'publish', 'clean', 'tests':
+        for option in 'vcs', 'file', 'regex', 'encoding', 'publish', 'clean', 'tests':
             if config.has_option('bumpr', option):
                 self[option] = config.get('bumpr', option)
         for option in 'tag', 'commit':
@@ -147,7 +147,7 @@ class Config(ObjectDict):
                 self[hook.key] = False
 
     def override_from_args(self, args):
-        for arg in 'module', 'vcs', 'attribute', 'verbose', 'dryrun', 'files':
+        for arg in 'file', 'vcs', 'attribute', 'verbose', 'dryrun', 'files':
             if arg in args and getattr(args, arg) is not None:
                 self[arg] = getattr(args, arg)
 
@@ -171,7 +171,7 @@ class Config(ObjectDict):
     def parse_args(cls, args=None):
         from bumpr import __version__, __description__
         parser = argparse.ArgumentParser(description=__description__)
-        parser.add_argument('module', help='Versionned module', nargs='?')
+        parser.add_argument('file', help='Versionned module file', nargs='?')
         parser.add_argument('files', help='Files to update', nargs='*')
 
         parser.add_argument('--version', action='version', version=__version__)

@@ -1,26 +1,87 @@
 # -*- coding: utf-8 -*-
+import os
+import shutil
+import tempfile
+import sys
+
 try:
     import unittest2 as unittest
 except:
     import unittest
 
-from mock import patch
+from os.path import join, relpath
+from contextlib import contextmanager
+from mock import patch, MagicMock
+from textwrap import dedent
 
-from bumpr.config import Config
-from bumpr.releaser import Releaser
+from bumpr.config import Config, ObjectDict
+from bumpr.releaser import Releaser, HOOKS
 from bumpr.version import Version
+
+
+@contextmanager
+def workspace(module_name, version='1.2.3.dev'):
+    root = tempfile.mkdtemp(module_name)
+    module_filename = join(root, '{0}.py'.format(module_name))
+    module_content =  '''\
+        # -*- coding: utf-8 -*-
+
+        __version__ = '{version}'
+        '''
+    readme_filename = join(root, 'README')
+    readme_content = '''\
+        README
+
+        Version: {version}
+        Lorem ipsum dolor sit amet, consectetur adipisicing elit.
+        Non, ad, facilis, vel voluptas fugiat sit debitis iusto
+        numquam quasi aliquid cum quod laborum assumenda quia
+        '''
+
+    for filename, content in ((module_filename, module_content), (readme_filename, readme_content)):
+        with open(filename, 'wb') as f:
+            content = dedent(content).format(version=version)
+            f.write(content.encode('utf8'))
+
+    cwd = os.getcwd()
+    os.chdir(root)
+
+    yield ObjectDict({
+        'root': root,
+        'module': module_filename,
+        'readme': readme_filename,
+    })
+
+    os.chdir(cwd)
+    shutil.rmtree(root)
+    if root in sys.path:
+        sys.path.remove(root)
+
+
+def test_workspace():
+    initial_dir = os.getcwd()
+    with workspace('fake') as wksp:
+        self.assertNotEqual(os.getcwd(), initial_dir)
+        self.assertEqual(wksp.root, os.getcwd())
+        self.assertEqual(wksp.module, join(w.root, 'fake.py'))
+        self.assertEqual(wksp.readme, join(w.root, 'README'))
+    self.assertEqual(os.getcwd(), initial_dir)
 
 
 class ReleaserTest(unittest.TestCase):
     def test_constructor(self):
         config = Config({
-            'module': 'bumpr'
+            'file': 'fake.py'
         })
-        releaser = Releaser(config)
+        with workspace('fake', '1.2.3.dev') as wksp:
+            releaser = Releaser(config)
 
-        self.assertEqual(releaser.module.__name__, 'bumpr')
-        self.assertIsNotNone(releaser.module_file)
+            # self.assertEqual(releaser.module.__name__, config.module)
+            # self.assertEqual(releaser.module_file, relpath(wksp.module, wksp.root))
+
         self.assertIsInstance(releaser.prev_version, Version)
+        self.assertEqual(str(releaser.prev_version), '1.2.3.dev')
+
         self.assertIsInstance(releaser.version, Version)
         self.assertIsInstance(releaser.next_version, Version)
 
@@ -32,12 +93,31 @@ class ReleaserTest(unittest.TestCase):
         self.assertEqual(releaser.modified, set())
         self.assertEqual(releaser.hooks, [])
 
+    def test_constructor_with_hooks(self):
+        config = Config({
+            'file': 'fake.py'
+        })
+        hooks = []
+        for i in range(3):
+            key = 'hook{0}'.format(i)
+            config[key] = True
+            mock = MagicMock()
+            mock.key = key
+            hooks.append(mock)
+
+        with workspace('fake', '1.2.3.dev') as wksp:
+            with patch('bumpr.releaser.HOOKS', hooks) as mock:
+                releaser = Releaser(config)
+                for hook in hooks:
+                    hook.assert_called_with(releaser)
+
     def test_test(self):
         config = Config({
-            'module': 'bumpr',
+            'file': 'fake.py',
             'tests': 'test command',
         })
-        releaser = Releaser(config)
+        with workspace('fake'):
+            releaser = Releaser(config)
 
         with patch.object(releaser, 'execute') as mock:
             releaser.test()
@@ -45,10 +125,12 @@ class ReleaserTest(unittest.TestCase):
 
     def test_publish(self):
         config = Config({
-            'module': 'bumpr',
+            'file': 'fake.py',
             'publish': 'publish command',
         })
-        releaser = Releaser(config)
+
+        with workspace('fake'):
+            releaser = Releaser(config)
 
         with patch.object(releaser, 'execute') as mock:
             releaser.publish()
@@ -56,11 +138,36 @@ class ReleaserTest(unittest.TestCase):
 
     def test_clean(self):
         config = Config({
-            'module': 'bumpr',
+            'file': 'fake.py',
             'clean': 'clean command',
         })
-        releaser = Releaser(config)
+        with workspace('fake'):
+            releaser = Releaser(config)
 
         with patch.object(releaser, 'execute') as mock:
             releaser.clean()
             mock.assert_called_with('clean command')
+
+    def test_execute_verbose(self):
+        config = Config({'file': 'fake.py', 'verbose': True})
+        with workspace('fake') as wksp:
+            releaser = Releaser(config)
+
+        with patch('subprocess.check_call') as check_call:
+            releaser.execute('bumpr test {major}.{minor}')
+            check_call.assert_called_with(['bumpr', 'test', '1.2'])
+
+    def test_execute_quiet(self):
+        config = Config({'file': 'fake.py', 'verbose': False})
+        with workspace('fake') as wksp:
+            releaser = Releaser(config)
+
+        with patch('subprocess.check_output') as check_call:
+            releaser.execute('bumpr test {major}.{minor}')
+            check_call.assert_called_with(['bumpr', 'test', '1.2'])
+
+    def test_bump(self):
+        pass
+
+    def test_prepapre(self):
+        pass

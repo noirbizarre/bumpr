@@ -92,13 +92,13 @@ class ConfigTest(unittest.TestCase):
     def test_override_from_config(self):
         bumprrc = '''\
         [bumpr]
-        module = test
+        file = test.py
         [bump]
         message = test
         '''
 
         expected = deepcopy(DEFAULTS)
-        expected['module'] = 'test'
+        expected['file'] = 'test.py'
         expected['bump']['message'] = 'test'
         for hook in HOOKS:
             expected[hook.key] = False
@@ -133,10 +133,10 @@ class ConfigTest(unittest.TestCase):
         self.assertDictEqual(config, expected)
 
     def test_override_from_args(self):
-        config = Config.parse_args(['test', '-M', '-v', '-s', 'test-suffix', '-c', 'fake'])
+        config = Config.parse_args(['test.py', '-M', '-v', '-s', 'test-suffix', '-c', 'fake'])
 
         expected = deepcopy(DEFAULTS)
-        expected['module'] = 'test'
+        expected['file'] = 'test.py'
         expected['bump']['part'] = Version.MAJOR
         expected['bump']['suffix'] = 'test-suffix'
         expected['verbose'] = True

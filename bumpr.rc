@@ -1,5 +1,5 @@
 [bumpr]
-module = bumpr
+file = bumpr/__init__.py
 vcs = git
 commit = true
 tag = true
