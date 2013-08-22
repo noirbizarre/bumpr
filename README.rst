@@ -11,12 +11,11 @@ Bump'R
 .. image:: https://pypip.in/d/bumpr/badge.png
     :target: https://crate.io/packages/bumpr
 
-Bump'R is a version bumper and a python package releaser.
-In a single command, it allows you:
+Bump'R is a version bumper and releaser allowing in a single command:
 
 - Clean-up release artifact
 - Bump version and tag it
-- Build a source distrbution and upload on PyPI
+- Build a source distribution and upload on PyPI
 - Update version for a new development cycle
 
 Bump'R intend to be customizable with the following features:
