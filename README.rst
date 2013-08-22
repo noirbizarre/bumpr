@@ -104,4 +104,4 @@ This way you only have to specify which part you want to bump on the command lin
 Documentation
 =============
 
-The documentation is hosted `on Read the Docs <http://bumpr.readthedocs.org/en/latest/>`_
+The documentation is hosted `on Read the Docs <http://bumpr.readthedocs.org/en/0.1.0/>`_
