@@ -162,7 +162,7 @@ class ReleaserTest(unittest.TestCase):
         with workspace('fake') as wksp:
             releaser = Releaser(config)
 
-        with patch('subprocess.check_output') as check_call:
+        with patch('bumpr.compat.check_output') as check_call:
             releaser.execute('bumpr test {major}.{minor}')
             check_call.assert_called_with(['bumpr', 'test', '1.2'])
 

@@ -4,15 +4,13 @@ from __future__ import unicode_literals
 
 import codecs
 import logging
-import os
-import subprocess
-import sys
 import re
+import subprocess
 
 from datetime import datetime
 from difflib import unified_diff
-from os.path import relpath
 
+from bumpr import compat
 from bumpr.hooks import HOOKS
 from bumpr.vcs import Git, Mercurial, Bazaar
 from bumpr.version import Version
@@ -27,6 +25,9 @@ VCS = {
 
 
 class Releaser(object):
+    '''
+    Release workflow executor
+    '''
     def __init__(self, config):
         self.config = config
 
@@ -73,7 +74,7 @@ class Releaser(object):
                     subprocess.check_call(cmd.split())
                 else:
                     try:
-                        subprocess.check_output(cmd.split())
+                        compat.check_output(cmd.split())
                     except subprocess.CalledProcessError as exception:
                         logger.error('Command "%s" failed with exit code %s', cmd, exception.returncode)
                         print(exception.output)
