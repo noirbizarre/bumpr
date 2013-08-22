@@ -11,10 +11,11 @@ except:
 
 from os.path import join, relpath
 from contextlib import contextmanager
-from mock import patch, MagicMock
+from mock import patch, MagicMock, ANY
 from textwrap import dedent
 
 from bumpr.config import Config, ObjectDict
+from bumpr.helpers import execute
 from bumpr.releaser import Releaser, HOOKS
 from bumpr.version import Version
 
@@ -116,9 +117,9 @@ class ReleaserTest(unittest.TestCase):
         with workspace('fake'):
             releaser = Releaser(config)
 
-        with patch.object(releaser, 'execute') as mock:
+        with patch('bumpr.releaser.execute') as execute:
             releaser.test()
-            mock.assert_called_with('test command')
+            execute.assert_called_with('test command', dryrun=ANY, verbose=ANY)
 
     def test_publish(self):
         config = Config({
@@ -129,9 +130,9 @@ class ReleaserTest(unittest.TestCase):
         with workspace('fake'):
             releaser = Releaser(config)
 
-        with patch.object(releaser, 'execute') as mock:
+        with patch('bumpr.releaser.execute') as execute:
             releaser.publish()
-            mock.assert_called_with('publish command', False)
+            execute.assert_called_with('publish command', dryrun=ANY, verbose=ANY)
 
     def test_publish_dryrun(self):
         config = Config({
@@ -143,9 +144,9 @@ class ReleaserTest(unittest.TestCase):
         with workspace('fake'):
             releaser = Releaser(config)
 
-        with patch.object(releaser, 'execute') as mock:
+        with patch('bumpr.releaser.execute') as execute:
             releaser.publish()
-            mock.assert_called_with('publish command', True)
+            execute.assert_called_with('publish command', dryrun=ANY, verbose=ANY)
 
     def test_clean(self):
         config = Config({
@@ -155,27 +156,9 @@ class ReleaserTest(unittest.TestCase):
         with workspace('fake'):
             releaser = Releaser(config)
 
-        with patch.object(releaser, 'execute') as mock:
+        with patch('bumpr.releaser.execute') as execute:
             releaser.clean()
-            mock.assert_called_with('clean command')
-
-    def test_execute_verbose(self):
-        config = Config({'file': 'fake.py', 'verbose': True})
-        with workspace('fake') as wksp:
-            releaser = Releaser(config)
-
-        with patch('subprocess.check_call') as check_call:
-            releaser.execute('bumpr test {major}.{minor}')
-            check_call.assert_called_with(['bumpr', 'test', '1.2'])
-
-    def test_execute_quiet(self):
-        config = Config({'file': 'fake.py'})
-        with workspace('fake') as wksp:
-            releaser = Releaser(config)
-
-        with patch('bumpr.compat.check_output') as check_call:
-            releaser.execute('bumpr test {major}.{minor}')
-            check_call.assert_called_with(['bumpr', 'test', '1.2'])
+            execute.assert_called_with('clean command', dryrun=ANY, verbose=ANY)
 
     def test_commit(self):
         config = Config({'file': 'fake.py', 'vcs': 'git'})
@@ -190,7 +173,7 @@ class ReleaserTest(unittest.TestCase):
         with workspace('fake', '1.2.3.dev') as wksp:
             config = Config({'file': 'fake.py', 'files': [wksp.readme]})
             releaser = Releaser(config)
-            with patch.object(releaser, 'execute') as execute:
+            with patch('bumpr.releaser.execute') as execute:
                 with patch.object(releaser, 'prepare') as prepare:
                     releaser.release()
                     self.assertFalse(execute.called)

@@ -1,18 +1,13 @@
 # -*- coding: utf-8 -*-
-import subprocess
-
-from bumpr import compat
+from bumpr.helpers import execute
 
 
 class BaseVCS(object):
     def __init__(self, verbose=False):
         self.verbose = verbose
 
-    def execute(self, args):
-        if self.verbose:
-            subprocess.check_call(args)
-        else:
-            compat.check_output(args)
+    def execute(self, command):
+        execute(command, verbose=self.verbose)
 
     def commit(self, message, files):
         raise NotImplementedError

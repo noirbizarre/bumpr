@@ -5,12 +5,11 @@ from __future__ import unicode_literals
 import codecs
 import logging
 import re
-import subprocess
 
 from datetime import datetime
 from difflib import unified_diff
 
-from bumpr import compat
+from bumpr.helpers import execute
 from bumpr.hooks import HOOKS
 from bumpr.vcs import VCS
 from bumpr.version import Version
@@ -50,6 +49,9 @@ class Releaser(object):
 
         self.hooks = [hook(self) for hook in HOOKS if self.config[hook.key]]
 
+    def execute(self, command, dryrun=False):
+        execute(command, dryrun=dryrun, verbose=self.config.verbose)
+
     def release(self):
         logger.info('Performing release')
         self.timestamp = datetime.now()
@@ -58,23 +60,6 @@ class Releaser(object):
         self.bump()
         if self.config.vcs and not self.config.dryrun:  # Does not make any sense without
             self.prepare()
-
-    def execute(self, command, dryrun=False):
-        if not command:
-            return
-        for cmd in command.split('\n'):
-            if cmd.strip():
-                cmd = cmd.format(version=self.version, date=self.timestamp, **self.version.__dict__).strip()
-                if dryrun:
-                    logger.info('dry run execute: {0}'.format(cmd))
-                elif self.config.verbose:
-                    subprocess.check_call(cmd.split())
-                else:
-                    try:
-                        compat.check_output(cmd.split())
-                    except subprocess.CalledProcessError as exception:
-                        logger.error('Command "%s" failed with exit code %s', cmd, exception.returncode)
-                        print(exception.output)
 
     def test(self):
         if self.config.tests:
@@ -152,7 +137,7 @@ class Releaser(object):
         '''Publish the current release to PyPI'''
         if self.config.publish:
             logger.info('Publish')
-            self.execute(self.config.publish, self.config.dryrun)
+            self.execute(self.config.publish, dryrun=self.config.dryrun)
 
     def commit_bump(self):
         if self.config.vcs:

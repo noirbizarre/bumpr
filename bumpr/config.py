@@ -147,6 +147,9 @@ class Config(ObjectDict):
             if arg in parsed_args and getattr(parsed_args, arg) not in (None, [], tuple()):
                 self[arg] = getattr(parsed_args, arg)
 
+        if parsed_args.nocommit:
+            self.commit = False
+
         # Bump
         if parsed_args.part is not None:
             self.bump.part = parsed_args.part
@@ -198,6 +201,7 @@ class Config(ObjectDict):
         parser.add_argument('-v', '--verbose', dest='verbose', action='store_true', help="Verbose output")
         parser.add_argument('-c', '--config', default='bumpr.rc', help='Specify a configuration file')
         parser.add_argument('-d', '--dryrun', action='store_true', help='Do not write anything and display a diff')
+        parser.add_argument('-nc', '--nocommit', action='store_true', help='Do not write anything and display a diff')
 
         parsed_args = parser.parse_args(args)
         return cls(parsed_args=parsed_args)

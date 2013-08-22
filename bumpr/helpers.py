@@ -21,19 +21,27 @@ def check_output(*args, **kwargs):
         return output
 
 
-def execute(command, verbose=False, replacements={}, dryrun=False):
+def execute(command, verbose=False, replacements=None, dryrun=False):
+    replacements = replacements or {}
     if not command:
         return
-    for cmd in command.split('\n'):
-        if cmd.strip():
-            cmd = cmd.format(**replacements).strip()
-            if dryrun:
-                logger.info('dry run execute: {0}'.format(cmd))
-            elif verbose:
-                subprocess.check_call(shlex.split(cmd))
-            else:
-                try:
-                    check_output(shlex.split(cmd))
-                except subprocess.CalledProcessError as exception:
-                    logger.error('Command "%s" failed with exit code %s', cmd, exception.returncode)
-                    print(exception.output)
+    elif isinstance(command, (list, tuple)):
+        if not isinstance(command[0], (list, tuple)):
+            command = [command]
+        commands = []
+        for cmd in command:
+            commands.append([part.format(**replacements) for part in cmd])
+    else:
+        commands = [shlex.split(cmd.format(**replacements)) for cmd in command.split('\n') if cmd.strip()]
+
+    for cmd in commands:
+        if dryrun:
+            logger.info('dry run execute: {0}'.format(' '.join(cmd)))
+        elif verbose:
+            subprocess.check_call(cmd)
+        else:
+            try:
+                check_output(cmd)
+            except subprocess.CalledProcessError as exception:
+                logger.error('Command "%s" failed with exit code %s', cmd, exception.returncode)
+                print(exception.output)

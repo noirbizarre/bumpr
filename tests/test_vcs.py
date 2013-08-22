@@ -11,19 +11,15 @@ from bumpr.vcs import BaseVCS, Git, Mercurial, Bazaar
 class BaseVCSTest(unittest.TestCase):
     def test_execute_verbose(self):
         vcs = BaseVCS(verbose=True)
-        with patch('subprocess.check_call') as check_call:
-            with patch('bumpr.compat.check_output') as check_output:
-                vcs.execute(['cmd', 'arg'])
-                check_call.assert_called_with(['cmd', 'arg'])
-                self.assertFalse(check_output.called)
+        with patch('bumpr.vcs.execute') as execute:
+            vcs.execute('cmd arg')
+            execute.assert_called_with('cmd arg', verbose=True)
 
     def test_execute_quiet(self):
         vcs = BaseVCS(verbose=False)
-        with patch('subprocess.check_call') as check_call:
-            with patch('bumpr.compat.check_output') as check_output:
-                vcs.execute(['cmd', 'arg'])
-                check_output.assert_called_with(['cmd', 'arg'])
-                self.assertFalse(check_call.called)
+        with patch('bumpr.vcs.execute') as execute:
+            vcs.execute('cmd arg')
+            execute.assert_called_with('cmd arg', verbose=False)
 
 
 class GitTest(unittest.TestCase):
