@@ -153,6 +153,8 @@ class ConfigTest(unittest.TestCase):
         files = README
         [bump]
         message = test
+        [prepare]
+        part = minor
         '''
 
         with mock_ini(bumprrc) as mock:
@@ -161,11 +163,14 @@ class ConfigTest(unittest.TestCase):
 
         expected = deepcopy(DEFAULTS)
         expected['file'] = 'test.py'
-        expected['files'] = ['README']
         expected['bump']['part'] = Version.MAJOR
         expected['bump']['suffix'] = 'test-suffix'
-        expected['bump']['message'] = 'test'
         expected['verbose'] = True
+
+        expected['files'] = ['README']
+        expected['bump']['message'] = 'test'
+        expected['prepare']['part'] = Version.MINOR
+
         for hook in HOOKS:
             expected[hook.key] = False
 

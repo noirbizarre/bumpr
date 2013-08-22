@@ -134,11 +134,6 @@ class Config(ObjectDict):
 
             if config.has_option(section, 'part'):
                 self[section]['part'] = PARTS[config.get(section, 'part').lower()]
-            else:
-                for option in 'major', 'minor', 'patch':
-                    if config.has_option(section, option) and config.getboolean(section, option):
-                        self[section]['part'] = PARTS[option]
-                        break
 
         for hook in HOOKS:
             if config.has_section(hook.key):

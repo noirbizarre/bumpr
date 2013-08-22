@@ -13,6 +13,7 @@ unsuffix = true
 message = Self bumped version {version}
 
 [prepare]
+part = patch
 suffix = dev
 
 [changelog]
