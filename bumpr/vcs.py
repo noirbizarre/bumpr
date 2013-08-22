@@ -1,8 +1,19 @@
 # -*- coding: utf-8 -*-
 import subprocess
 
+from bumpr import compat
 
-class VCS(object):
+
+class BaseVCS(object):
+    def __init__(self, verbose=False):
+        self.verbose = verbose
+
+    def execute(self, args):
+        if self.verbose:
+            subprocess.check_call(args)
+        else:
+            compat.check_output(args)
+
     def commit(self, message, files):
         raise NotImplementedError
 
@@ -10,29 +21,36 @@ class VCS(object):
         raise NotImplementedError
 
 
-class Git(VCS):
+class Git(BaseVCS):
     def commit(self, message, files):
         for filename in files:
-            subprocess.check_call(["git", "add", filename])
-        subprocess.check_call(["git", "commit", "-m", message.encode('utf-8')])
+            self.execute(["git", "add", filename])
+        self.execute(["git", "commit", "-m", message.encode('utf-8')])
 
     def tag(self, name):
-        subprocess.check_call(["git", "tag", name])
+        self.execute(["git", "tag", name])
 
 
-class Mercurial(VCS):
+class Mercurial(BaseVCS):
     def commit(self, message, files):
         for filename in files:
-            subprocess.check_call(["hg", "add", filename])
-        subprocess.check_call(["hg", "commit", "-m", message.encode('utf-8')])
+            self.execute(["hg", "add", filename])
+        self.execute(["hg", "commit", "-m", message.encode('utf-8')])
 
     def tag(self, name):
-        subprocess.check_call(["hg", "tag", name])
+        self.execute(["hg", "tag", name])
 
 
-class Bazaar(VCS):
+class Bazaar(BaseVCS):
     def commit(self, message, files):
-        subprocess.check_call(["bzr"] + list(files) + ["commit", "-m", message.encode('utf-8')])
+        self.execute(["bzr"] + list(files) + ["commit", "-m", message.encode('utf-8')])
 
     def tag(self, name):
-        subprocess.check_call(["bzr", "tag", name])
+        self.execute(["bzr", "tag", name])
+
+
+VCS = {
+    'git': Git,
+    'hg': Mercurial,
+    'bzr': Bazaar,
+}

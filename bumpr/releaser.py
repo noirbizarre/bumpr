@@ -12,16 +12,10 @@ from difflib import unified_diff
 
 from bumpr import compat
 from bumpr.hooks import HOOKS
-from bumpr.vcs import Git, Mercurial, Bazaar
+from bumpr.vcs import VCS
 from bumpr.version import Version
 
 logger = logging.getLogger(__name__)
-
-VCS = {
-    'git': Git,
-    'hg': Mercurial,
-    'bzr': Bazaar,
-}
 
 
 class Releaser(object):
@@ -49,7 +43,7 @@ class Releaser(object):
         self.modified = set()
 
         if config.vcs:
-            self.vcs = VCS[config.vcs]()
+            self.vcs = VCS[config.vcs](verbose=config.verbose)
 
         if config.dryrun:
             self.diffs = {}
