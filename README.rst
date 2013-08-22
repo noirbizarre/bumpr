@@ -59,6 +59,13 @@ You can use directly the command line to setup every parameter:
     $ bumpr fake/__init__.py README.rst -M -ps dev
 
 But Bump'R is designed to work with a configuration file (``bumpr.rc`` by defaults).
+Some features are only availables with the configuration file like:
+
+- commit message customization
+- hooks configuration
+- multiline test, clean and publish commands
+
+Here's an exemple:
 
 .. code-block:: ini
 

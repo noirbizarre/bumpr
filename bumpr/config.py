@@ -147,7 +147,7 @@ class Config(ObjectDict):
                 self[hook.key] = False
 
     def override_from_args(self, args):
-        for arg in 'file', 'vcs', 'attribute', 'verbose', 'dryrun', 'files':
+        for arg in 'file', 'vcs', 'verbose', 'dryrun', 'files':
             if arg in args and getattr(args, arg) is not None:
                 self[arg] = getattr(args, arg)
 
@@ -196,6 +196,8 @@ class Config(ObjectDict):
         parser.add_argument('-ps', '--prepare-suffix', dest='prepare_suffix', type=str, help="Set suffix")
         parser.add_argument('-pu', '--prepare-unsuffix', dest='prepare_unsuffix', action='store_true',
             help="Unset suffix")
+
+        parser.add_argument('--vcs', choices=['git', 'hg'], default=None, help='VCS implementation')
 
         parser.add_argument('-v', '--verbose', dest='verbose', action='store_true', help="Verbose output")
         parser.add_argument('-c', '--config', default='bumpr.rc', help='Specify a configuration file')
