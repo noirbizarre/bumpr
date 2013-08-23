@@ -5,6 +5,8 @@ from __future__ import unicode_literals
 import codecs
 import logging
 
+from bumpr.helpers import execute
+
 logger = logging.getLogger(__name__)
 
 __all_ = (
@@ -109,10 +111,20 @@ class CommandHook(Hook):
 
     def bump(self, replacements):
         if self.config.bump:
-            self.releaser.execute(self.config.bump)
+            replacements = dict(
+                version=self.releaser.version,
+                date=self.releaser.timestamp,
+                **self.releaser.version.__dict__
+            )
+            execute(self.config.bump, replacements=replacements,verbose=self.releaser.config.verbose)
 
     def prepare(self, replacements):
         if self.config.prepare:
-            self.releaser.execute(self.config.prepare)
+            replacements = dict(
+                version=self.releaser.next_version,
+                date=self.releaser.timestamp,
+                **self.releaser.next_version.__dict__
+            )
+            execute(self.config.prepare, replacements=replacements,verbose=self.releaser.config.verbose)
 
 HOOKS = (ReadTheDocHook, ChangelogHook, CommandHook)
