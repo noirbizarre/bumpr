@@ -21,6 +21,7 @@ try:
 except ImportError:
     from configparser import RawConfigParser  # pylint: disable=F0401
 
+from bumpr.helpers import ObjectDict
 from bumpr.hooks import HOOKS
 from bumpr.version import Version, PARTS
 
@@ -38,6 +39,8 @@ DEFAULTS = {
     'clean': None,
     'tests': None,
     'publish': None,
+    'bump_only': False,
+    'prepare_only': False,
     'files': [],
 
     'bump': {
@@ -50,45 +53,10 @@ DEFAULTS = {
     'prepare': {
         'unsuffix': False,
         'suffix': None,
-        'part': 'patch',
+        'part': None,
         'message': 'Update to version {version} for next development cycle',
     },
 }
-
-
-class ObjectDict(dict):
-    '''A dictionnary with object-like attribute access and depp merge'''
-    def __init__(self, *args, **kwargs):  # pylint: disable=W0231
-        self.update(*args, **kwargs)
-
-    def __getattr__(self, key):
-        return self[key]
-
-    def __setattr__(self, key, value):
-        if isinstance(value, dict) and not isinstance(value, ObjectDict):
-            value = ObjectDict(value)
-        self[key] = value
-
-    def __setitem__(self, key, value):
-        if isinstance(value, dict) and not isinstance(value, ObjectDict):
-            value = ObjectDict(value)
-        super(ObjectDict, self).__setitem__(key, value)
-
-    def update(self, *args, **kwargs):
-        for key, value in dict(*args, **kwargs).items():
-            if isinstance(value, dict) and not isinstance(value, ObjectDict):
-                value = ObjectDict(value)
-            self[key] = value
-
-    def merge(self, *args, **kwargs):
-        for key, value in dict(*args, **kwargs).items():
-            if isinstance(value, dict):
-                if not isinstance(value, ObjectDict):
-                    value = ObjectDict(value)
-                if key in self and isinstance(self[key], ObjectDict):
-                    self[key].merge(value)
-                    continue
-            self[key] = value
 
 
 class Config(ObjectDict):
@@ -137,7 +105,8 @@ class Config(ObjectDict):
 
         for hook in HOOKS:
             if config.has_section(hook.key):
-                self[hook.key] = hook.defaults
+                if not self.get(hook.key, False):
+                    self[hook.key] = hook.defaults
                 self[hook.key].update(config.items(hook.key))
             else:
                 self[hook.key] = False
@@ -147,8 +116,9 @@ class Config(ObjectDict):
             if arg in parsed_args and getattr(parsed_args, arg) not in (None, [], tuple()):
                 self[arg] = getattr(parsed_args, arg)
 
-        if parsed_args.nocommit:
-            self.commit = False
+        self.commit = not parsed_args.nocommit  # pylint: disable=W0201
+        self.bump_only = parsed_args.bump_only  # pylint: disable=W0201
+        self.prepare_only = parsed_args.prepare_only  # pylint: disable=W0201
 
         # Bump
         if parsed_args.part is not None:
@@ -170,38 +140,46 @@ class Config(ObjectDict):
     def parse_args(cls, args=None):
         from bumpr import __version__, __description__
         parser = argparse.ArgumentParser(description=__description__)
+
         parser.add_argument('file', help='Versionned module file', nargs='?')
         parser.add_argument('files', help='Files to update', nargs='*')
 
         parser.add_argument('--version', action='version', version=__version__)
-
-        # Bump behavior for release
-        parser.add_argument('-M', '--major', dest='part', action='store_const',
-                            const=Version.MAJOR, help="Bump major version")
-        parser.add_argument('-m', '--minor', dest='part', action='store_const',
-                            const=Version.MINOR, help="Bump minor version")
-        parser.add_argument('-p', '--patch', dest='part', action='store_const',
-                            const=Version.PATCH, help="Bump patch version")
-        parser.add_argument('-s', '--suffix', dest='suffix', type=str, help="Set suffix")
-        parser.add_argument('-u', '--unsuffix', dest='unsuffix', action='store_true', default=None, help="Unset suffix")
-
-        # Bump behavior for prepare version
-        parser.add_argument('-pM', '--prepare-major', dest='prepare_part', action='store_const',
-                            const=Version.MAJOR, help="Bump major version")
-        parser.add_argument('-pm', '--prepare-minor', dest='prepare_part', action='store_const',
-                            const=Version.MINOR, help="Bump minor version")
-        parser.add_argument('-pp', '--prepare-patch', dest='prepare_part', action='store_const',
-                            const=Version.PATCH, help="Bump patch version")
-        parser.add_argument('-ps', '--prepare-suffix', dest='prepare_suffix', type=str, help="Set suffix")
-        parser.add_argument('-pu', '--prepare-unsuffix', dest='prepare_unsuffix', action='store_true',
-            help="Unset suffix")
-
-        parser.add_argument('--vcs', choices=['git', 'hg'], default=None, help='VCS implementation')
-
         parser.add_argument('-v', '--verbose', dest='verbose', action='store_true', help="Verbose output")
         parser.add_argument('-c', '--config', default='bumpr.rc', help='Specify a configuration file')
         parser.add_argument('-d', '--dryrun', action='store_true', help='Do not write anything and display a diff')
-        parser.add_argument('-nc', '--nocommit', action='store_true', help='Do not write anything and display a diff')
+
+        group = parser.add_mutually_exclusive_group()
+        group.add_argument('-b', '--bump', dest='bump_only', action='store_true', help='Only perform the bump')
+        group.add_argument('-pr', '--prepare', dest='prepare_only', action='store_true',
+            help='Only perform the prepare')
+
+        # Bump behavior for bump
+        group = parser.add_argument_group('bump')
+        group.add_argument('-M', '--major', dest='part', action='store_const', const=Version.MAJOR,
+                help="Bump major version")
+        group.add_argument('-m', '--minor', dest='part', action='store_const', const=Version.MINOR,
+                help="Bump minor version")
+        group.add_argument('-p', '--patch', dest='part', action='store_const',
+                const=Version.PATCH, help="Bump patch version")
+        group.add_argument('-s', '--suffix', dest='suffix', type=str, help="Set suffix")
+        group.add_argument('-u', '--unsuffix', dest='unsuffix', action='store_true', default=None, help="Unset suffix")
+
+        # Bump behavior for prepare version
+        group = parser.add_argument_group('prepare')
+        group.add_argument('-pM', '--prepare-major', dest='prepare_part', action='store_const',
+                const=Version.MAJOR, help="Bump major version")
+        group.add_argument('-pm', '--prepare-minor', dest='prepare_part', action='store_const',
+                const=Version.MINOR, help="Bump minor version")
+        group.add_argument('-pp', '--prepare-patch', dest='prepare_part', action='store_const',
+                const=Version.PATCH, help="Bump patch version")
+        group.add_argument('-ps', '--prepare-suffix', dest='prepare_suffix', type=str, help="Set suffix")
+        group.add_argument('-pu', '--prepare-unsuffix', dest='prepare_unsuffix', action='store_true',
+                help="Unset suffix")
+
+        group = parser.add_argument_group('Version control system')
+        group.add_argument('--vcs', choices=['git', 'hg'], default=None, help='VCS implementation')
+        group.add_argument('-nc', '--nocommit', action='store_true', help='Do not commit')
 
         parsed_args = parser.parse_args(args)
         return cls(parsed_args=parsed_args)

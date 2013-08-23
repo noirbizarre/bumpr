@@ -116,7 +116,7 @@ class CommandHook(Hook):
                 date=self.releaser.timestamp,
                 **self.releaser.version.__dict__
             )
-            execute(self.config.bump, replacements=replacements,verbose=self.releaser.config.verbose)
+            execute(self.config.bump, replacements=replacements, verbose=self.releaser.config.verbose)
 
     def prepare(self, replacements):
         if self.config.prepare:
@@ -125,6 +125,6 @@ class CommandHook(Hook):
                 date=self.releaser.timestamp,
                 **self.releaser.next_version.__dict__
             )
-            execute(self.config.prepare, replacements=replacements,verbose=self.releaser.config.verbose)
+            execute(self.config.prepare, replacements=replacements, verbose=self.releaser.config.verbose)
 
 HOOKS = (ReadTheDocHook, ChangelogHook, CommandHook)

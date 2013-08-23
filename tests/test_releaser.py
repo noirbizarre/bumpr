@@ -14,59 +14,12 @@ from contextlib import contextmanager
 from mock import patch, MagicMock, ANY
 from textwrap import dedent
 
+from tests.test_tools import workspace
+
 from bumpr.config import Config, ObjectDict
 from bumpr.helpers import execute
 from bumpr.releaser import Releaser, HOOKS
 from bumpr.version import Version
-
-
-@contextmanager
-def workspace(module_name, version='1.2.3.dev'):
-    root = tempfile.mkdtemp(module_name)
-    module_filename = join(root, '{0}.py'.format(module_name))
-    module_content =  '''\
-        # -*- coding: utf-8 -*-
-
-        __version__ = '{version}'
-        '''
-    readme_filename = join(root, 'README')
-    readme_content = '''\
-        README
-
-        Version: {version}
-        Lorem ipsum dolor sit amet, consectetur adipisicing elit.
-        Non, ad, facilis, vel voluptas fugiat sit debitis iusto
-        numquam quasi aliquid cum quod laborum assumenda quia
-        '''
-
-    for filename, content in ((module_filename, module_content), (readme_filename, readme_content)):
-        with open(filename, 'wb') as f:
-            content = dedent(content).format(version=version)
-            f.write(content.encode('utf8'))
-
-    cwd = os.getcwd()
-    os.chdir(root)
-
-    yield ObjectDict({
-        'root': root,
-        'module': module_filename,
-        'readme': readme_filename,
-    })
-
-    os.chdir(cwd)
-    shutil.rmtree(root)
-    if root in sys.path:
-        sys.path.remove(root)
-
-
-def test_workspace():
-    initial_dir = os.getcwd()
-    with workspace('fake') as wksp:
-        self.assertNotEqual(os.getcwd(), initial_dir)
-        self.assertEqual(wksp.root, os.getcwd())
-        self.assertEqual(wksp.module, join(w.root, 'fake.py'))
-        self.assertEqual(wksp.readme, join(w.root, 'README'))
-    self.assertEqual(os.getcwd(), initial_dir)
 
 
 class ReleaserTest(unittest.TestCase):
@@ -88,7 +41,6 @@ class ReleaserTest(unittest.TestCase):
         self.assertFalse(hasattr(releaser, 'vcs'))
         self.assertFalse(hasattr(releaser, 'diffs'))
 
-        self.assertEqual(releaser.modified, set())
         self.assertEqual(releaser.hooks, [])
 
     def test_constructor_with_hooks(self):
@@ -119,7 +71,7 @@ class ReleaserTest(unittest.TestCase):
 
         with patch('bumpr.releaser.execute') as execute:
             releaser.test()
-            execute.assert_called_with('test command', dryrun=ANY, verbose=ANY)
+            execute.assert_called_with('test command', replacements=ANY, dryrun=ANY, verbose=ANY)
 
     def test_publish(self):
         config = Config({
@@ -132,21 +84,7 @@ class ReleaserTest(unittest.TestCase):
 
         with patch('bumpr.releaser.execute') as execute:
             releaser.publish()
-            execute.assert_called_with('publish command', dryrun=ANY, verbose=ANY)
-
-    def test_publish_dryrun(self):
-        config = Config({
-            'file': 'fake.py',
-            'publish': 'publish command',
-            'dryrun': True,
-        })
-
-        with workspace('fake'):
-            releaser = Releaser(config)
-
-        with patch('bumpr.releaser.execute') as execute:
-            releaser.publish()
-            execute.assert_called_with('publish command', dryrun=ANY, verbose=ANY)
+            execute.assert_called_with('publish command', replacements=ANY, dryrun=ANY, verbose=ANY)
 
     def test_clean(self):
         config = Config({
@@ -158,7 +96,7 @@ class ReleaserTest(unittest.TestCase):
 
         with patch('bumpr.releaser.execute') as execute:
             releaser.clean()
-            execute.assert_called_with('clean command', dryrun=ANY, verbose=ANY)
+            execute.assert_called_with('clean command', replacements=ANY, dryrun=ANY, verbose=ANY)
 
     def test_commit(self):
         config = Config({'file': 'fake.py', 'vcs': 'git'})
@@ -167,17 +105,26 @@ class ReleaserTest(unittest.TestCase):
 
         with patch.object(releaser, 'vcs') as vcs:
             releaser.commit('message')
-            vcs.commit.assert_called_with('message', set())
+            vcs.commit.assert_called_with('message')
+
+    def test_tag(self):
+        config = Config({'file': 'fake.py', 'vcs': 'git'})
+        with workspace('fake') as wksp:
+            releaser = Releaser(config)
+
+        with patch.object(releaser, 'vcs') as vcs:
+            releaser.tag()
+            vcs.tag.assert_called_with(str(releaser.version))
 
     def test_release_wihtout_vcs_or_commands(self):
         with workspace('fake', '1.2.3.dev') as wksp:
             config = Config({'file': 'fake.py', 'files': [wksp.readme]})
             releaser = Releaser(config)
             with patch('bumpr.releaser.execute') as execute:
-                with patch.object(releaser, 'prepare') as prepare:
+                with patch.object(releaser, 'commit') as commit:
                     releaser.release()
                     self.assertFalse(execute.called)
-                    self.assertFalse(prepare.called)
+                    self.assertFalse(commit.called)
 
             for filename in wksp.module, wksp.readme:
                 with open(filename) as f:
@@ -185,6 +132,107 @@ class ReleaserTest(unittest.TestCase):
                     self.assertIn('1.2.3', content)
                     self.assertNotIn('1.2.3.dev', content)
 
+    def test_bump(self):
+        with workspace('fake', '1.2.3.dev') as wksp:
+            config = Config({'file': 'fake.py', 'files': [wksp.readme]})
+            releaser = Releaser(config)
+            with patch.object(releaser, 'commit') as commit:
+                with patch.object(releaser, 'tag') as tag:
+                    releaser.bump()
+                    self.assertFalse(commit.called)
+                    self.assertFalse(tag.called)
+
+            for filename in wksp.module, wksp.readme:
+                with open(filename) as f:
+                    content = f.read()
+                    self.assertIn('1.2.3', content)
+                    self.assertNotIn('1.2.3.dev', content)
+
+    def test_bump_vcs(self):
+        with workspace('fake', '1.2.3.dev') as wksp:
+            config = Config({
+                'file': 'fake.py',
+                'files': [wksp.readme],
+                'vcs': 'git',
+            })
+            releaser = Releaser(config)
+            with patch.object(releaser, 'commit') as commit:
+                with patch.object(releaser, 'tag') as tag:
+                    releaser.bump()
+                    self.assertEqual(commit.call_count, 1)
+                    self.assertTrue(tag.called)
+
+            for filename in wksp.module, wksp.readme:
+                with open(filename) as f:
+                    content = f.read()
+                    self.assertIn('1.2.3', content)
+                    self.assertNotIn('1.2.3.dev', content)
+
+    def test_release_dryrun(self):
+        with workspace('fake', '1.2.3.dev') as wksp:
+            config = Config({
+                'file': 'fake.py',
+                'files': [wksp.readme],
+                'vcs': 'git',
+                'dryrun': True,
+            })
+            releaser = Releaser(config)
+            with patch('bumpr.releaser.execute') as execute:
+                with patch.object(releaser, 'vcs') as vcs:
+                    releaser.release()
+                    self.assertFalse(execute.called)
+                    self.assertFalse(vcs.commit.called)
+                    self.assertFalse(vcs.tag.called)
+
+            for filename in wksp.module, wksp.readme:
+                with open(filename) as f:
+                    content = f.read()
+                    self.assertIn('1.2.3.dev', content)
+                    self.assertNotIn('1.2.4', content)
 
     def test_prepare(self):
-        pass
+        with workspace('fake', '1.2.3') as wksp:
+            config = Config({
+                'file': 'fake.py',
+                'files': [wksp.readme],
+                'prepare': {
+                    'part': Version.PATCH,
+                    'suffix': 'dev',
+                }
+            })
+            releaser = Releaser(config)
+            with patch.object(releaser, 'commit') as commit:
+                with patch.object(releaser, 'tag') as tag:
+                    releaser.prepare()
+                    self.assertFalse(commit.called)
+                    self.assertFalse(tag.called)
+
+            for filename in wksp.module, wksp.readme:
+                with open(filename) as f:
+                    content = f.read()
+                    self.assertIn('1.2.4.dev', content)
+                    self.assertNotIn('1.2.3', content)
+
+    def test_prepare_vcs(self):
+        with workspace('fake', '1.2.3') as wksp:
+            config = Config({
+                'file': 'fake.py',
+                'files': [wksp.readme],
+                'vcs': 'git',
+                'prepare': {
+                    'part': Version.PATCH,
+                    'suffix': 'dev',
+                }
+            })
+            releaser = Releaser(config)
+            with patch.object(releaser, 'commit') as commit:
+                with patch.object(releaser, 'tag') as tag:
+                    releaser.prepare()
+                    self.assertEqual(commit.call_count, 1)
+                    self.assertFalse(tag.called)
+
+            for filename in wksp.module, wksp.readme:
+                with open(filename) as f:
+                    content = f.read()
+                    self.assertIn('1.2.4.dev', content)
+                    self.assertNotIn('1.2.3', content)

@@ -9,10 +9,6 @@ except:
 from bumpr.version import  Version
 
 
-if sys.version_info[0] == 3:
-    unicode = lambda x: str(x)
-
-
 class VersionTest(unittest.TestCase):
     def test_default_constructor(self):
         version = Version()
@@ -108,17 +104,14 @@ class VersionTest(unittest.TestCase):
         self.assertEqual(version.patch, 3)
         self.assertEqual(version.suffix, 'dev')
 
-    def test_copy_unsuffix(self):
-        version = Version(1, 2, 3, 'dev').copy(True)
+    def test_copy_bump(self):
+        version = Version(1, 2, 3, 'dev').copy(part=Version.MINOR, unsuffix=True)
 
         self.assertEqual(version.major, 1)
-        self.assertEqual(version.minor, 2)
-        self.assertEqual(version.patch, 3)
+        self.assertEqual(version.minor, 3)
+        self.assertEqual(version.patch, 0)
         self.assertEqual(version.suffix, None)
 
-    def test_display(self):
-        self.assertEqual(unicode(Version(1, 2, 3)), '1.2.3')
-        self.assertEqual(unicode(Version(1, 2, 3, 'dev')), '1.2.3.dev')
 
     def test_parse(self):
         version = Version.parse('1.2.3')

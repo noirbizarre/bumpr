@@ -6,6 +6,10 @@ import subprocess
 logger = logging.getLogger(__name__)
 
 
+class BumprError(Exception):
+    pass
+
+
 def check_output(*args, **kwargs):
     '''Compatibility wrapper for Python 2.6 missin g subprocess.check_output'''
     if hasattr(subprocess, 'check_output'):
@@ -34,6 +38,7 @@ def execute(command, verbose=False, replacements=None, dryrun=False):
     else:
         commands = [shlex.split(cmd.format(**replacements)) for cmd in command.split('\n') if cmd.strip()]
 
+    output = ''
     for cmd in commands:
         if dryrun:
             logger.info('dry run execute: {0}'.format(' '.join(cmd)))
@@ -41,7 +46,43 @@ def execute(command, verbose=False, replacements=None, dryrun=False):
             subprocess.check_call(cmd)
         else:
             try:
-                check_output(cmd)
+                output += check_output(cmd)
             except subprocess.CalledProcessError as exception:
                 logger.error('Command "%s" failed with exit code %s', cmd, exception.returncode)
                 print(exception.output)
+    return output
+
+
+class ObjectDict(dict):
+    '''A dictionnary with object-like attribute access and depp merge'''
+    def __init__(self, *args, **kwargs):  # pylint: disable=W0231
+        self.update(*args, **kwargs)
+
+    def __getattr__(self, key):
+        return self[key]
+
+    def __setattr__(self, key, value):
+        if isinstance(value, dict) and not isinstance(value, ObjectDict):
+            value = ObjectDict(value)
+        self[key] = value
+
+    def __setitem__(self, key, value):
+        if isinstance(value, dict) and not isinstance(value, ObjectDict):
+            value = ObjectDict(value)
+        super(ObjectDict, self).__setitem__(key, value)
+
+    def update(self, *args, **kwargs):
+        for key, value in dict(*args, **kwargs).items():
+            if isinstance(value, dict) and not isinstance(value, ObjectDict):
+                value = ObjectDict(value)
+            self[key] = value
+
+    def merge(self, *args, **kwargs):
+        for key, value in dict(*args, **kwargs).items():
+            if isinstance(value, dict):
+                if not isinstance(value, ObjectDict):
+                    value = ObjectDict(value)
+                if key in self and isinstance(self[key], ObjectDict):
+                    self[key].merge(value)
+                    continue
+            self[key] = value

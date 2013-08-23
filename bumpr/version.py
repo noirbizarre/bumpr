@@ -3,13 +3,13 @@ from __future__ import unicode_literals
 
 import re
 
-VERSION_PATTERN = re.compile(r'(?P<major>\d+)\.(?P<minor>\d+)\.(?P<patch>\d+)(\.(?P<suffix>[\w\d.]+))?')
-SEMVER = r'{major}.{minor}.{patch}'
-SEMVER_SUFFIXED = r'{major}.{minor}.{patch}.{suffix}'
-
 
 class Version(object):
     MAJOR, MINOR, PATCH = range(3)
+
+    PATTERN = re.compile(r'(?P<major>\d+)\.(?P<minor>\d+)\.(?P<patch>\d+)(\.(?P<suffix>[\w\d.]+))?')
+    FORMAT = r'{major}.{minor}.{patch}'
+    FORMAT_SUFFIXED = r'{major}.{minor}.{patch}.{suffix}'
 
     def __init__(self, major=0, minor=0, patch=0, suffix=None):
         self.major = int(major)
@@ -33,24 +33,25 @@ class Version(object):
         if suffix:
             self.suffix = suffix
 
-        return self
-
-    def copy(self, unsuffix=False):
+    def copy(self, **kwargs):
         version = Version(**self.__dict__)
-        if unsuffix:
-            version.suffix = None
+        unsuffix = kwargs.pop('unsuffix', False)
+        version.bump(unsuffix=unsuffix, **kwargs)
         return version
 
     def __unicode__(self):
-        pattern = SEMVER_SUFFIXED if self.suffix else SEMVER
+        pattern = self.FORMAT_SUFFIXED if self.suffix else self.FORMAT
         return pattern.format(**self.__dict__)
 
     @classmethod
     def parse(cls, string):
-        match = VERSION_PATTERN.match(string)
+        match = cls.PATTERN.match(string)
         return cls(**match.groupdict())
 
     __str__ = __unicode__
+
+    def __repr__(self):
+        return "'Version({major},{minor},{patch},{suffix})'".format(**self.__dict__)
 
 
 PARTS = {

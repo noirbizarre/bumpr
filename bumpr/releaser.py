@@ -39,7 +39,6 @@ class Releaser(object):
         self.next_version.bump(config.prepare.part, config.prepare.unsuffix, config.prepare.suffix)
 
         self.timestamp = None
-        self.modified = set()
 
         if config.vcs:
             self.vcs = VCS[config.vcs](verbose=config.verbose)
@@ -49,16 +48,24 @@ class Releaser(object):
 
         self.hooks = [hook(self) for hook in HOOKS if self.config[hook.key]]
 
-    def execute(self, command, dryrun=False):
-        execute(command, dryrun=dryrun, verbose=self.config.verbose)
+    def execute(self, command, version=None):
+        version = version or self.version
+        replacements = dict(version=version, date=self.timestamp, **version.__dict__)
+        execute(command, replacements=replacements, dryrun=self.config.dryrun, verbose=self.config.verbose)
 
     def release(self):
         logger.info('Performing release')
         self.timestamp = datetime.now()
-        self.clean()
-        self.test()
-        self.bump()
-        if self.config.vcs and not self.config.dryrun:  # Does not make any sense without
+
+        if self.config.bump_only:
+            self.bump()
+        elif self.config.prepare_only:
+            self.prepare()
+        else:
+            self.clean()
+            self.test()
+            self.bump()
+            self.publish()
             self.prepare()
 
     def test(self):
@@ -78,9 +85,16 @@ class Releaser(object):
 
         self.bump_version_file(self.prev_version, self.version)
         self.bump_files(replacements)
-        self.commit_bump()
-        self.publish()
-        if self.config.verbose and self.config.dryrun:
+
+        if self.config.vcs:
+            self.commit(self.config.bump.message.format(
+                version=self.version,
+                date=self.timestamp,
+                **self.version.__dict__
+            ))
+            self.tag()
+
+        if self.config.dryrun:
             for filename, diff in self.diffs.items():
                 print(filename)
                 print(diff)
@@ -98,8 +112,15 @@ class Releaser(object):
 
         self.bump_version_file(self.version, self.next_version)
         self.bump_files(replacements)
-        self.commit_prepare()
-        if self.config.verbose and self.config.dryrun:
+
+        if self.config.vcs:
+            self.commit(self.config.prepare.message.format(
+                version=self.next_version,
+                date=self.timestamp,
+                **self.next_version.__dict__
+            ))
+
+        if self.config.dryrun:
             for filename, diff in self.diffs.items():
                 print(filename)
                 print(diff)
@@ -111,12 +132,12 @@ class Releaser(object):
             self.execute(self.config.clean)
 
     def perform(self, filename, before, after):
-        with open(filename, 'wb') as f:
-            f.write(after.encode(self.config.encoding))
-        self.modified.add(filename)
         if self.config.dryrun:
             diff = unified_diff(before.split('\n'), after.split('\n'))
             self.diffs[filename] = '\n'.join(diff)
+        else:
+            with open(filename, 'wb') as f:
+                f.write(after.encode(self.config.encoding))
 
     def bump_version_file(self, from_version, to_version):
         with codecs.open(self.config.file, 'r', self.config.encoding) as f:
@@ -137,30 +158,16 @@ class Releaser(object):
         '''Publish the current release to PyPI'''
         if self.config.publish:
             logger.info('Publish')
-            self.execute(self.config.publish, dryrun=self.config.dryrun)
+            self.execute(self.config.publish)
 
-    def commit_bump(self):
-        if self.config.vcs:
-            if self.config.commit:
-                self.commit(self.config.bump.message.format(
-                    version=self.version,
-                    date=self.timestamp,
-                    **self.version.__dict__
-                ))
-            if self.config.tag:
+    def tag(self):
+        if self.config.tag:
+            logger.info('Tag: %s', self.version)
+            if not self.config.dryrun:
                 self.vcs.tag(str(self.version))
 
-    def commit_prepare(self):
-        if self.config.vcs:
-            if self.config.commit:
-                self.commit(self.config.prepare.message.format(
-                    version=self.next_version,
-                    date=self.timestamp,
-                    **self.next_version.__dict__
-                ))
-
     def commit(self, message):
-        if self.config.commit and self.config.vcs:
+        if self.config.commit:
             logger.info('Commit: %s', message)
-            self.vcs.commit(message, self.modified)
-            self.modified.clear()
+            if not self.config.dryrun:
+                self.vcs.commit(message)

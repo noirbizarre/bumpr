@@ -12,7 +12,9 @@ from bumpr.helpers import execute
 @patch('subprocess.check_call')
 class ExecuteTest(unittest.TestCase):
     def test_execute_quiet(self, check_call, check_output):
-        execute('some command')
+        output = 'some output'
+        check_output.return_value = output
+        self.assertEqual(execute('some command'), output)
         check_output.assert_called_with(['some', 'command'])
         self.assertFalse(check_call.called)
 

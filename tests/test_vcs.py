@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import os
 try:
     import unittest2 as unittest
 except:
@@ -6,7 +7,10 @@ except:
 
 from mock import patch, call
 
+from tests.test_tools import workspace
+
 from bumpr.vcs import BaseVCS, Git, Mercurial, Bazaar
+from bumpr.helpers import BumprError
 
 class BaseVCSTest(unittest.TestCase):
     def test_execute_verbose(self):
@@ -23,6 +27,37 @@ class BaseVCSTest(unittest.TestCase):
 
 
 class GitTest(unittest.TestCase):
+    def test_validate_ok(self):
+        with workspace('git') as wksp:
+            os.mkdir('.git')
+            git = Git()
+
+            with patch('bumpr.vcs.execute') as execute:
+                execute.return_value = '?? new.py'
+                git.validate()
+                execute.assert_called_with('git status --porcelain', verbose=False)
+
+    def test_validate_ko_not_git(self):
+        with workspace('git') as wksp:
+            git = Git()
+
+            with patch('bumpr.vcs.execute') as execute:
+                with self.assertRaises(BumprError):
+                    git.validate()
+                self.assertFalse(execute.called)
+
+    def test_validate_ko_not_clean(self):
+        with workspace('git') as wksp:
+            os.mkdir('.git')
+            git = Git()
+
+            with patch('bumpr.vcs.execute') as execute:
+                execute.return_value = '\n'.join((' M modified.py', '?? new.py'))
+                with self.assertRaises(BumprError):
+                    git.validate()
+                execute.assert_called_with('git status --porcelain', verbose=False)
+
+
     def test_tag(self):
         git = Git()
 
@@ -34,17 +69,40 @@ class GitTest(unittest.TestCase):
         git = Git()
 
         with patch.object(git, 'execute') as execute:
-            git.commit('message', ['file1', 'file2'])
-
-            expected = (
-                call(['git', 'add', 'file1']),
-                call(['git', 'add', 'file2']),
-                call(['git', 'commit', '-m', 'message'.encode('utf8')]),
-            )
-            self.assertSequenceEqual(execute.call_args_list, expected)
+            git.commit('message')
+            execute.assert_called_with(['git', 'commit', '-am', 'message'.encode('utf8')])
 
 
 class MercurialTest(unittest.TestCase):
+    def test_validate_ok(self):
+        with workspace('mercurial') as wksp:
+            os.mkdir('.hg')
+            mercurial = Mercurial()
+
+            with patch('bumpr.vcs.execute') as execute:
+                execute.return_value = '?? new.py'
+                mercurial.validate()
+                execute.assert_called_with('hg status -mard', verbose=False)
+
+    def test_validate_ko_not_mercurial(self):
+        with workspace('mercurial') as wksp:
+            mercurial = Mercurial()
+
+            with patch('bumpr.vcs.execute') as execute:
+                with self.assertRaises(BumprError):
+                    mercurial.validate()
+                self.assertFalse(execute.called)
+
+    def test_validate_ko_not_clean(self):
+        with workspace('mercurial') as wksp:
+            os.mkdir('.hg')
+            mercurial = Mercurial()
+
+            with patch('bumpr.vcs.execute') as execute:
+                execute.return_value = '\n'.join((' M modified.py', '?? new.py'))
+                with self.assertRaises(BumprError):
+                    mercurial.validate()
+                execute.assert_called_with('hg status -mard', verbose=False)
     def test_tag(self):
         mercurial = Mercurial()
 
@@ -56,17 +114,41 @@ class MercurialTest(unittest.TestCase):
         mercurial = Mercurial()
 
         with patch.object(mercurial, 'execute') as execute:
-            mercurial.commit('message', ['file1', 'file2'])
-
-            expected = (
-                call(['hg', 'add', 'file1']),
-                call(['hg', 'add', 'file2']),
-                call(['hg', 'commit', '-m', 'message'.encode('utf8')]),
-            )
-            self.assertSequenceEqual(execute.call_args_list, expected)
+            mercurial.commit('message')
+            execute.assert_called_with(['hg', 'commit', '-A', '-m', 'message'.encode('utf8')])
 
 
 class BazaarTest(unittest.TestCase):
+    def test_validate_ok(self):
+        with workspace('bazaar') as wksp:
+            os.mkdir('.bzr')
+            bazaar = Bazaar()
+
+            with patch('bumpr.vcs.execute') as execute:
+                execute.return_value = '? new.py'
+                bazaar.validate()
+                execute.assert_called_with('bzr status --short', verbose=False)
+
+    def test_validate_ko_not_bazaar(self):
+        with workspace('bazaar') as wksp:
+            bazaar = Bazaar()
+
+            with patch('bumpr.vcs.execute') as execute:
+                with self.assertRaises(BumprError):
+                    bazaar.validate()
+                self.assertFalse(execute.called)
+
+    def test_validate_ko_not_clean(self):
+        with workspace('bazaar') as wksp:
+            os.mkdir('.bzr')
+            bazaar = Bazaar()
+
+            with patch('bumpr.vcs.execute') as execute:
+                execute.return_value = '\n'.join((' M modified.py', '? new.py'))
+                with self.assertRaises(BumprError):
+                    bazaar.validate()
+                execute.assert_called_with('bzr status --short', verbose=False)
+
     def test_tag(self):
         bazaar = Bazaar()
 
@@ -78,5 +160,5 @@ class BazaarTest(unittest.TestCase):
         bazaar = Bazaar()
 
         with patch.object(bazaar, 'execute') as execute:
-            bazaar.commit('message', ['file1', 'file2'])
-            execute.assert_called_with(['bzr', 'file1', 'file2', 'commit', '-m', 'message'.encode('utf8')])
+            bazaar.commit('message')
+            execute.assert_called_with(['bzr', 'commit', '-m', 'message'.encode('utf8')])
