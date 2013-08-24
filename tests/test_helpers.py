@@ -1,4 +1,8 @@
 # -*- coding: utf-8 -*-
+from __future__ import print_function, unicode_literals
+
+import sys
+
 try:
     import unittest2 as unittest
 except:
@@ -11,6 +15,9 @@ from bumpr import log
 log.declare()  # Fix tests with custom log level
 
 from bumpr.helpers import execute, BumprError
+
+IS_PY3 = sys.version_info[0] == 3
+
 
 @patch('bumpr.helpers.check_output')
 @patch('subprocess.check_call')
@@ -79,7 +86,9 @@ class ExecuteTest(unittest.TestCase):
         check_output.side_effect = error
 
         with self.assertRaises(BumprError):
-            execute('some failed command')
+            to_patch = '{0}.print'.format('builtins' if IS_PY3 else '__builtin__')
+            with patch(to_patch):
+                execute('some failed command')
 
     def test_execute_error_verbose(self, check_call, check_output):
         check_call.side_effect = CalledProcessError(1, 'cmd')
