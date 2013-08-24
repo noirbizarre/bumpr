@@ -6,6 +6,9 @@ except:
 
 from mock import patch, call
 
+from bumpr import log
+log.declare()  # Fix tests with custom log level
+
 from bumpr.helpers import execute
 
 @patch('bumpr.helpers.check_output')

@@ -18,11 +18,13 @@ __description__ = 'Version bumper and Python package releaser'
 
 def main():
     from bumpr import log
+    log.init()
+
     from bumpr.config import Config
     from bumpr.releaser import Releaser
-    from logging import DEBUG, INFO
+    from logging import DEBUG, INFO, getLogger
 
     config = Config.parse_args()
-    log.init(DEBUG if config.verbose else INFO)
+    getLogger().setLevel(DEBUG if config.verbose else INFO)
     releaser = Releaser(config)
     releaser.release()

@@ -95,13 +95,11 @@ class Releaser(object):
             self.tag()
 
         if self.config.dryrun:
-            for filename, diff in self.diffs.items():
-                print(filename)
-                print(diff)
+            self.display_diff()
             self.diffs.clear()
 
     def prepare(self):
-        logger.info('Prepare version %s', self.version)
+        logger.info('Prepare version %s', self.next_version)
 
         replacements = [
             (str(self.version), str(self.next_version))
@@ -121,9 +119,7 @@ class Releaser(object):
             ))
 
         if self.config.dryrun:
-            for filename, diff in self.diffs.items():
-                print(filename)
-                print(diff)
+            self.display_diff()
 
     def clean(self):
         '''Clean the workspace'''
@@ -133,8 +129,8 @@ class Releaser(object):
 
     def perform(self, filename, before, after):
         if self.config.dryrun:
-            diff = unified_diff(before.split('\n'), after.split('\n'))
-            self.diffs[filename] = '\n'.join(diff)
+            diff = unified_diff(before.split('\n'), after.split('\n'), lineterm='')
+            self.diffs[filename] = diff
         else:
             with open(filename, 'wb') as f:
                 f.write(after.encode(self.config.encoding))
@@ -162,12 +158,23 @@ class Releaser(object):
 
     def tag(self):
         if self.config.tag:
-            logger.info('Tag: %s', self.version)
+            logger.debug('Tag: %s', self.version)
             if not self.config.dryrun:
                 self.vcs.tag(str(self.version))
+            else:
+                logger.dryrun('tag: {0}'.format(self.version))
 
     def commit(self, message):
         if self.config.commit:
-            logger.info('Commit: %s', message)
+            logger.debug('Commit: %s', message)
             if not self.config.dryrun:
                 self.vcs.commit(message)
+            else:
+                logger.dryrun('commit: {0}'.format(message))
+
+    def display_diff(self):
+        for filename, diff in self.diffs.items():
+            logger.diff(filename)
+            for line in diff:
+                logger.diff(line)
+            logger.diff('')

@@ -41,7 +41,7 @@ def execute(command, verbose=False, replacements=None, dryrun=False):
     output = ''
     for cmd in commands:
         if dryrun:
-            logger.info('dry run execute: {0}'.format(' '.join(cmd)))
+            logger.dryrun('execute: {0}'.format(' '.join(cmd)))
         elif verbose:
             subprocess.check_call(cmd)
         else:

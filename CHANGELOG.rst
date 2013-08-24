@@ -4,6 +4,7 @@ Changelog
 Current
 -------
 
+- colored diff
 - Added ``--bump`` and ``--prepare`` to only perform bump or prepare
 - Rely on VCS for tracking files and ensure working copy is clean
 - Added option ``--nocommit``

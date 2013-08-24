@@ -16,10 +16,14 @@ from textwrap import dedent
 
 from tests.test_tools import workspace
 
+from bumpr import log
+log.declare()  # Fix tests with custom log level
+
 from bumpr.config import Config, ObjectDict
 from bumpr.helpers import execute
 from bumpr.releaser import Releaser, HOOKS
 from bumpr.version import Version
+
 
 
 class ReleaserTest(unittest.TestCase):
