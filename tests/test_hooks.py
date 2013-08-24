@@ -4,10 +4,10 @@ try:
 except:
     import unittest
 
-from mock import patch, MagicMock
+from mock import patch, MagicMock, ANY
 
 from bumpr.config import ObjectDict
-from bumpr.hooks import ReadTheDocHook
+from bumpr.hooks import ReadTheDocHook, CommandHook
 from bumpr.version import Version
 
 
@@ -32,3 +32,35 @@ class ReadTheDocHookTest(unittest.TestCase):
         replacements = []
         self.hook.prepare(replacements)
         self.assertEqual(replacements, [('http://fake.somewhere.io/1.2.3', 'http://fake.somewhere.io/latest')])
+
+
+@patch('bumpr.hooks.execute')
+class CommandHookTest(unittest.TestCase):
+    def setUp(self):
+        self.releaser = MagicMock()
+        self.releaser.version = Version.parse('1.2.3')
+        self.releaser.config.__getitem__.return_value = ObjectDict({
+            'bump': 'bump command',
+            'prepare': 'prepare command',
+        })
+        self.releaser.config.verbose = False
+        self.releaser.config.dryrun = False
+        self.hook = CommandHook(self.releaser)
+
+    def test_bump(self, execute):
+        self.hook.bump([])
+        execute.assert_called_once_with('bump command', replacements=ANY, verbose=ANY, dryrun=False)
+
+    def test_prepare(self, execute):
+        self.hook.prepare([])
+        execute.assert_called_once_with('prepare command', replacements=ANY, verbose=ANY, dryrun=False)
+
+    def test_bump_dryrun(self, execute):
+        self.hook.dryrun = True
+        self.hook.bump([])
+        execute.assert_called_once_with('bump command', replacements=ANY, verbose=ANY, dryrun=True)
+
+    def test_prepare_dryrun(self, execute):
+        self.hook.dryrun = True
+        self.hook.prepare([])
+        execute.assert_called_once_with('prepare command', replacements=ANY, verbose=ANY, dryrun=True)

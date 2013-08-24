@@ -3,7 +3,6 @@ source = bumpr
 branch = True
 omit =
     tests/*
-    bumpr/log.py
 
 [report]
 # Regexes for lines to exclude from consideration
