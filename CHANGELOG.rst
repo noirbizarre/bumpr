@@ -11,6 +11,7 @@ Current
 - Ensure dry run does not write or execute anything
 - Better output and error handling
 - Group parameters in help
+- Added optionnal hook vaidation
 
 0.1.0 (2013-08-22)
 ------------------

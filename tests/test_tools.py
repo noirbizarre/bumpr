@@ -19,7 +19,7 @@ from bumpr.helpers import execute
 
 
 @contextmanager
-def workspace(module_name, version='1.2.3.dev'):
+def workspace(module_name='fake', version='1.2.3.dev'):
     root = tempfile.mkdtemp(module_name)
     module_filename = join(root, '{0}.py'.format(module_name))
     module_content =  '''\

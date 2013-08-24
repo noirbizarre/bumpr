@@ -1,11 +1,12 @@
 # -*- coding: utf-8 -*-
-from __future__ import print_function
-from __future__ import unicode_literals
+from __future__ import print_function, unicode_literals
 
 import codecs
 import logging
 
-from bumpr.helpers import execute
+from os.path import exists
+
+from bumpr.helpers import execute, BumprError
 
 logger = logging.getLogger(__name__)
 
@@ -27,6 +28,10 @@ class Hook(object):
         self.verbose = releaser.config.verbose
         self.dryrun = releaser.config.dryrun
         self.config = releaser.config[self.key]
+        self.validate()
+
+    def validate(self):
+        '''Override this method to implement initial validation'''
 
     def bump(self, replacements):
         pass
@@ -76,26 +81,35 @@ class ChangelogHook(Hook):
         'empty': 'Nothing yet',
     }
 
+    def validate(self):
+        if not self.config.get('file'):
+            raise BumprError('Changelog file has not been specified')
+        elif not exists(self.config.file):
+            raise BumprError('Changelog file does not exists')
+
     def bump(self, replacements):
-        self.dev_header = self.underline(self.config.prepare)  # pylint: disable=W0201
+        with codecs.open(self.config.file, 'r', self.releaser.config.encoding) as changelog_file:
+            before = changelog_file.read()
+            after = before.replace(self.dev_header(), self.bumped_header())
+        self.releaser.perform(self.config.file, before, after)
+
+    def prepare(self, replacements):
+        next_header = '\n'.join((self.dev_header(), '', '- {0}'.format(self.config.empty), '', self.bumped_header()))
+        with codecs.open(self.config.file, 'r', self.releaser.config.encoding) as changelog_file:
+            before = changelog_file.read()
+            after = before.replace(self.bumped_header(), next_header)
+        self.releaser.perform(self.config.file, before, after)
+
+    def dev_header(self):
+        return self.underline(self.config.prepare)
+
+    def bumped_header(self):
         title = self.config.bump.format(
             version=self.releaser.version,
             date=self.releaser.timestamp,
             **self.releaser.version.__dict__
         )
-        self.bumped_header = self.underline(title)  # pylint: disable=W0201
-
-        with codecs.open(self.config.file, 'r', self.releaser.config.encoding) as changelog_file:
-            before = changelog_file.read()
-            after = before.replace(self.dev_header, self.bumped_header)
-        self.releaser.perform(self.config.file, before, after)
-
-    def prepare(self, replacements):
-        next_header = '\n'.join((self.dev_header, '', '- {}'.format(self.config.empty), '', self.bumped_header))
-        with codecs.open(self.config.file, 'r', self.releaser.config.encoding) as changelog_file:
-            before = changelog_file.read()
-            after = before.replace(self.bumped_header, next_header)
-        self.releaser.perform(self.config.file, before, after)
+        return self.underline(title)
 
     def underline(self, text):
         return '\n'.join((text, len(text) * self.config.separator))
