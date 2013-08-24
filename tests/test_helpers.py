@@ -5,11 +5,12 @@ except:
     import unittest
 
 from mock import patch, call
+from subprocess import CalledProcessError
 
 from bumpr import log
 log.declare()  # Fix tests with custom log level
 
-from bumpr.helpers import execute
+from bumpr.helpers import execute, BumprError
 
 @patch('bumpr.helpers.check_output')
 @patch('subprocess.check_call')
@@ -71,3 +72,17 @@ class ExecuteTest(unittest.TestCase):
             call(['another', 'command']),
         )
         self.assertSequenceEqual(check_output.call_args_list, expected)
+
+    def test_execute_error_quiet(self, check_call, check_output):
+        error = CalledProcessError(1, 'cmd')
+        error.output = 'some output'
+        check_output.side_effect = error
+
+        with self.assertRaises(BumprError):
+            execute('some failed command')
+
+    def test_execute_error_verbose(self, check_call, check_output):
+        check_call.side_effect = CalledProcessError(1, 'cmd')
+
+        with self.assertRaises(BumprError):
+            execute('some failed command', verbose=True)

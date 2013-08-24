@@ -13,9 +13,9 @@ class BumprError(Exception):
 def check_output(*args, **kwargs):
     '''Compatibility wrapper for Python 2.6 missin g subprocess.check_output'''
     if hasattr(subprocess, 'check_output'):
-        return subprocess.check_output(*args, **kwargs)
+        return subprocess.check_output(stderr=subprocess.STDOUT, *args, **kwargs)
     else:
-        process = subprocess.Popen(args, stdout=subprocess.PIPE, **kwargs)
+        process = subprocess.Popen(args, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, **kwargs)
         output, _ = process.communicate()
         retcode = process.poll()
         if retcode:
@@ -40,16 +40,18 @@ def execute(command, verbose=False, replacements=None, dryrun=False):
 
     output = ''
     for cmd in commands:
-        if dryrun:
-            logger.dryrun('execute: {0}'.format(' '.join(cmd)))
-        elif verbose:
-            subprocess.check_call(cmd)
-        else:
-            try:
+        try:
+            if dryrun:
+                logger.dryrun('execute: {0}'.format(' '.join(cmd)))
+            elif verbose:
+                subprocess.check_call(cmd)
+            else:
                 output += check_output(cmd)
-            except subprocess.CalledProcessError as exception:
-                logger.error('Command "%s" failed with exit code %s', cmd, exception.returncode)
+        except subprocess.CalledProcessError as exception:
+            if hasattr(exception, 'output') and exception.output:
                 print(exception.output)
+            cmd = ' '.join(cmd) if isinstance(cmd, (list, tuple)) else cmd
+            raise BumprError('Command "{0}" failed with exit code {1}'.format(cmd, exception.returncode))
     return output
 
 

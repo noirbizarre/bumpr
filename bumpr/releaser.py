@@ -9,7 +9,7 @@ import re
 from datetime import datetime
 from difflib import unified_diff
 
-from bumpr.helpers import execute
+from bumpr.helpers import execute, BumprError
 from bumpr.hooks import HOOKS
 from bumpr.vcs import VCS
 from bumpr.version import Version
@@ -30,31 +30,36 @@ class Releaser(object):
                 version_string = match.group('version')
                 self.prev_version = Version.parse(version_string)
             except:
-                raise ValueError('Version not found in {}'.format(config.file))
+                raise BumprError('Version not found in {}'.format(config.file))
+
+        logger.debug('Previous version: {0}'.format(self.prev_version))
 
         self.version = self.prev_version.copy()
         self.version.bump(config.bump.part, config.bump.unsuffix, config.bump.suffix)
+        logger.debug('Bumped version: {0}'.format(self.version))
 
         self.next_version = self.version.copy()
         self.next_version.bump(config.prepare.part, config.prepare.unsuffix, config.prepare.suffix)
+        logger.debug('Prepared version: {0}'.format(self.next_version))
 
         self.timestamp = None
 
         if config.vcs:
             self.vcs = VCS[config.vcs](verbose=config.verbose)
+            self.vcs.validate()
 
         if config.dryrun:
             self.diffs = {}
 
         self.hooks = [hook(self) for hook in HOOKS if self.config[hook.key]]
 
-    def execute(self, command, version=None):
+    def execute(self, command, version=None, verbose=None):
         version = version or self.version
+        verbose = verbose or self.config.verbose
         replacements = dict(version=version, date=self.timestamp, **version.__dict__)
-        execute(command, replacements=replacements, dryrun=self.config.dryrun, verbose=self.config.verbose)
+        execute(command, replacements=replacements, dryrun=self.config.dryrun, verbose=verbose)
 
     def release(self):
-        logger.info('Performing release')
         self.timestamp = datetime.now()
 
         if self.config.bump_only:
@@ -71,7 +76,7 @@ class Releaser(object):
     def test(self):
         if self.config.tests:
             logger.info('Running test suite')
-            self.execute(self.config.tests)
+            self.execute(self.config.tests, verbose=True)
 
     def bump(self):
         logger.info('Bump version %s', self.version)

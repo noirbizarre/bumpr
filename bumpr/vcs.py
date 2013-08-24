@@ -73,8 +73,20 @@ class Bazaar(BaseVCS):
         self.execute(["bzr", "tag", name])
 
 
+class Fake(BaseVCS):
+    def validate(self):
+        return True
+
+    def commit(self, message):
+        pass
+
+    def tag(self, name):
+        pass
+
+
 VCS = {
     'git': Git,
     'hg': Mercurial,
     'bzr': Bazaar,
+    'fake': Fake,
 }

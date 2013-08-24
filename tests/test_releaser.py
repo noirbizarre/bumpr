@@ -103,7 +103,7 @@ class ReleaserTest(unittest.TestCase):
             execute.assert_called_with('clean command', replacements=ANY, dryrun=ANY, verbose=ANY)
 
     def test_commit(self):
-        config = Config({'file': 'fake.py', 'vcs': 'git'})
+        config = Config({'file': 'fake.py', 'vcs': 'fake'})
         with workspace('fake') as wksp:
             releaser = Releaser(config)
 
@@ -112,7 +112,7 @@ class ReleaserTest(unittest.TestCase):
             vcs.commit.assert_called_with('message')
 
     def test_tag(self):
-        config = Config({'file': 'fake.py', 'vcs': 'git'})
+        config = Config({'file': 'fake.py', 'vcs': 'fake'})
         with workspace('fake') as wksp:
             releaser = Releaser(config)
 
@@ -157,7 +157,7 @@ class ReleaserTest(unittest.TestCase):
             config = Config({
                 'file': 'fake.py',
                 'files': [wksp.readme],
-                'vcs': 'git',
+                'vcs': 'fake',
             })
             releaser = Releaser(config)
             with patch.object(releaser, 'commit') as commit:
@@ -177,7 +177,7 @@ class ReleaserTest(unittest.TestCase):
             config = Config({
                 'file': 'fake.py',
                 'files': [wksp.readme],
-                'vcs': 'git',
+                'vcs': 'fake',
                 'dryrun': True,
             })
             releaser = Releaser(config)
@@ -222,7 +222,7 @@ class ReleaserTest(unittest.TestCase):
             config = Config({
                 'file': 'fake.py',
                 'files': [wksp.readme],
-                'vcs': 'git',
+                'vcs': 'fake',
                 'prepare': {
                     'part': Version.PATCH,
                     'suffix': 'dev',
