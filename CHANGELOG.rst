@@ -1,8 +1,8 @@
 Changelog
 =========
 
-Current
--------
+0.2.0 (2013-08-24)
+------------------
 
 - colored diff
 - Added ``--bump`` and ``--prepare`` to only perform bump or prepare

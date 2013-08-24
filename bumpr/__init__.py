@@ -12,7 +12,7 @@ Bump'R: Version bumper and Python package releaser
 - Extensible with hooks
 '''
 
-__version__ = '0.1.1.dev'
+__version__ = '0.2.0'
 __description__ = 'Version bumper and Python package releaser'
 
 
