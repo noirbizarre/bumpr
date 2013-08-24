@@ -5,7 +5,7 @@ python:
   - 3.2
   - 3.3
 install:
-  - pip install -e .[test] --use-mirrors
+  - pip install -U -e .[test] --use-mirrors
   - pip install pep8 python-coveralls
 script:
   - make coverage pep8
