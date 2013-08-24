@@ -65,7 +65,7 @@ The separator parameter spcify the character user to underline your changelog se
     In development
     ~~~~~~~~~~~~~~
 
-    - No feature yet
+    - Another feature
 
     Version 1.0.1 (2013-08-23)
     ~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -81,8 +81,46 @@ To handle this changelog you will have the following configuration
     separator = ~
     bump = Version {version} ({date:%Y-%m-%d})
     prepare = In development
-    empty = No Feature yet
+    empty = Empty
 
+If you execute Bump'R, the changelog will be bumped like:
+
+.. code-block:: rst
+
+    Changelog
+    =========
+
+    Version 1.0.2 (2013-08-24)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    - Another feature
+
+    Version 1.0.1 (2013-08-23)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    - Some new feature
+
+And then prepared:
+
+.. code-block:: rst
+
+    Changelog
+    =========
+
+    In development
+    ~~~~~~~~~~~~~~
+
+    - Empty
+
+    Version 1.0.2 (2013-08-24)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    - Another feature
+
+    Version 1.0.1 (2013-08-23)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    - Some new feature
 
 Commands
 --------
