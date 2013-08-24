@@ -11,9 +11,6 @@ except:
 from mock import patch, call
 from subprocess import CalledProcessError
 
-from bumpr import log
-log.declare()  # Fix tests with custom log level
-
 from bumpr.helpers import execute, BumprError
 
 IS_PY3 = sys.version_info[0] == 3

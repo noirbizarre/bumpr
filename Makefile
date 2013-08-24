@@ -20,20 +20,12 @@ help:
 
 test:
 	@echo 'Running test suite'
-ifeq ($(PYTHON_VERSION),2.6)
-	@unit2 discover
-else
-	@python -m unittest discover
-endif
+	@python run_tests.py
 
 coverage:
 	@echo 'Running test suite with coverage'
 	@coverage erase
-ifeq ($(PYTHON_VERSION),2.6)
-	@coverage run --rcfile=coverage.rc -m unittest2 discover
-else
-	@coverage run --rcfile=coverage.rc -m unittest discover
-endif
+	@coverage run --rcfile=coverage.rc run_tests.py
 	@echo
 	@coverage report --rcfile=coverage.rc
 

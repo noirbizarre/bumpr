@@ -6,8 +6,6 @@ import shlex
 import subprocess
 import sys
 
-logger = logging.getLogger(__name__)
-
 IS_PY26 = sys.version_info[:2] == (2, 6)
 
 
@@ -31,6 +29,7 @@ def check_output(*args, **kwargs):
 
 
 def execute(command, verbose=False, replacements=None, dryrun=False):
+    logger = logging.getLogger(__name__)
     replacements = replacements or {}
     if not command:
         return
