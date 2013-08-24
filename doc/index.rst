@@ -20,6 +20,8 @@ Bump'R intend to be customizable with the following features:
 - Overridable by command line
 - Extensible with hooks
 
+The main goal is to provide a release workflow without manual intervention.
+
 
 Compatibility
 =============
@@ -93,7 +95,7 @@ This way you only have to specify which part you want to bump on the command lin
 
 .. code-block:: console
 
-    $ bumpr -M  # Bump the major
+    $ bumpr -M -s rc4  # Bump the major with an 'rc4' suffix
     $ bumpr     # Bump the default part aka. patch
 
 
@@ -103,6 +105,7 @@ Documentation
 .. toctree::
     :maxdepth: 2
 
+    workflow
     rcfile
     commandline
     hooks

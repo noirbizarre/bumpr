@@ -1,14 +1,4 @@
-#!/usr/bin/env python
 # -*- coding: utf-8 -*-
-'''
-Pymp: Python release bumper
-
-- Prompt for versions
-- Clean-up release artifact
-- Bump version and tag it
-- Build a source distrbution and upload on PyPI
-- Update version for new develpoment cycle
-'''
 from __future__ import print_function, unicode_literals
 
 import argparse

@@ -115,7 +115,7 @@ class ChangelogHook(Hook):
         return '\n'.join((text, len(text) * self.config.separator))
 
 
-class CommandHook(Hook):
+class CommandsHook(Hook):
     '''
     This hook execute commands
     '''
@@ -143,4 +143,4 @@ class CommandHook(Hook):
             )
             execute(self.config.prepare, replacements=replacements, verbose=self.verbose, dryrun=self.dryrun)
 
-HOOKS = (ReadTheDocHook, ChangelogHook, CommandHook)
+HOOKS = (ReadTheDocHook, ChangelogHook, CommandsHook)

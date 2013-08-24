@@ -13,7 +13,7 @@ from textwrap import dedent
 
 from bumpr.config import ObjectDict
 from bumpr.helpers import BumprError
-from bumpr.hooks import ReadTheDocHook, CommandHook, ChangelogHook
+from bumpr.hooks import ReadTheDocHook, CommandsHook, ChangelogHook
 from bumpr.version import Version
 
 from tests.test_tools import workspace
@@ -42,7 +42,7 @@ class ReadTheDocHookTest(unittest.TestCase):
 
 
 @patch('bumpr.hooks.execute')
-class CommandHookTest(unittest.TestCase):
+class CommandsHookTest(unittest.TestCase):
     def setUp(self):
         self.releaser = MagicMock()
         self.releaser.version = Version.parse('1.2.3')
@@ -52,7 +52,7 @@ class CommandHookTest(unittest.TestCase):
         })
         self.releaser.config.verbose = False
         self.releaser.config.dryrun = False
-        self.hook = CommandHook(self.releaser)
+        self.hook = CommandsHook(self.releaser)
 
     def test_bump(self, execute):
         self.hook.bump([])

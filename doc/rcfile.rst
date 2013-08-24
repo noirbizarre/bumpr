@@ -45,7 +45,8 @@ verbose
 dryrun
     *Default:* ``False``
 
-    TODO
+    If ``True``, no command or VCS operation will be executed.
+    They will be displayed in the command output.
 
 clean
     *Default:* ``None``

@@ -12,6 +12,8 @@ Current
 - Better output and error handling
 - Group parameters in help
 - Added optionnal hook vaidation
+- Fix some Python incompatibilities (Python 2.6 and 3.X)
+- More documentation
 
 0.1.0 (2013-08-22)
 ------------------
