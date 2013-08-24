@@ -87,7 +87,6 @@ class Releaser(object):
         for hook in self.hooks:
             hook.bump(replacements)
 
-        self.bump_version_file(self.prev_version, self.version)
         self.bump_files(replacements)
 
         if self.config.vcs:
@@ -112,7 +111,6 @@ class Releaser(object):
         for hook in self.hooks:
             hook.prepare(replacements)
 
-        self.bump_version_file(self.version, self.next_version)
         self.bump_files(replacements)
 
         if self.config.vcs:
@@ -139,14 +137,8 @@ class Releaser(object):
             with open(filename, 'wb') as f:
                 f.write(after.encode(self.config.encoding))
 
-    def bump_version_file(self, from_version, to_version):
-        with codecs.open(self.config.file, 'r', self.config.encoding) as f:
-            before = f.read()
-        after = before.replace(str(from_version), str(to_version))
-        self.perform(self.config.file, before, after)
-
     def bump_files(self, replacements):
-        for filename in self.config.files:
+        for filename in [self.config.file] + self.config.files:
             with codecs.open(filename, 'r', self.config.encoding) as current_file:
                 before = current_file.read()
             after = before
