@@ -9,9 +9,8 @@ python:
   - pypy
   - pypy3
 install:
-  - pip install -e .[test] --use-mirrors
-  - pip install pep8 python-coveralls
+  - pip install -r travis.pip
 script:
-  - make coverage pep8
+  - inv cover qa
 after_success:
   - coveralls -c coverage.rc

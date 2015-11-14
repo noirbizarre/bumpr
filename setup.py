@@ -40,6 +40,8 @@ long_description = '\n'.join((
 
 install_requires = []
 tests_require = ['mock', 'nose', 'rednose']
+doc_require = ['sphinx']
+qa_require = ['flake8', 'coverage']
 
 if sys.version_info[0:2] < (2, 7):
     install_requires.append('argparse')
@@ -59,7 +61,7 @@ setup(
     install_requires=install_requires,
     license='LGPL',
     use_2to3=True,
-    entry_points = {
+    entry_points={
         'console_scripts': [
             'bumpr = bumpr:main',
         ],
@@ -70,6 +72,8 @@ setup(
     tests_require=tests_require,
     extras_require={
         'test': tests_require,
+        'doc': doc_require,
+        'qa': qa_require,
     },
     keywords='version bump release tag',
     classifiers=[
