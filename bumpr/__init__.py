@@ -12,8 +12,7 @@ Bump'R: Version bumper and Python package releaser
 - Extensible with hooks
 '''
 
-__version__ = '0.2.1.dev'
-__description__ = 'Version bumper and Python package releaser'
+from .__about__ import __description__, __version__  # noqa
 
 
 def main():

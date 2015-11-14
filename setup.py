@@ -39,17 +39,17 @@ long_description = '\n'.join((
 
 
 install_requires = []
-tests_require = ['mock']
+tests_require = ['mock', 'nose', 'rednose']
 
 if sys.version_info[0:2] < (2, 7):
     install_requires.append('argparse')
-    tests_require.append('unittest2')
+    tests_require.append('unittest2==0.5.1')
 
 
 setup(
     name='bumpr',
-    version=__import__('bumpr').__version__,
-    description=__import__('bumpr').__description__,
+    version=__import__('bumpr.__about__').__version__,
+    description=__import__('bumpr.__about__').__description__,
     long_description=long_description,
     url='https://github.com/noirbizarre/bumpr',
     download_url='http://pypi.python.org/pypi/bumpr',
@@ -62,11 +62,14 @@ setup(
     entry_points = {
         'console_scripts': [
             'bumpr = bumpr:main',
-        ]
+        ],
+        'nose.plugins.0.10': [
+            'dryrun-logger = bumpr.tests:DryRunLoggerPlugin'
+        ],
     },
     tests_require=tests_require,
-    extras_require = {
-        'test':  tests_require,
+    extras_require={
+        'test': tests_require,
     },
     keywords='version bump release tag',
     classifiers=[
