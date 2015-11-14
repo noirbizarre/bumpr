@@ -1,11 +1,11 @@
 [bumpr]
-file = bumpr/__init__.py
+file = bumpr/__about__.py
 vcs = git
 tests = tox
-publish = python setup.py register sdist upload
+publish = python setup.py register sdist bdist_wheel upload
 clean =
     python setup.py clean
-    rm -rf *egg-info build dist
+    inv clean
 files = README.rst
 
 [bump]
@@ -23,4 +23,3 @@ prepare = Current
 
 [readthedoc]
 id = bumpr
-
