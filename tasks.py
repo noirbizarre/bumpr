@@ -19,7 +19,7 @@ def clean(docs=False, bytecode=False, extra=''):
     patterns = ['build', 'dist', 'cover', 'docs/_build', '**/*.pyc', '*.egg-info', '.tox', '**/__pycache__']
     for pattern in patterns:
         print('Removing {0}'.format(pattern))
-        lrun('rm -rf {1}'.format(pattern))
+        lrun('rm -rf {0}'.format(pattern))
 
 
 @task
