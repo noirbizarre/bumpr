@@ -12,7 +12,7 @@ Bump'R
     :target: https://requires.io/github/noirbizarre/bumpr/requirements/?branch=master
     :alt: Requirements Status
 .. image:: https://readthedocs.org/projects/bumpr/badge/?version=latest
-    :target: http://bumpr.readthedocs.org/en/0.2.1/
+    :target: http://bumpr.readthedocs.org/en/latest/
     :alt: Documentation status
 
 Bump'R is a version bumper and releaser allowing in a single command:
@@ -108,4 +108,4 @@ This way you only have to specify which part you want to bump on the command lin
 Documentation
 =============
 
-The documentation is hosted `on Read the Docs <http://bumpr.readthedocs.org/en/0.2.1/>`_
+The documentation is hosted `on Read the Docs <http://bumpr.readthedocs.org/en/latest/>`_
