@@ -31,5 +31,5 @@ def main():
         releaser = Releaser(config)
         releaser.release()
     except BumprError as error:
-        getLogger(__name__).error(error.message)
+        getLogger(__name__).error(str(error))
         sys.exit(1)
