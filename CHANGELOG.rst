@@ -4,7 +4,9 @@ Changelog
 Current
 -------
 
-- Nothing yet
+- Use nosetests instead of custom discovery
+- Some fixes on Python 3 (mostly encodings)
+- Improve error handling
 
 0.2.0 (2013-08-24)
 ------------------
