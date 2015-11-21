@@ -13,12 +13,13 @@ from copy import deepcopy
 from mock import patch
 from textwrap import dedent
 
-from bumpr.config import DEFAULTS, Config, ObjectDict, __name__ as config_module_name
+from bumpr.config import DEFAULTS, Config, ValidationError, __name__ as config_module_name
 from bumpr.version import Version
 from bumpr.hooks import HOOKS, ReadTheDocHook
 
 if sys.version_info[0] == 3:
     unicode = str  # pylint: disable=W0622,C0103
+
 
 @contextmanager
 def mock_ini(data):
@@ -157,7 +158,7 @@ class ConfigTest(unittest.TestCase):
         part = minor
         '''
 
-        with mock_ini(bumprrc) as mock:
+        with mock_ini(bumprrc):
             with patch('bumpr.config.exists', return_value=True):
                 config = Config.parse_args(['test.py', '-M', '-v', '-s', 'test-suffix', '-c', 'test.rc'])
 
@@ -176,3 +177,11 @@ class ConfigTest(unittest.TestCase):
 
         self.assertDictEqual(config, expected)
 
+    def test_validate(self):
+        config = Config({'file': 'version.py'})
+        config.validate()
+
+    def test_validate_file_missing(self):
+        config = Config()
+        with self.assertRaises(ValidationError):
+            config.validate()

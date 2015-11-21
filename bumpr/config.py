@@ -51,6 +51,10 @@ DEFAULTS = {
 }
 
 
+class ValidationError(ValueError):
+    pass
+
+
 class Config(ObjectDict):
     def __init__(self, source=None, parsed_args=None):
         super(Config, self).__init__(DEFAULTS)
@@ -130,6 +134,10 @@ class Config(ObjectDict):
             self.prepare.suffix = parsed_args.prepare_suffix
         if parsed_args.prepare_unsuffix is not None:
             self.prepare.unsuffix = parsed_args.prepare_unsuffix
+
+    def validate(self):
+        if not self.file:
+            raise ValidationError('A file is required from the configuration file or the command line')
 
     @classmethod
     def parse_args(cls, args=None):
