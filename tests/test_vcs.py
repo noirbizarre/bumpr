@@ -1,16 +1,19 @@
 # -*- coding: utf-8 -*-
+from __future__ import print_function, unicode_literals
+
 import os
 try:
     import unittest2 as unittest
 except:
     import unittest
 
-from mock import patch, call
+from mock import patch
 
 from tests.test_tools import workspace
 
 from bumpr.vcs import BaseVCS, Git, Mercurial, Bazaar
 from bumpr.helpers import BumprError
+
 
 class BaseVCSTest(unittest.TestCase):
     def test_execute_verbose(self):
@@ -28,7 +31,7 @@ class BaseVCSTest(unittest.TestCase):
 
 class GitTest(unittest.TestCase):
     def test_validate_ok(self):
-        with workspace('git') as wksp:
+        with workspace('git'):
             os.mkdir('.git')
             git = Git()
 
@@ -38,7 +41,7 @@ class GitTest(unittest.TestCase):
                 execute.assert_called_with('git status --porcelain', verbose=False)
 
     def test_validate_ko_not_git(self):
-        with workspace('git') as wksp:
+        with workspace('git'):
             git = Git()
 
             with patch('bumpr.vcs.execute') as execute:
@@ -47,7 +50,7 @@ class GitTest(unittest.TestCase):
                 self.assertFalse(execute.called)
 
     def test_validate_ko_not_clean(self):
-        with workspace('git') as wksp:
+        with workspace('git'):
             os.mkdir('.git')
             git = Git()
 
@@ -56,7 +59,6 @@ class GitTest(unittest.TestCase):
                 with self.assertRaises(BumprError):
                     git.validate()
                 execute.assert_called_with('git status --porcelain', verbose=False)
-
 
     def test_tag(self):
         git = Git()
@@ -70,12 +72,12 @@ class GitTest(unittest.TestCase):
 
         with patch.object(git, 'execute') as execute:
             git.commit('message')
-            execute.assert_called_with(['git', 'commit', '-am', 'message'.encode('utf8')])
+            execute.assert_called_with(['git', 'commit', '-am', 'message'])
 
 
 class MercurialTest(unittest.TestCase):
     def test_validate_ok(self):
-        with workspace('mercurial') as wksp:
+        with workspace('mercurial'):
             os.mkdir('.hg')
             mercurial = Mercurial()
 
@@ -85,7 +87,7 @@ class MercurialTest(unittest.TestCase):
                 execute.assert_called_with('hg status -mard', verbose=False)
 
     def test_validate_ko_not_mercurial(self):
-        with workspace('mercurial') as wksp:
+        with workspace('mercurial'):
             mercurial = Mercurial()
 
             with patch('bumpr.vcs.execute') as execute:
@@ -94,7 +96,7 @@ class MercurialTest(unittest.TestCase):
                 self.assertFalse(execute.called)
 
     def test_validate_ko_not_clean(self):
-        with workspace('mercurial') as wksp:
+        with workspace('mercurial'):
             os.mkdir('.hg')
             mercurial = Mercurial()
 
@@ -103,6 +105,7 @@ class MercurialTest(unittest.TestCase):
                 with self.assertRaises(BumprError):
                     mercurial.validate()
                 execute.assert_called_with('hg status -mard', verbose=False)
+
     def test_tag(self):
         mercurial = Mercurial()
 
@@ -115,12 +118,12 @@ class MercurialTest(unittest.TestCase):
 
         with patch.object(mercurial, 'execute') as execute:
             mercurial.commit('message')
-            execute.assert_called_with(['hg', 'commit', '-A', '-m', 'message'.encode('utf8')])
+            execute.assert_called_with(['hg', 'commit', '-A', '-m', 'message'])
 
 
 class BazaarTest(unittest.TestCase):
     def test_validate_ok(self):
-        with workspace('bazaar') as wksp:
+        with workspace('bazaar'):
             os.mkdir('.bzr')
             bazaar = Bazaar()
 
@@ -130,7 +133,7 @@ class BazaarTest(unittest.TestCase):
                 execute.assert_called_with('bzr status --short', verbose=False)
 
     def test_validate_ko_not_bazaar(self):
-        with workspace('bazaar') as wksp:
+        with workspace('bazaar'):
             bazaar = Bazaar()
 
             with patch('bumpr.vcs.execute') as execute:
@@ -139,7 +142,7 @@ class BazaarTest(unittest.TestCase):
                 self.assertFalse(execute.called)
 
     def test_validate_ko_not_clean(self):
-        with workspace('bazaar') as wksp:
+        with workspace('bazaar'):
             os.mkdir('.bzr')
             bazaar = Bazaar()
 
@@ -161,4 +164,4 @@ class BazaarTest(unittest.TestCase):
 
         with patch.object(bazaar, 'execute') as execute:
             bazaar.commit('message')
-            execute.assert_called_with(['bzr', 'commit', '-m', 'message'.encode('utf8')])
+            execute.assert_called_with(['bzr', 'commit', '-m', 'message'])

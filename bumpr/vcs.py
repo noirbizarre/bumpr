@@ -35,7 +35,7 @@ class Git(BaseVCS):
                 raise BumprError('The current repository contains modified files')
 
     def commit(self, message):
-        self.execute(["git", "commit", "-am", message.encode('utf-8')])
+        self.execute(["git", "commit", "-am", message])
 
     def tag(self, name):
         self.execute(["git", "tag", name])
@@ -51,7 +51,7 @@ class Mercurial(BaseVCS):
                 raise BumprError('The current repository contains modified files')
 
     def commit(self, message):
-        self.execute(["hg", "commit", "-A", "-m", message.encode('utf-8')])
+        self.execute(["hg", "commit", "-A", "-m", message])
 
     def tag(self, name):
         self.execute(["hg", "tag", name])
@@ -67,7 +67,7 @@ class Bazaar(BaseVCS):
                 raise BumprError('The current repository contains modified files')
 
     def commit(self, message):
-        self.execute(["bzr", "commit", "-m", message.encode('utf-8')])
+        self.execute(["bzr", "commit", "-m", message])
 
     def tag(self, name):
         self.execute(["bzr", "tag", name])
