@@ -1,8 +1,8 @@
 Changelog
 =========
 
-Current
--------
+0.2.1 (2015-11-21)
+------------------
 
 - Use nosetests instead of custom discovery
 - Some fixes on Python 3 (mostly encodings)
