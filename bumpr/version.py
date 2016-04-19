@@ -53,6 +53,10 @@ class Version(object):
     def __repr__(self):
         return "'Version({major},{minor},{patch},{suffix})'".format(**self.__dict__)
 
+    def __eq__(self, other):
+        if not isinstance(other, Version):
+            return False
+        return self.__dict__ == other.__dict__
 
 PARTS = {
     'major': Version.MAJOR,
