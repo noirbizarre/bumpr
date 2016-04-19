@@ -1,12 +1,15 @@
 # -*- coding: utf-8 -*-
 from __future__ import print_function, unicode_literals
 
-import codecs
 import logging
+import sys
 
 from os.path import exists
 
 from bumpr.helpers import execute, BumprError
+
+if sys.version_info < (3, 0):
+	from io import open
 
 logger = logging.getLogger(__name__)
 
@@ -88,14 +91,14 @@ class ChangelogHook(Hook):
             raise BumprError('Changelog file does not exists')
 
     def bump(self, replacements):
-        with codecs.open(self.config.file, 'r', self.releaser.config.encoding) as changelog_file:
+        with open(self.config.file, 'r', encoding=self.releaser.config.encoding) as changelog_file:
             before = changelog_file.read()
             after = before.replace(self.dev_header(), self.bumped_header())
         self.releaser.perform(self.config.file, before, after)
 
     def prepare(self, replacements):
         next_header = '\n'.join((self.dev_header(), '', '- {0}'.format(self.config.empty), '', self.bumped_header()))
-        with codecs.open(self.config.file, 'r', self.releaser.config.encoding) as changelog_file:
+        with open(self.config.file, 'r', encoding=self.releaser.config.encoding) as changelog_file:
             before = changelog_file.read()
             after = before.replace(self.bumped_header(), next_header)
         self.releaser.perform(self.config.file, before, after)
