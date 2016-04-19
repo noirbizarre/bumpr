@@ -102,6 +102,9 @@ class Releaser(object):
             self.diffs.clear()
 
     def prepare(self):
+		if self.version == self.next_version:
+			logger.info('Skip prepare phase')
+			return
         logger.info('Prepare version %s', self.next_version)
 
         replacements = [
