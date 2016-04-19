@@ -9,7 +9,7 @@ from os.path import exists
 from bumpr.helpers import execute, BumprError
 
 if sys.version_info < (3, 0):
-	from io import open
+    from io import open
 
 logger = logging.getLogger(__name__)
 

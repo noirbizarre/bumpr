@@ -6,7 +6,7 @@ import re
 import sys
 
 if sys.version_info < (3, 0):
-	from io import open
+    from io import open
 
 from datetime import datetime
 from difflib import unified_diff
@@ -105,9 +105,9 @@ class Releaser(object):
             self.diffs.clear()
 
     def prepare(self):
-		if self.version == self.next_version:
-			logger.info('Skip prepare phase')
-			return
+        if self.version == self.next_version:
+            logger.info('Skip prepare phase')
+            return
         logger.info('Prepare version %s', self.next_version)
 
         replacements = [
@@ -136,8 +136,8 @@ class Releaser(object):
             self.execute(self.config.clean)
 
     def perform(self, filename, before, after):
-		if before == after:
-			return
+        if before == after:
+            return
         if self.config.dryrun:
             diff = unified_diff(before.split('\n'), after.split('\n'), lineterm='')
             self.diffs[filename] = diff
