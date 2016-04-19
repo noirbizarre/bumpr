@@ -136,6 +136,8 @@ class Releaser(object):
             self.execute(self.config.clean)
 
     def perform(self, filename, before, after):
+		if before == after:
+			return
         if self.config.dryrun:
             diff = unified_diff(before.split('\n'), after.split('\n'), lineterm='')
             self.diffs[filename] = diff
