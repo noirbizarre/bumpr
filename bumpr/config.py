@@ -114,7 +114,7 @@ class Config(ObjectDict):
         for arg in 'file', 'vcs', 'files':
             if arg in parsed_args and getattr(parsed_args, arg) not in (None, [], tuple()):
                 self[arg] = getattr(parsed_args, arg)
-                
+
         for arg in 'verbose', 'dryrun':
             if arg in parsed_args and getattr(parsed_args, arg):
                 self[arg] = True

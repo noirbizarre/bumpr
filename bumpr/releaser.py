@@ -5,9 +5,6 @@ import logging
 import re
 import sys
 
-if sys.version_info < (3, 0):
-    from io import open
-
 from datetime import datetime
 from difflib import unified_diff
 
@@ -15,6 +12,9 @@ from bumpr.helpers import execute, BumprError
 from bumpr.hooks import HOOKS
 from bumpr.vcs import VCS
 from bumpr.version import Version
+
+if sys.version_info < (3, 0):
+    from io import open
 
 logger = logging.getLogger(__name__)
 
