@@ -14,7 +14,7 @@ def lrun(command, **kwargs):
 
 
 @task
-def clean(docs=False, bytecode=False, extra=''):
+def clean(ctx, docs=False, bytecode=False, extra=''):
     '''Cleanup all build artifacts'''
     patterns = ['build', 'dist', 'cover', 'docs/_build', '**/*.pyc', '*.egg-info', '.tox', '**/__pycache__']
     for pattern in patterns:
@@ -23,47 +23,47 @@ def clean(docs=False, bytecode=False, extra=''):
 
 
 @task
-def test():
+def test(ctx):
     '''Run tests suite'''
     lrun('nosetests --force-color', pty=True)
 
 
 @task
-def cover():
+def cover(ctx):
     '''Run tests suite with coverage'''
     lrun('nosetests --force-color --with-coverage --cover-html', pty=True)
 
 
 @task
-def tox():
+def tox(ctx):
     '''Run test in all Python versions'''
     lrun('tox', pty=True)
 
 
 @task
-def qa():
+def qa(ctx):
     '''Run a quality report'''
     lrun('flake8 bumpr')
 
 
 @task
-def doc():
+def doc(ctx):
     '''Build the documentation'''
     lrun('cd doc && make html', pty=True)
 
 
 @task
-def completion():
+def completion(ctx):
     '''Generate bash completion script'''
     lrun('_bumpr_COMPLETE=source bumpr > bumpr-complete.sh', pty=True)
 
 
 @task
-def dist():
+def dist(ctx):
     '''Package for distribution'''
     lrun('python setup.py sdist bdist_wheel', pty=True)
 
 
 @task(tox, doc, qa, dist, default=True)
-def all():
+def all(ctx):
     pass
