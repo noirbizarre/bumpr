@@ -41,11 +41,14 @@ long_description = '\n'.join((
 install_requires = []
 tests_require = ['mock', 'nose', 'rednose']
 doc_require = ['sphinx']
-qa_require = ['flake8', 'coverage']
+qa_require = ['coverage']
 
 if sys.version_info[0:2] < (2, 7):
     install_requires.append('argparse')
     tests_require.append('unittest2==0.5.1')
+    qa_require.append('flake8<3.0')
+else:
+    qa_require.append('flake8')
 
 
 setup(
