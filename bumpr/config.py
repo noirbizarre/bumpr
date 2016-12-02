@@ -55,6 +55,46 @@ class ValidationError(ValueError):
     pass
 
 
+class BumprConfigParser(RawConfigParser):
+    '''
+    A config parser with optionnal implicit `bumpr:` prefix on sections.
+
+    Allow better isolation in setup.cfg.
+    '''
+    prefix = 'bumpr'
+
+    def candidate_sections(self, section):
+        return [section, '{0}:{1}'.format(self.prefix, section)]
+
+    def has_section(self, section):
+        sections = self.candidate_sections(section)
+        return any(RawConfigParser.has_section(self, section) for section in sections)
+
+    def options(self, section):
+        for section in self.candidate_sections(section):
+            if RawConfigParser.has_section(self, section):
+                return RawConfigParser.options(self, section)
+
+    def has_option(self, section, option):
+        sections = self.candidate_sections(section)
+        return any(RawConfigParser.has_option(self, section, option) for section in sections)
+
+    def get(self, section, option):
+        for section in self.candidate_sections(section):
+            if RawConfigParser.has_option(self, section, option):
+                return RawConfigParser.get(self, section, option)
+
+    def getboolean(self, section, option):
+        for section in self.candidate_sections(section):
+            if RawConfigParser.has_option(self, section, option):
+                return RawConfigParser.getboolean(self, section, option)
+
+    def items(self, section):
+        for section in self.candidate_sections(section):
+            if RawConfigParser.has_section(self, section):
+                return RawConfigParser.items(self, section)
+
+
 class Config(ObjectDict):
     def __init__(self, source=None, parsed_args=None):
         super(Config, self).__init__(DEFAULTS)
@@ -67,13 +107,16 @@ class Config(ObjectDict):
                     self.merge({hook.key: hook.defaults})
             self.merge(source)
 
+        if exists('setup.cfg'):
+            self.override_from_config('setup.cfg')
+
         if parsed_args:
             if 'config' in parsed_args and exists(parsed_args.config):
                 self.override_from_config(parsed_args.config)
             self.override_from_args(parsed_args)
 
     def override_from_config(self, filename):
-        config = RawConfigParser()
+        config = BumprConfigParser()
         if IS_PY3:
             config.read_file(open(filename))
         else:

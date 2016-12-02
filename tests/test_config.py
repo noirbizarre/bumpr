@@ -1,7 +1,10 @@
 # -*- coding: utf-8 -*-
 from __future__ import print_function, unicode_literals
+import os
 import io
+import shutil
 import sys
+import tempfile
 
 try:
     import unittest2 as unittest
@@ -30,6 +33,15 @@ def mock_ini(data):
 
 class ConfigTest(unittest.TestCase):
     maxDiff = None
+
+    def setUp(self):
+        self.currentdir = os.getcwd()
+        self.workdir = tempfile.mkdtemp()
+        os.chdir(self.workdir)
+
+    def tearDown(self):
+        os.chdir(self.currentdir)
+        shutil.rmtree(self.workdir)
 
     def test_defaults(self):
         '''It should initialize with default values'''
@@ -111,6 +123,45 @@ class ConfigTest(unittest.TestCase):
             config.override_from_config('test.rc')
 
         mock.assert_called_once_with('test.rc')
+        self.assertDictEqual(config, expected)
+
+    def test_override_from_setup_cfg(self):
+        with io.open('setup.cfg', 'w') as cfg:
+            cfg.write('\n'.join([
+                '[bumpr]',
+                'file = test.py',
+                'files = README',
+                '[bumpr:bump]',
+                'message = test',
+            ]))
+
+        expected = deepcopy(DEFAULTS)
+        expected['file'] = 'test.py'
+        expected['files'] = ['README']
+        expected['bump']['message'] = 'test'
+        for hook in HOOKS:
+            expected[hook.key] = False
+
+        config = Config()
+        self.assertDictEqual(config, expected)
+
+    def test_override_from_setup_cfg_with_hooks(self):
+        tested_hook = ReadTheDocHook
+        with io.open('setup.cfg', 'w') as cfg:
+            cfg.write('\n'.join([
+                '[bumpr:{0}]'.format(tested_hook.key),
+                'bump = test',
+            ]))
+
+        expected = deepcopy(DEFAULTS)
+        for hook in HOOKS:
+            if hook is tested_hook:
+                expected[hook.key] = hook.defaults
+                expected[hook.key]['bump'] = 'test'
+            else:
+                expected[hook.key] = False
+
+        config = Config()
         self.assertDictEqual(config, expected)
 
     def test_override_hook_from_config(self):

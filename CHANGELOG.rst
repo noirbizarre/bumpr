@@ -4,7 +4,8 @@ Changelog
 Current
 -------
 
-- Nothing yet
+- `setup.cfg` declaration support
+- Optionnal `bumpr:` prefix support
 
 0.2.1 (2015-11-21)
 ------------------
