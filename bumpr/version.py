@@ -58,6 +58,7 @@ class Version(object):
             return False
         return self.__dict__ == other.__dict__
 
+
 PARTS = {
     'major': Version.MAJOR,
     'minor': Version.MINOR,

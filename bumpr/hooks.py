@@ -146,4 +146,5 @@ class CommandsHook(Hook):
             )
             execute(self.config.prepare, replacements=replacements, verbose=self.verbose, dryrun=self.dryrun)
 
+
 HOOKS = (ReadTheDocHook, ChangelogHook, CommandsHook)
