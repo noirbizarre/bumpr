@@ -176,6 +176,14 @@ class Releaser(object):
             else:
                 logger.dryrun('commit: {0}'.format(message))
 
+    def push(self):
+        if self.config.push:
+            logger.debug('Push to upstream repository')
+            if not self.config.dryrun:
+                self.vcs.push()
+            else:
+                logger.dryrun('push to remote repository')
+
     def display_diff(self):
         for filename, diff in self.diffs.items():
             logger.diff(filename)

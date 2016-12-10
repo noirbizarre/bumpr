@@ -40,6 +40,10 @@ class Git(BaseVCS):
     def tag(self, name):
         self.execute(["git", "tag", name])
 
+    def push(self):
+        self.execute(["git", "push"])
+        self.execute(["git", "push", "--tags"])
+
 
 class Mercurial(BaseVCS):
     def validate(self):
@@ -56,6 +60,9 @@ class Mercurial(BaseVCS):
     def tag(self, name):
         self.execute(["hg", "tag", name])
 
+    def push(self):
+        self.execute(["hg", "push"])
+
 
 class Bazaar(BaseVCS):
     def validate(self):
@@ -71,6 +78,9 @@ class Bazaar(BaseVCS):
 
     def tag(self, name):
         self.execute(["bzr", "tag", name])
+
+    def push(self):
+        self.execute(["bzr", "push"])
 
 
 class Fake(BaseVCS):

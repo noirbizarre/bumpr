@@ -119,6 +119,24 @@ class ReleaserTest(unittest.TestCase):
             releaser.tag()
             vcs.tag.assert_called_with(str(releaser.version))
 
+    def test_push_disabled_by_default(self):
+        config = Config({'file': 'fake.py', 'vcs': 'fake'})
+        with workspace('fake'):
+            releaser = Releaser(config)
+
+        with patch.object(releaser, 'vcs') as vcs:
+            releaser.push()
+            assert not vcs.push.called
+
+    def test_push(self):
+        config = Config({'file': 'fake.py', 'vcs': 'fake', 'push': True})
+        with workspace('fake'):
+            releaser = Releaser(config)
+
+        with patch.object(releaser, 'vcs') as vcs:
+            releaser.push()
+            assert vcs.push.called
+
     def test_release_wihtout_vcs_or_commands(self):
         with workspace('fake', '1.2.3.dev') as wksp:
             config = Config({'file': 'fake.py', 'files': [wksp.readme]})

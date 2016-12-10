@@ -74,6 +74,14 @@ class GitTest(unittest.TestCase):
             git.commit('message')
             execute.assert_called_with(['git', 'commit', '-am', 'message'])
 
+    def test_push(self):
+        git = Git()
+
+        with patch.object(git, 'execute') as execute:
+            git.push()
+            execute.assert_any_call(['git', 'push'])
+            execute.assert_any_call(['git', 'push', '--tags'])
+
 
 class MercurialTest(unittest.TestCase):
     def test_validate_ok(self):
@@ -120,6 +128,13 @@ class MercurialTest(unittest.TestCase):
             mercurial.commit('message')
             execute.assert_called_with(['hg', 'commit', '-A', '-m', 'message'])
 
+    def test_push(self):
+        mercurial = Mercurial()
+
+        with patch.object(mercurial, 'execute') as execute:
+            mercurial.push()
+            execute.assert_called_with(['hg', 'push'])
+
 
 class BazaarTest(unittest.TestCase):
     def test_validate_ok(self):
@@ -165,3 +180,10 @@ class BazaarTest(unittest.TestCase):
         with patch.object(bazaar, 'execute') as execute:
             bazaar.commit('message')
             execute.assert_called_with(['bzr', 'commit', '-m', 'message'])
+
+    def test_push(self):
+        bazaar = Bazaar()
+
+        with patch.object(bazaar, 'execute') as execute:
+            bazaar.push()
+            execute.assert_called_with(['bzr', 'push'])

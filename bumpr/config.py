@@ -26,6 +26,7 @@ DEFAULTS = {
     'vcs': None,
     'commit': True,
     'tag': True,
+    'push': False,
     'verbose': False,
     'dryrun': False,
     'clean': None,
@@ -125,7 +126,7 @@ class Config(ObjectDict):
         # Common options
         if config.has_section('bumpr'):
             for option in config.options('bumpr'):
-                if option in ('tag', 'commit'):
+                if option in ('tag', 'commit', 'push'):
                     self[option] = config.getboolean('bumpr', option)
                 elif option == 'files':
                     # pylint: disable=W0201
@@ -165,6 +166,7 @@ class Config(ObjectDict):
         self.commit = not parsed_args.nocommit  # pylint: disable=W0201
         self.bump_only = parsed_args.bump_only  # pylint: disable=W0201
         self.prepare_only = parsed_args.prepare_only  # pylint: disable=W0201
+        self.push = parsed_args.push  # pylint: disable=W0201
 
         # Bump
         if parsed_args.part is not None:
@@ -230,6 +232,7 @@ class Config(ObjectDict):
         group = parser.add_argument_group('Version control system')
         group.add_argument('--vcs', choices=['git', 'hg'], default=None, help='VCS implementation')
         group.add_argument('-nc', '--nocommit', action='store_true', help='Do not commit')
+        group.add_argument('-P', '--push', action='store_true', help='Push changes to remote repository')
 
         parsed_args = parser.parse_args(args)
         return cls(parsed_args=parsed_args)
