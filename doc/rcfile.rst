@@ -3,6 +3,12 @@ Configuration file
 
 The ``bumpr.rc`` configuration file is an inifile with the following possible sections and keys.
 
+.. note::
+    You can also use the ``setup.cfg`` file to store the configuration.
+    It's recommanded to prefix section with ``bumpr:`` (*ie.* ``[bumpr:bump]``).
+    Be carefull, when using Python 3, ``setup.cfg`` is parsed with ConfigParser
+    and perform string interpolation.
+
 bumpr
 -----
 This is the main section defining the common behavior and parameters.
