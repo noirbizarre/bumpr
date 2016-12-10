@@ -6,6 +6,7 @@ Current
 
 - `setup.cfg` declaration support
 - Optionnal `bumpr:` prefix support
+- Switch to pytest
 
 0.2.1 (2015-11-21)
 ------------------

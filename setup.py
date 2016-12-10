@@ -39,9 +39,9 @@ long_description = '\n'.join((
 
 
 install_requires = []
-tests_require = ['mock', 'nose', 'rednose']
+tests_require = ['mock', 'pytest']
 doc_require = ['sphinx']
-qa_require = ['coverage']
+qa_require = ['pytest-cov', 'coverage']
 
 if sys.version_info[0:2] < (2, 7):
     install_requires.append('argparse')
@@ -67,9 +67,6 @@ setup(
     entry_points={
         'console_scripts': [
             'bumpr = bumpr:main',
-        ],
-        'nose.plugins.0.10': [
-            'dryrun-logger = bumpr.tests:DryRunLoggerPlugin'
         ],
     },
     tests_require=tests_require,

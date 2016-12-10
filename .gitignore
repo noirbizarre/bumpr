@@ -24,8 +24,10 @@ cover
 pip-log.txt
 
 # Unit test / coverage reports
+.cache
 .coverage
 .tox
+htmlcov
 nosetests.xml
 
 # Translations
