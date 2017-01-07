@@ -6,15 +6,13 @@ import shutil
 import sys
 import tempfile
 
-try:
-    import unittest2 as unittest
-except:
-    import unittest
+import pytest
 
 from contextlib import contextmanager
 from copy import deepcopy
 from mock import patch
 from textwrap import dedent
+
 
 from bumpr.config import DEFAULTS, Config, ValidationError, __name__ as config_module_name
 from bumpr.version import Version
@@ -31,15 +29,14 @@ def mock_ini(data):
         yield mock
 
 
-class ConfigTest(unittest.TestCase):
-    maxDiff = None
+class ConfigTest(object):
 
-    def setUp(self):
+    @pytest.fixture(autouse=True)
+    def cleandir(self):
         self.currentdir = os.getcwd()
         self.workdir = tempfile.mkdtemp()
         os.chdir(self.workdir)
-
-    def tearDown(self):
+        yield
         os.chdir(self.currentdir)
         shutil.rmtree(self.workdir)
 
@@ -49,7 +46,7 @@ class ConfigTest(unittest.TestCase):
         expected = deepcopy(DEFAULTS)
         for hook in HOOKS:
             expected[hook.key] = False
-        self.assertDictEqual(config, expected)
+        assert config == expected
 
     def test_from_dict(self):
         '''It can take a dictionnay as parameter but keeps defaults'''
@@ -80,7 +77,7 @@ class ConfigTest(unittest.TestCase):
                 expected[key] = value
         for hook in HOOKS:
             expected[hook.key] = False
-        self.assertDictEqual(config, expected)
+        assert config == expected
 
     def test_from_dict_with_hook(self):
         '''It should take defaults from hooks if present and set it to false if not'''
@@ -100,7 +97,7 @@ class ConfigTest(unittest.TestCase):
                 expected[hook.key] = False
 
         config = Config(config_dict)
-        self.assertDictEqual(config, expected)
+        assert config == expected
 
     def test_override_from_config(self):
         bumprrc = '''\
@@ -123,7 +120,7 @@ class ConfigTest(unittest.TestCase):
             config.override_from_config('test.rc')
 
         mock.assert_called_once_with('test.rc')
-        self.assertDictEqual(config, expected)
+        assert config == expected
 
     def test_override_from_setup_cfg(self):
         with io.open('setup.cfg', 'w') as cfg:
@@ -143,7 +140,7 @@ class ConfigTest(unittest.TestCase):
             expected[hook.key] = False
 
         config = Config()
-        self.assertDictEqual(config, expected)
+        assert config == expected
 
     def test_override_from_setup_cfg_with_hooks(self):
         tested_hook = ReadTheDocHook
@@ -162,7 +159,7 @@ class ConfigTest(unittest.TestCase):
                 expected[hook.key] = False
 
         config = Config()
-        self.assertDictEqual(config, expected)
+        assert config == expected
 
     def test_override_hook_from_config(self):
         tested_hook = ReadTheDocHook
@@ -184,7 +181,7 @@ class ConfigTest(unittest.TestCase):
             config.override_from_config('test.rc')
 
         mock.assert_called_once_with('test.rc')
-        self.assertDictEqual(config, expected)
+        assert config == expected
 
     def test_override_from_args(self):
         config = Config.parse_args(['test.py', '-M', '-v', '-s', 'test-suffix', '-c', 'fake'])
@@ -197,7 +194,7 @@ class ConfigTest(unittest.TestCase):
         for hook in HOOKS:
             expected[hook.key] = False
 
-        self.assertDictEqual(config, expected)
+        assert config == expected
 
     def test_override_args_keeps_config_values(self):
         bumprrc = '''\
@@ -226,7 +223,7 @@ class ConfigTest(unittest.TestCase):
         for hook in HOOKS:
             expected[hook.key] = False
 
-        self.assertDictEqual(config, expected)
+        assert config == expected
 
     def test_validate(self):
         config = Config({'file': 'version.py'})
@@ -234,5 +231,5 @@ class ConfigTest(unittest.TestCase):
 
     def test_validate_file_missing(self):
         config = Config()
-        with self.assertRaises(ValidationError):
+        with pytest.raises(ValidationError):
             config.validate()
