@@ -8,9 +8,9 @@ import sys
 from os.path import exists
 
 try:
-    from ConfigParser import RawConfigParser  # pylint: disable=F0401
+    from ConfigParser import RawConfigParser
 except ImportError:
-    from configparser import RawConfigParser  # pylint: disable=F0401
+    from configparser import RawConfigParser
 
 from bumpr.helpers import ObjectDict
 from bumpr.hooks import HOOKS
@@ -129,9 +129,7 @@ class Config(ObjectDict):
                 if option in ('tag', 'commit', 'push'):
                     self[option] = config.getboolean('bumpr', option)
                 elif option == 'files':
-                    # pylint: disable=W0201
                     self.files = [name.strip() for name in config.get('bumpr', 'files').split('\n') if name.strip()]
-                    # pylint: enable=W0201
                 else:
                     self[option] = config.get('bumpr', option)
 
@@ -163,10 +161,10 @@ class Config(ObjectDict):
             if arg in parsed_args and getattr(parsed_args, arg):
                 self[arg] = True
 
-        self.commit = not parsed_args.nocommit  # pylint: disable=W0201
-        self.bump_only = parsed_args.bump_only  # pylint: disable=W0201
-        self.prepare_only = parsed_args.prepare_only  # pylint: disable=W0201
-        self.push = parsed_args.push  # pylint: disable=W0201
+        self.commit = not parsed_args.nocommit
+        self.bump_only = parsed_args.bump_only
+        self.prepare_only = parsed_args.prepare_only
+        self.push = parsed_args.push
 
         # Bump
         if parsed_args.part is not None:
@@ -204,30 +202,30 @@ class Config(ObjectDict):
         group = parser.add_mutually_exclusive_group()
         group.add_argument('-b', '--bump', dest='bump_only', action='store_true', help='Only perform the bump')
         group.add_argument('-pr', '--prepare', dest='prepare_only', action='store_true',
-            help='Only perform the prepare')
+                           help='Only perform the prepare')
 
         # Bump behavior for bump
         group = parser.add_argument_group('bump')
         group.add_argument('-M', '--major', dest='part', action='store_const', const=Version.MAJOR,
-                help="Bump major version")
+                           help="Bump major version")
         group.add_argument('-m', '--minor', dest='part', action='store_const', const=Version.MINOR,
-                help="Bump minor version")
+                           help="Bump minor version")
         group.add_argument('-p', '--patch', dest='part', action='store_const',
-                const=Version.PATCH, help="Bump patch version")
+                           const=Version.PATCH, help="Bump patch version")
         group.add_argument('-s', '--suffix', dest='suffix', type=str, help="Set suffix")
         group.add_argument('-u', '--unsuffix', dest='unsuffix', action='store_true', default=None, help="Unset suffix")
 
         # Bump behavior for prepare version
         group = parser.add_argument_group('prepare')
         group.add_argument('-pM', '--prepare-major', dest='prepare_part', action='store_const',
-                const=Version.MAJOR, help="Bump major version")
+                           const=Version.MAJOR, help="Bump major version")
         group.add_argument('-pm', '--prepare-minor', dest='prepare_part', action='store_const',
-                const=Version.MINOR, help="Bump minor version")
+                           const=Version.MINOR, help="Bump minor version")
         group.add_argument('-pp', '--prepare-patch', dest='prepare_part', action='store_const',
-                const=Version.PATCH, help="Bump patch version")
+                           const=Version.PATCH, help="Bump patch version")
         group.add_argument('-ps', '--prepare-suffix', dest='prepare_suffix', type=str, help="Set suffix")
         group.add_argument('-pu', '--prepare-unsuffix', dest='prepare_unsuffix', action='store_true',
-                help="Unset suffix")
+                           help="Unset suffix")
 
         group = parser.add_argument_group('Version control system')
         group.add_argument('--vcs', choices=['git', 'hg'], default=None, help='VCS implementation')

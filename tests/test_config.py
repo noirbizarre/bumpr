@@ -19,7 +19,7 @@ from bumpr.version import Version
 from bumpr.hooks import HOOKS, ReadTheDocHook
 
 if sys.version_info[0] == 3:
-    unicode = str  # pylint: disable=W0622,C0103
+    unicode = str
 
 
 @contextmanager

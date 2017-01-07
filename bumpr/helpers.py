@@ -66,7 +66,7 @@ def execute(command, verbose=False, replacements=None, dryrun=False):
 
 class ObjectDict(dict):
     '''A dictionnary with object-like attribute access and depp merge'''
-    def __init__(self, *args, **kwargs):  # pylint: disable=W0231
+    def __init__(self, *args, **kwargs):
         self.update(*args, **kwargs)
 
     def __getattr__(self, key):
