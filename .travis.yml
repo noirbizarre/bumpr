@@ -9,7 +9,7 @@ python:
   - pypy
   - pypy3
 install:
-  - pip install -r travis.pip
+  - pip install -e .[test,qa,doc,dev] python-coveralls
 script:
   - inv cover qa
 after_success:

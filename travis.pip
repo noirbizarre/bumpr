@@ -1,3 +1,0 @@
-invoke
--e .[test,qa,doc]
-python-coveralls
