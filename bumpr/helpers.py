@@ -19,7 +19,7 @@ def check_output(*args, **kwargs):
         return subprocess.check_output(stderr=subprocess.STDOUT, universal_newlines=True,
                                        *args, **kwargs)
     else:
-        process = subprocess.Popen(args, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
+        process = subprocess.Popen(*args, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
                                    universal_newlines=True, **kwargs)
         output, _ = process.communicate()
         retcode = process.poll()
