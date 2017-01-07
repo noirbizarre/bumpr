@@ -11,20 +11,18 @@ try:
 except:
     import unittest
 
-from os.path import join, relpath
+from os.path import join
 from contextlib import contextmanager
-from mock import patch, MagicMock, ANY
 from textwrap import dedent
 
-from bumpr.config import Config, ObjectDict
-from bumpr.helpers import execute
+from bumpr.config import ObjectDict
 
 
 @contextmanager
 def workspace(module_name='fake', version='1.2.3.dev'):
     root = tempfile.mkdtemp(module_name)
     module_filename = join(root, '{0}.py'.format(module_name))
-    module_content =  '''\
+    module_content = '''\
         # -*- coding: utf-8 -*-
 
         __version__ = '{version}'

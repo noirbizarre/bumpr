@@ -18,6 +18,7 @@ from bumpr.version import Version
 
 from tests.test_tools import workspace
 
+
 class ReadTheDocHookTest(unittest.TestCase):
     def setUp(self):
         self.releaser = MagicMock()
@@ -87,16 +88,16 @@ class ChangelogHookTest(unittest.TestCase):
 
     def test_validate_no_file(self):
         with self.assertRaises(BumprError):
-            hook = ChangelogHook(self.releaser)
+            ChangelogHook(self.releaser)
 
     def test_validate_file_does_not_exists(self):
         with workspace():
             self.releaser.config.__getitem__.return_value = ObjectDict({'file': 'changelog'})
             with self.assertRaises(BumprError):
-                hook = ChangelogHook(self.releaser)
+                ChangelogHook(self.releaser)
 
     def test_validate(self):
-        with workspace() as wksp:
+        with workspace():
             with codecs.open('changelog', 'wb', encoding='utf8') as f:
                 f.write('')
             self.releaser.config.__getitem__.return_value = ObjectDict({'file': 'changelog'})
@@ -110,7 +111,7 @@ class ChangelogHookTest(unittest.TestCase):
             - some changes
         ''')
 
-        with workspace() as wksp:
+        with workspace():
             with codecs.open('changelog', 'wb', encoding='utf8') as f:
                 f.write(content)
 
@@ -142,7 +143,7 @@ class ChangelogHookTest(unittest.TestCase):
             - some changes
         ''').format(self.releaser.timestamp)
 
-        with workspace() as wksp:
+        with workspace():
             with codecs.open('changelog', 'wb', encoding='utf8') as f:
                 f.write(content)
 

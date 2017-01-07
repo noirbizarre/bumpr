@@ -1,28 +1,18 @@
 # -*- coding: utf-8 -*-
 from __future__ import print_function, unicode_literals
 
-import os
-import shutil
-import tempfile
-import sys
-
 try:
     import unittest2 as unittest
 except:
     import unittest
 
-from os.path import join, relpath
-from contextlib import contextmanager
 from mock import patch, MagicMock, ANY
-from textwrap import dedent
 
 from tests.test_tools import workspace
 
-from bumpr.config import Config, ObjectDict
-from bumpr.helpers import execute
-from bumpr.releaser import Releaser, HOOKS
+from bumpr.config import Config
+from bumpr.releaser import Releaser
 from bumpr.version import Version
-
 
 
 class ReleaserTest(unittest.TestCase):
@@ -30,7 +20,7 @@ class ReleaserTest(unittest.TestCase):
         config = Config({
             'file': 'fake.py'
         })
-        with workspace('fake', '1.2.3.dev') as wksp:
+        with workspace('fake', '1.2.3.dev'):
             releaser = Releaser(config)
 
         self.assertIsInstance(releaser.prev_version, Version)
@@ -58,7 +48,7 @@ class ReleaserTest(unittest.TestCase):
             mock.key = key
             hooks.append(mock)
 
-        with workspace('fake', '1.2.3.dev') as wksp:
+        with workspace('fake', '1.2.3.dev'):
             with patch('bumpr.releaser.HOOKS', hooks) as mock:
                 releaser = Releaser(config)
                 for hook in hooks:
@@ -103,7 +93,7 @@ class ReleaserTest(unittest.TestCase):
 
     def test_commit(self):
         config = Config({'file': 'fake.py', 'vcs': 'fake'})
-        with workspace('fake') as wksp:
+        with workspace('fake'):
             releaser = Releaser(config)
 
         with patch.object(releaser, 'vcs') as vcs:
@@ -112,7 +102,7 @@ class ReleaserTest(unittest.TestCase):
 
     def test_tag(self):
         config = Config({'file': 'fake.py', 'vcs': 'fake'})
-        with workspace('fake') as wksp:
+        with workspace('fake'):
             releaser = Releaser(config)
 
         with patch.object(releaser, 'vcs') as vcs:

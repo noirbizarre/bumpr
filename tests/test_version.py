@@ -1,12 +1,10 @@
 # -*- coding: utf-8 -*-
-import sys
-
 try:
     import unittest2 as unittest
 except:
     import unittest
 
-from bumpr.version import  Version
+from bumpr.version import Version
 
 
 class VersionTest(unittest.TestCase):
@@ -111,7 +109,6 @@ class VersionTest(unittest.TestCase):
         self.assertEqual(version.minor, 3)
         self.assertEqual(version.patch, 0)
         self.assertEqual(version.suffix, None)
-
 
     def test_parse(self):
         version = Version.parse('1.2.3')
