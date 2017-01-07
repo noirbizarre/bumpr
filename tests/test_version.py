@@ -1,129 +1,136 @@
 # -*- coding: utf-8 -*-
-try:
-    import unittest2 as unittest
-except:
-    import unittest
 
 from bumpr.version import Version
 
 
-class VersionTest(unittest.TestCase):
-    def test_default_constructor(self):
-        version = Version()
+def test_default_constructor():
+    version = Version()
 
-        self.assertEqual(version.major, 0)
-        self.assertEqual(version.minor, 0)
-        self.assertEqual(version.patch, 0)
-        self.assertEqual(version.suffix, None)
+    assert version.major == 0
+    assert version.minor == 0
+    assert version.patch == 0
+    assert version.suffix is None
 
-    def test_constructor(self):
-        version = Version(1, suffix='dev')
 
-        self.assertEqual(version.major, 1)
-        self.assertEqual(version.minor, 0)
-        self.assertEqual(version.patch, 0)
-        self.assertEqual(version.suffix, 'dev')
+def test_constructor():
+    version = Version(1, suffix='dev')
 
-    def test_bump_major(self):
-        version = Version(1, 2, 3, 'dev')
+    assert version.major == 1
+    assert version.minor == 0
+    assert version.patch == 0
+    assert version.suffix == 'dev'
 
-        version.bump(Version.MAJOR)
 
-        self.assertEqual(version.major, 2)
-        self.assertEqual(version.minor, 0)
-        self.assertEqual(version.patch, 0)
-        self.assertEqual(version.suffix, None)
+def test_bump_major():
+    version = Version(1, 2, 3, 'dev')
 
-    def test_bump_minor(self):
-        version = Version(1, 2, 3, 'dev')
+    version.bump(Version.MAJOR)
 
-        version.bump(Version.MINOR)
+    assert version.major == 2
+    assert version.minor == 0
+    assert version.patch == 0
+    assert version.suffix is None
 
-        self.assertEqual(version.major, 1)
-        self.assertEqual(version.minor, 3)
-        self.assertEqual(version.patch, 0)
-        self.assertEqual(version.suffix, None)
 
-    def test_bump_patch(self):
-        version = Version(1, 2, 3, 'dev')
+def test_bump_minor():
+    version = Version(1, 2, 3, 'dev')
 
-        version.bump(Version.PATCH)
+    version.bump(Version.MINOR)
 
-        self.assertEqual(version.major, 1)
-        self.assertEqual(version.minor, 2)
-        self.assertEqual(version.patch, 4)
-        self.assertEqual(version.suffix, None)
+    assert version.major == 1
+    assert version.minor == 3
+    assert version.patch == 0
+    assert version.suffix is None
 
-    def test_bump_suffix(self):
-        version = Version(1, 2, 3, 'dev')
 
-        version.bump(suffix='rc1')
+def test_bump_patch():
+    version = Version(1, 2, 3, 'dev')
 
-        self.assertEqual(version.major, 1)
-        self.assertEqual(version.minor, 2)
-        self.assertEqual(version.patch, 3)
-        self.assertEqual(version.suffix, 'rc1')
+    version.bump(Version.PATCH)
 
-    def test_bump_unsuffix(self):
-        version = Version(1, 2, 3, 'dev')
+    assert version.major == 1
+    assert version.minor == 2
+    assert version.patch == 4
+    assert version.suffix is None
 
-        version.bump(unsuffix=True)
 
-        self.assertEqual(version.major, 1)
-        self.assertEqual(version.minor, 2)
-        self.assertEqual(version.patch, 3)
-        self.assertEqual(version.suffix, None)
+def test_bump_suffix():
+    version = Version(1, 2, 3, 'dev')
 
-    def test_bump_suffix_override_unsuffix(self):
-        version = Version(1, 2, 3, 'dev')
+    version.bump(suffix='rc1')
 
-        version.bump(suffix='rc1', unsuffix=True)
+    assert version.major == 1
+    assert version.minor == 2
+    assert version.patch == 3
+    assert version.suffix == 'rc1'
 
-        self.assertEqual(version.major, 1)
-        self.assertEqual(version.minor, 2)
-        self.assertEqual(version.patch, 3)
-        self.assertEqual(version.suffix, 'rc1')
 
-    def test_bump_no_effect(self):
-        version = Version(1, 2, 3, 'dev')
+def test_bump_unsuffix():
+    version = Version(1, 2, 3, 'dev')
 
-        version.bump(unsuffix=False)
+    version.bump(unsuffix=True)
 
-        self.assertEqual(version.major, 1)
-        self.assertEqual(version.minor, 2)
-        self.assertEqual(version.patch, 3)
-        self.assertEqual(version.suffix, 'dev')
+    assert version.major == 1
+    assert version.minor == 2
+    assert version.patch == 3
+    assert version.suffix is None
 
-    def test_copy(self):
-        version = Version(1, 2, 3, 'dev').copy()
 
-        self.assertEqual(version.major, 1)
-        self.assertEqual(version.minor, 2)
-        self.assertEqual(version.patch, 3)
-        self.assertEqual(version.suffix, 'dev')
+def test_bump_suffix_override_unsuffix():
+    version = Version(1, 2, 3, 'dev')
 
-    def test_copy_bump(self):
-        version = Version(1, 2, 3, 'dev').copy(part=Version.MINOR, unsuffix=True)
+    version.bump(suffix='rc1', unsuffix=True)
 
-        self.assertEqual(version.major, 1)
-        self.assertEqual(version.minor, 3)
-        self.assertEqual(version.patch, 0)
-        self.assertEqual(version.suffix, None)
+    assert version.major == 1
+    assert version.minor == 2
+    assert version.patch == 3
+    assert version.suffix == 'rc1'
 
-    def test_parse(self):
-        version = Version.parse('1.2.3')
 
-        self.assertIsNotNone(version)
-        self.assertEqual(version.major, 1)
-        self.assertEqual(version.minor, 2)
-        self.assertEqual(version.patch, 3)
-        self.assertEqual(version.suffix, None)
+def test_bump_no_effect():
+    version = Version(1, 2, 3, 'dev')
 
-    def test_parse_with_suffix(self):
-        version = Version.parse('1.2.3.rc4')
+    version.bump(unsuffix=False)
 
-        self.assertIsNotNone(version)
-        self.assertEqual(version.major, 1)
-        self.assertEqual(version.minor, 2)
-        self.assertEqual(version.patch, 3)
-        self.assertEqual(version.suffix, 'rc4')
+    assert version.major == 1
+    assert version.minor == 2
+    assert version.patch == 3
+    assert version.suffix == 'dev'
+
+
+def test_copy():
+    version = Version(1, 2, 3, 'dev').copy()
+
+    assert version.major == 1
+    assert version.minor == 2
+    assert version.patch == 3
+    assert version.suffix == 'dev'
+
+
+def test_copy_bump():
+    version = Version(1, 2, 3, 'dev').copy(part=Version.MINOR, unsuffix=True)
+
+    assert version.major == 1
+    assert version.minor == 3
+    assert version.patch == 0
+    assert version.suffix is None
+
+
+def test_parse():
+    version = Version.parse('1.2.3')
+
+    assert version is not None
+    assert version.major == 1
+    assert version.minor == 2
+    assert version.patch == 3
+    assert version.suffix is None
+
+
+def test_parse_with_suffix():
+    version = Version.parse('1.2.3.rc4')
+
+    assert version is not None
+    assert version.major == 1
+    assert version.minor == 2
+    assert version.patch == 3
+    assert version.suffix == 'rc4'
