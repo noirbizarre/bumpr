@@ -16,13 +16,16 @@ def pytest_configure():
     log.declare()
 
 
+DEFAULT_VERSION = '1.2.3.dev'
+
+
 class Workspace(object):
-    def __init__(self, module_name='fake', version='1.2.3.dev'):
-        self.module_name = module_name
+    def __init__(self, version):
+        self.module_name = 'fake'
         self.cwd = os.getcwd()
-        self.root = tempfile.mkdtemp(module_name)
+        self.root = tempfile.mkdtemp(self.module_name)
         self.version = version
-        self.module_filename = self.write('{0}.py'.format(module_name), '''\
+        self.module_filename = self.write('{0}.py'.format(self.module_name), '''\
             # -*- coding: utf-8 -*-
 
             __version__ = '{version}'
@@ -62,17 +65,10 @@ class Workspace(object):
             sys.path.remove(self.root)
 
 
-def with_workspace(module_name='fake', version='1.2.3.dev'):
-    def wrapper(wrapped):
-        wrapped.__module_name = module_name
-        wrapped.__version = version
-        return wrapped
-    return wrapper
-
-
 @pytest.fixture
 def workspace(request):
-    wksp = Workspace()
+    version = getattr(request.function, '__version', DEFAULT_VERSION)
+    wksp = Workspace(version)
     wksp.chdir()
 
     yield wksp
