@@ -3,7 +3,7 @@ Bump'R
 ======
 
 .. image:: https://secure.travis-ci.org/noirbizarre/bumpr.svg?branch=master
-    :target: http://travis-ci.org/noirbizarre/bumpr
+    :target: https://travis-ci.org/noirbizarre/bumpr
     :alt: Build status
 .. image:: https://coveralls.io/repos/noirbizarre/bumpr/badge.svg?branch=master
     :target: https://coveralls.io/r/noirbizarre/bumpr?branch=master
@@ -12,8 +12,14 @@ Bump'R
     :target: https://requires.io/github/noirbizarre/bumpr/requirements/?branch=master
     :alt: Requirements Status
 .. image:: https://readthedocs.org/projects/bumpr/badge/?version=latest
-    :target: http://bumpr.readthedocs.org/en/latest/
+    :target: https://bumpr.readthedocs.org/en/latest/
     :alt: Documentation status
+.. image:: https://img.shields.io/pypi/l/bumpr.svg
+    :target: https://pypi.python.org/pypi/bumpr
+    :alt: License
+.. image:: https://img.shields.io/pypi/pyversions/bumpr.svg
+    :target: https://pypi.python.org/pypi/bumpr
+    :alt: Supported Python versions
 
 Bump'R is a version bumper and releaser allowing in a single command:
 
