@@ -42,7 +42,6 @@ install_requires = []
 tests_require = ['mock', 'pytest']
 doc_require = ['sphinx']
 qa_require = ['pytest-cov', 'coverage']
-dev_require = ['invoke']
 
 if sys.version_info[0:2] < (2, 7):
     install_requires.append('argparse')
@@ -74,7 +73,6 @@ setup(
         'test': tests_require,
         'doc': doc_require,
         'qa': qa_require,
-        'dev': dev_require,
     },
     keywords='version bump release tag',
     classifiers=[
