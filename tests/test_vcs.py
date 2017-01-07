@@ -1,21 +1,15 @@
 # -*- coding: utf-8 -*-
 from __future__ import print_function, unicode_literals
 
-import os
-try:
-    import unittest2 as unittest
-except:
-    import unittest
+import pytest
 
 from mock import patch
-
-from tests.test_tools import workspace
 
 from bumpr.vcs import BaseVCS, Git, Mercurial, Bazaar
 from bumpr.helpers import BumprError
 
 
-class BaseVCSTest(unittest.TestCase):
+class BaseVCSTest(object):
     def test_execute_verbose(self):
         vcs = BaseVCS(verbose=True)
         with patch('bumpr.vcs.execute') as execute:
@@ -29,36 +23,33 @@ class BaseVCSTest(unittest.TestCase):
             execute.assert_called_with('cmd arg', verbose=False)
 
 
-class GitTest(unittest.TestCase):
-    def test_validate_ok(self):
-        with workspace('git'):
-            os.mkdir('.git')
-            git = Git()
+class GitTest(object):
+    def test_validate_ok(self, workspace):
+        workspace.mkdir('.git')
+        git = Git()
 
-            with patch('bumpr.vcs.execute') as execute:
-                execute.return_value = '?? new.py'
+        with patch('bumpr.vcs.execute') as execute:
+            execute.return_value = '?? new.py'
+            git.validate()
+            execute.assert_called_with('git status --porcelain', verbose=False)
+
+    def test_validate_ko_not_git(self, workspace):
+        git = Git()
+
+        with patch('bumpr.vcs.execute') as execute:
+            with pytest.raises(BumprError):
                 git.validate()
-                execute.assert_called_with('git status --porcelain', verbose=False)
+            assert execute.called is False
 
-    def test_validate_ko_not_git(self):
-        with workspace('git'):
-            git = Git()
+    def test_validate_ko_not_clean(self, workspace):
+        workspace.mkdir('.git')
+        git = Git()
 
-            with patch('bumpr.vcs.execute') as execute:
-                with self.assertRaises(BumprError):
-                    git.validate()
-                self.assertFalse(execute.called)
-
-    def test_validate_ko_not_clean(self):
-        with workspace('git'):
-            os.mkdir('.git')
-            git = Git()
-
-            with patch('bumpr.vcs.execute') as execute:
-                execute.return_value = '\n'.join((' M modified.py', '?? new.py'))
-                with self.assertRaises(BumprError):
-                    git.validate()
-                execute.assert_called_with('git status --porcelain', verbose=False)
+        with patch('bumpr.vcs.execute') as execute:
+            execute.return_value = '\n'.join((' M modified.py', '?? new.py'))
+            with pytest.raises(BumprError):
+                git.validate()
+            execute.assert_called_with('git status --porcelain', verbose=False)
 
     def test_tag(self):
         git = Git()
@@ -83,36 +74,33 @@ class GitTest(unittest.TestCase):
             execute.assert_any_call(['git', 'push', '--tags'])
 
 
-class MercurialTest(unittest.TestCase):
-    def test_validate_ok(self):
-        with workspace('mercurial'):
-            os.mkdir('.hg')
-            mercurial = Mercurial()
+class MercurialTest(object):
+    def test_validate_ok(self, workspace):
+        workspace.mkdir('.hg')
+        mercurial = Mercurial()
 
-            with patch('bumpr.vcs.execute') as execute:
-                execute.return_value = '?? new.py'
+        with patch('bumpr.vcs.execute') as execute:
+            execute.return_value = '?? new.py'
+            mercurial.validate()
+            execute.assert_called_with('hg status -mard', verbose=False)
+
+    def test_validate_ko_not_mercurial(self, workspace):
+        mercurial = Mercurial()
+
+        with patch('bumpr.vcs.execute') as execute:
+            with pytest.raises(BumprError):
                 mercurial.validate()
-                execute.assert_called_with('hg status -mard', verbose=False)
+            assert execute.called is False
 
-    def test_validate_ko_not_mercurial(self):
-        with workspace('mercurial'):
-            mercurial = Mercurial()
+    def test_validate_ko_not_clean(self, workspace):
+        workspace.mkdir('.hg')
+        mercurial = Mercurial()
 
-            with patch('bumpr.vcs.execute') as execute:
-                with self.assertRaises(BumprError):
-                    mercurial.validate()
-                self.assertFalse(execute.called)
-
-    def test_validate_ko_not_clean(self):
-        with workspace('mercurial'):
-            os.mkdir('.hg')
-            mercurial = Mercurial()
-
-            with patch('bumpr.vcs.execute') as execute:
-                execute.return_value = '\n'.join((' M modified.py', '?? new.py'))
-                with self.assertRaises(BumprError):
-                    mercurial.validate()
-                execute.assert_called_with('hg status -mard', verbose=False)
+        with patch('bumpr.vcs.execute') as execute:
+            execute.return_value = '\n'.join((' M modified.py', '?? new.py'))
+            with pytest.raises(BumprError):
+                mercurial.validate()
+            execute.assert_called_with('hg status -mard', verbose=False)
 
     def test_tag(self):
         mercurial = Mercurial()
@@ -136,36 +124,33 @@ class MercurialTest(unittest.TestCase):
             execute.assert_called_with(['hg', 'push'])
 
 
-class BazaarTest(unittest.TestCase):
-    def test_validate_ok(self):
-        with workspace('bazaar'):
-            os.mkdir('.bzr')
-            bazaar = Bazaar()
+class BazaarTest(object):
+    def test_validate_ok(self, workspace):
+        workspace.mkdir('.bzr')
+        bazaar = Bazaar()
 
-            with patch('bumpr.vcs.execute') as execute:
-                execute.return_value = '? new.py'
+        with patch('bumpr.vcs.execute') as execute:
+            execute.return_value = '? new.py'
+            bazaar.validate()
+            execute.assert_called_with('bzr status --short', verbose=False)
+
+    def test_validate_ko_not_bazaar(self, workspace):
+        bazaar = Bazaar()
+
+        with patch('bumpr.vcs.execute') as execute:
+            with pytest.raises(BumprError):
                 bazaar.validate()
-                execute.assert_called_with('bzr status --short', verbose=False)
+            assert execute.called is False
 
-    def test_validate_ko_not_bazaar(self):
-        with workspace('bazaar'):
-            bazaar = Bazaar()
+    def test_validate_ko_not_clean(self, workspace):
+        workspace.mkdir('.bzr')
+        bazaar = Bazaar()
 
-            with patch('bumpr.vcs.execute') as execute:
-                with self.assertRaises(BumprError):
-                    bazaar.validate()
-                self.assertFalse(execute.called)
-
-    def test_validate_ko_not_clean(self):
-        with workspace('bazaar'):
-            os.mkdir('.bzr')
-            bazaar = Bazaar()
-
-            with patch('bumpr.vcs.execute') as execute:
-                execute.return_value = '\n'.join((' M modified.py', '? new.py'))
-                with self.assertRaises(BumprError):
-                    bazaar.validate()
-                execute.assert_called_with('bzr status --short', verbose=False)
+        with patch('bumpr.vcs.execute') as execute:
+            execute.return_value = '\n'.join((' M modified.py', '? new.py'))
+            with pytest.raises(BumprError):
+                bazaar.validate()
+            execute.assert_called_with('bzr status --short', verbose=False)
 
     def test_tag(self):
         bazaar = Bazaar()

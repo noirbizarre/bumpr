@@ -45,6 +45,13 @@ class Workspace(object):
             f.write(content.encode('utf8'))
         return wksp_filename
 
+    def mkdir(self, dirname):
+        wksp_dirname = os.path.join(self.root, dirname)
+        try:
+            os.makedirs(wksp_dirname)
+        except FileExistsError as exc:
+            pass
+
     def chdir(self):
         os.chdir(self.root)
 
