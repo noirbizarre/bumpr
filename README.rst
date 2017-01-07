@@ -2,13 +2,13 @@
 Bump'R
 ======
 
-.. image:: https://secure.travis-ci.org/noirbizarre/bumpr.png
+.. image:: https://secure.travis-ci.org/noirbizarre/bumpr.svg?branch=master
     :target: http://travis-ci.org/noirbizarre/bumpr
     :alt: Build status
-.. image:: https://coveralls.io/repos/noirbizarre/bumpr/badge.png?branch=master
-    :target: https://coveralls.io/r/noirbizarre/bumpr
+.. image:: https://coveralls.io/repos/noirbizarre/bumpr/badge.svg?branch=master
+    :target: https://coveralls.io/r/noirbizarre/bumpr?branch=master
     :alt: Code coverage
-.. image:: https://requires.io/github/noirbizarre/bumpr/requirements.png?branch=master
+.. image:: https://requires.io/github/noirbizarre/bumpr/requirements.svg?branch=master
     :target: https://requires.io/github/noirbizarre/bumpr/requirements/?branch=master
     :alt: Requirements Status
 .. image:: https://readthedocs.org/projects/bumpr/badge/?version=latest
