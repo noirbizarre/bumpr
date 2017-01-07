@@ -1,12 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import print_function, unicode_literals
 
-import codecs
-try:
-    import unittest2 as unittest
-except:
-    import unittest
-
 from datetime import datetime
 from mock import patch, MagicMock, ANY
 from textwrap import dedent
@@ -16,10 +10,11 @@ from bumpr.helpers import BumprError
 from bumpr.hooks import ReadTheDocHook, CommandsHook, ChangelogHook
 from bumpr.version import Version
 
-from tests.test_tools import workspace
+import pytest
 
 
-class ReadTheDocHookTest(unittest.TestCase):
+class ReadTheDocHookTest(object):
+    @pytest.fixture(autouse=True)
     def setUp(self):
         self.releaser = MagicMock()
         self.releaser.version = Version.parse('1.2.3')
@@ -34,16 +29,17 @@ class ReadTheDocHookTest(unittest.TestCase):
     def test_bump(self):
         replacements = []
         self.hook.bump(replacements)
-        self.assertEqual(replacements, [('http://fake.somewhere.io/latest', 'http://fake.somewhere.io/1.2.3')])
+        assert replacements == [('http://fake.somewhere.io/latest', 'http://fake.somewhere.io/1.2.3')]
 
     def test_prepare(self):
         replacements = []
         self.hook.prepare(replacements)
-        self.assertEqual(replacements, [('http://fake.somewhere.io/1.2.3', 'http://fake.somewhere.io/latest')])
+        assert replacements == [('http://fake.somewhere.io/1.2.3', 'http://fake.somewhere.io/latest')]
 
 
 @patch('bumpr.hooks.execute')
-class CommandsHookTest(unittest.TestCase):
+class CommandsHookTest(object):
+    @pytest.fixture(autouse=True)
     def setUp(self):
         self.releaser = MagicMock()
         self.releaser.version = Version.parse('1.2.3')
@@ -74,7 +70,8 @@ class CommandsHookTest(unittest.TestCase):
         execute.assert_called_once_with('prepare command', replacements=ANY, verbose=ANY, dryrun=True)
 
 
-class ChangelogHookTest(unittest.TestCase):
+class ChangelogHookTest(object):
+    @pytest.fixture(autouse=True)
     def setUp(self):
         self.releaser = MagicMock()
         self.releaser.prev_version = Version.parse('1.2.3.dev')
@@ -87,55 +84,49 @@ class ChangelogHookTest(unittest.TestCase):
         self.releaser.config.dryrun = False
 
     def test_validate_no_file(self):
-        with self.assertRaises(BumprError):
+        with pytest.raises(BumprError):
             ChangelogHook(self.releaser)
 
-    def test_validate_file_does_not_exists(self):
-        with workspace():
-            self.releaser.config.__getitem__.return_value = ObjectDict({'file': 'changelog'})
-            with self.assertRaises(BumprError):
-                ChangelogHook(self.releaser)
-
-    def test_validate(self):
-        with workspace():
-            with codecs.open('changelog', 'wb', encoding='utf8') as f:
-                f.write('')
-            self.releaser.config.__getitem__.return_value = ObjectDict({'file': 'changelog'})
+    def test_validate_file_does_not_exists(self, workspace):
+        self.releaser.config.__getitem__.return_value = ObjectDict({'file': 'changelog'})
+        with pytest.raises(BumprError):
             ChangelogHook(self.releaser)
 
-    def test_bump(self):
+    def test_validate(self, workspace):
+        workspace.write('changelog', '')
+        self.releaser.config.__getitem__.return_value = ObjectDict({'file': 'changelog'})
+        ChangelogHook(self.releaser)
+
+    def test_bump(self, workspace):
         content = dedent('''\
             Dev
             ###
 
             - some changes
         ''')
+        workspace.write('changelog', content)
 
-        with workspace():
-            with codecs.open('changelog', 'wb', encoding='utf8') as f:
-                f.write(content)
+        self.releaser.config.__getitem__.return_value = ObjectDict({
+            'file': 'changelog',
+            'separator': '#',
+            'bump': '{version} {date:%Y-%m-%d}',
+            'prepare': 'Dev',
+            'empty': 'Empty',
+        })
 
-            self.releaser.config.__getitem__.return_value = ObjectDict({
-                'file': 'changelog',
-                'separator': '#',
-                'bump': '{version} {date:%Y-%m-%d}',
-                'prepare': 'Dev',
-                'empty': 'Empty',
-            })
+        hook = ChangelogHook(self.releaser)
+        hook.bump([])
 
-            hook = ChangelogHook(self.releaser)
-            hook.bump([])
+        expected = dedent('''\
+            1.2.3 {0:%Y-%m-%d}
+            ################
 
-            expected = dedent('''\
-                1.2.3 {0:%Y-%m-%d}
-                ################
+            - some changes
+        ''').format(self.releaser.timestamp)
 
-                - some changes
-            ''').format(self.releaser.timestamp)
+        self.releaser.perform.assert_called_once_with('changelog', content, expected)
 
-            self.releaser.perform.assert_called_once_with('changelog', content, expected)
-
-    def test_prepare(self):
+    def test_prepare(self, workspace):
         content = dedent('''\
             1.2.3 {0:%Y-%m-%d}
             ################
@@ -143,31 +134,29 @@ class ChangelogHookTest(unittest.TestCase):
             - some changes
         ''').format(self.releaser.timestamp)
 
-        with workspace():
-            with codecs.open('changelog', 'wb', encoding='utf8') as f:
-                f.write(content)
+        workspace.write('changelog', content)
 
-            self.releaser.config.__getitem__.return_value = ObjectDict({
-                'file': 'changelog',
-                'separator': '#',
-                'bump': '{version} {date:%Y-%m-%d}',
-                'prepare': 'Dev',
-                'empty': 'Empty',
-            })
+        self.releaser.config.__getitem__.return_value = ObjectDict({
+            'file': 'changelog',
+            'separator': '#',
+            'bump': '{version} {date:%Y-%m-%d}',
+            'prepare': 'Dev',
+            'empty': 'Empty',
+        })
 
-            hook = ChangelogHook(self.releaser)
-            hook.prepare([])
+        hook = ChangelogHook(self.releaser)
+        hook.prepare([])
 
-            expected = dedent('''\
-                Dev
-                ###
+        expected = dedent('''\
+            Dev
+            ###
 
-                - Empty
+            - Empty
 
-                1.2.3 {0:%Y-%m-%d}
-                ################
+            1.2.3 {0:%Y-%m-%d}
+            ################
 
-                - some changes
-            ''').format(self.releaser.timestamp)
+            - some changes
+        ''').format(self.releaser.timestamp)
 
-            self.releaser.perform.assert_called_once_with('changelog', content, expected)
+        self.releaser.perform.assert_called_once_with('changelog', content, expected)
