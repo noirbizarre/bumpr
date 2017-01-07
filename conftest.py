@@ -60,7 +60,8 @@ class Workspace(object):
 
     def cleanup(self):
         os.chdir(self.cwd)
-        shutil.rmtree(self.root)
+        if os.path.exists(self.root):
+            shutil.rmtree(self.root)
         if self.root in sys.path:
             sys.path.remove(self.root)
 

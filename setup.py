@@ -45,7 +45,6 @@ qa_require = ['pytest-cov', 'coverage']
 
 if sys.version_info[0:2] < (2, 7):
     install_requires.append('argparse')
-    tests_require.append('unittest2==0.5.1')
     qa_require.append('flake8<3.0')
 else:
     qa_require.append('flake8')
