@@ -39,7 +39,7 @@ long_description = '\n'.join((
 
 
 install_requires = []
-tests_require = ['mock', 'pytest']
+tests_require = ['mock', 'pytest', 'pytest-catchlog']
 doc_require = ['sphinx']
 qa_require = ['pytest-cov', 'coverage']
 

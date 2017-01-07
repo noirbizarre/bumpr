@@ -109,7 +109,7 @@ def init(level=INFO):
         logger.setLevel(level)
 
 
-if __name__ == '__main__':
+if __name__ == '__main__':  # pragma: no cover
     init(level=DEBUG)
 
     logger = logging.getLogger(__name__)

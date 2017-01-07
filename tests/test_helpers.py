@@ -8,7 +8,7 @@ import pytest
 from mock import patch, call
 from subprocess import CalledProcessError
 
-from bumpr.helpers import execute, BumprError
+from bumpr.helpers import execute, BumprError, check_output
 
 IS_PY3 = sys.version_info[0] == 3
 
@@ -91,3 +91,7 @@ class ExecuteTest(object):
 
         with pytest.raises(BumprError):
             execute('some failed command', verbose=True)
+
+
+def test_check_output():
+    assert check_output(['echo', '123']).strip() == '123'

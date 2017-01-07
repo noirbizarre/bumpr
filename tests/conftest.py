@@ -13,7 +13,7 @@ import pytest
 
 def pytest_configure():
     from bumpr import log
-    log.declare()
+    log.init()
 
 
 DEFAULT_VERSION = '1.2.3.dev'
@@ -29,8 +29,7 @@ class Workspace(object):
             # -*- coding: utf-8 -*-
 
             __version__ = '{version}'
-            '''
-        )
+        ''')
         self.readme_filename = self.write('README', '''\
             README
 
@@ -38,8 +37,7 @@ class Workspace(object):
             Lorem ipsum dolor sit amet, consectetur adipisicing elit.
             Non, ad, facilis, vel voluptas fugiat sit debitis iusto
             numquam quasi aliquid cum quod laborum assumenda quia
-            '''
-        )
+        ''')
 
     def write(self, filename, content):
         wksp_filename = os.path.join(self.root, filename)
