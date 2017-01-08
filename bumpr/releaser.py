@@ -179,7 +179,7 @@ class Releaser(object):
 
     def push(self):
         if self.config.vcs and self.config.commit and self.config.push:
-            logger.debug('Push to upstream repository')
+            logger.info('Push to upstream repository')
             if not self.config.dryrun:
                 self.vcs.push()
             else:

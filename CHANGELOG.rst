@@ -4,7 +4,7 @@ Changelog
 Current
 -------
 
-- Nothing yet
+- Push action is verbose
 
 0.3.2 (2017-01-08)
 ------------------
