@@ -18,6 +18,7 @@ __all_ = (
     'ReadTheDocHook',
     'ChangelogHook',
     'CommandHook',
+    'ReplaceHook',
     'HOOKS',
 )
 
@@ -150,4 +151,31 @@ class CommandsHook(Hook):
             execute(self.config.prepare, replacements=replacements, verbose=self.verbose, dryrun=self.dryrun)
 
 
-HOOKS = (ReadTheDocHook, ChangelogHook, CommandsHook)
+class ReplaceHook(Hook):
+    '''
+    This hook perform replacements in files
+    '''
+    key = 'replace'
+
+    def bump(self, replacements):
+        replacements.insert(0, (
+            self.config.dev.format(version=self.releaser.prev_version,
+                                   date=self.releaser.timestamp,
+                                   **self.releaser.prev_version.__dict__),
+            self.config.stable.format(version=self.releaser.version,
+                                      date=self.releaser.timestamp,
+                                      **self.releaser.version.__dict__)
+        ))
+
+    def prepare(self, replacements):
+        replacements.insert(0, (
+            self.config.stable.format(version=self.releaser.version,
+                                      date=self.releaser.timestamp,
+                                      **self.releaser.version.__dict__),
+            self.config.dev.format(version=self.releaser.next_version,
+                                   date=self.releaser.timestamp,
+                                   **self.releaser.next_version.__dict__)
+        ))
+
+
+HOOKS = (ReadTheDocHook, ChangelogHook, CommandsHook, ReplaceHook)

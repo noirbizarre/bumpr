@@ -5,9 +5,9 @@ from datetime import datetime
 from mock import patch, MagicMock, ANY
 from textwrap import dedent
 
-from bumpr.config import ObjectDict
+from bumpr.config import ObjectDict, Config
 from bumpr.helpers import BumprError
-from bumpr.hooks import ReadTheDocHook, CommandsHook, ChangelogHook
+from bumpr.hooks import ReadTheDocHook, CommandsHook, ChangelogHook, ReplaceHook
 from bumpr.version import Version
 
 import pytest
@@ -219,3 +219,38 @@ class ChangelogHookTest(object):
         ''').format(self.releaser.timestamp)
 
         self.releaser.perform.assert_called_once_with('changelog', content, expected)
+
+
+class ReplaceHookTest(object):
+    @pytest.fixture(autouse=True)
+    def setUp(self):
+        self.releaser = MagicMock()
+        self.releaser.prev_version = Version.parse('1.2.3.dev')
+        self.releaser.version = Version.parse('1.2.3')
+        self.releaser.next_version = Version.parse('1.2.4.dev')
+        self.releaser.timestamp = datetime.now()
+        self.releaser.config = Config()
+
+    def test_bump(self):
+        self.releaser.config[ReplaceHook.key] = {
+            'dev': 'dev-{version}',
+            'stable': 'stable-{version}',
+        }
+
+        replacements = []
+        hook = ReplaceHook(self.releaser)
+        hook.bump(replacements)
+
+        assert replacements == [('dev-1.2.3.dev', 'stable-1.2.3')]
+
+    def test_prepare(self):
+        self.releaser.config[ReplaceHook.key] = {
+            'dev': 'dev-{version}',
+            'stable': 'stable-{version}',
+        }
+
+        replacements = []
+        hook = ReplaceHook(self.releaser)
+        hook.prepare(replacements)
+
+        assert replacements == [('stable-1.2.3', 'dev-1.2.4.dev')]
