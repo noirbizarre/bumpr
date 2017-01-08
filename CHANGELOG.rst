@@ -1,8 +1,8 @@
 Changelog
 =========
 
-Current
--------
+0.3.0 (2017-01-08)
+------------------
 
 - Support seprator omission in changelog (for markdown)
 - Add readthedoc badge support.
