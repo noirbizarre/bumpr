@@ -83,7 +83,7 @@ class Bazaar(BaseVCS):
         self.execute(["bzr", "push"])
 
 
-class Fake(BaseVCS):
+class Fake(BaseVCS):  # pragma: no cover
     def validate(self):
         return True
 
