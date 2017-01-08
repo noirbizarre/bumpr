@@ -104,6 +104,7 @@ class ConfigTest(object):
         [bumpr]
         file = test.py
         files = README
+        tag = true
         [bump]
         message = test
         '''
@@ -111,6 +112,7 @@ class ConfigTest(object):
         expected = deepcopy(DEFAULTS)
         expected['file'] = 'test.py'
         expected['files'] = ['README']
+        expected['tag'] = True
         expected['bump']['message'] = 'test'
         for hook in HOOKS:
             expected[hook.key] = False
@@ -128,6 +130,7 @@ class ConfigTest(object):
                 '[bumpr]',
                 'file = test.py',
                 'files = README',
+                'tag = true',
                 '[bumpr:bump]',
                 'message = test',
             ]))
@@ -135,6 +138,7 @@ class ConfigTest(object):
         expected = deepcopy(DEFAULTS)
         expected['file'] = 'test.py'
         expected['files'] = ['README']
+        expected['tag'] = True
         expected['bump']['message'] = 'test'
         for hook in HOOKS:
             expected[hook.key] = False
