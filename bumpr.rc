@@ -1,6 +1,7 @@
 [bumpr]
 file = bumpr/__about__.py
 vcs = git
+push = true
 tests = tox
 publish = python setup.py register sdist bdist_wheel upload
 clean =
@@ -23,3 +24,7 @@ prepare = Current
 
 [readthedoc]
 id = bumpr
+
+[replace]
+dev = ?branch=master
+stable = ?tag={version}
