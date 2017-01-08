@@ -1,9 +1,12 @@
 # -*- coding: utf-8 -*-
 from __future__ import print_function, unicode_literals
 
+import pytest
+
 from mock import patch, MagicMock, ANY
 
 from bumpr.config import Config
+from bumpr.helpers import BumprError
 from bumpr.releaser import Releaser
 from bumpr.version import Version
 
@@ -34,6 +37,22 @@ class ReleaserTest(object):
         assert not hasattr(releaser, 'diffs')
 
         assert releaser.hooks == []
+
+    def test_constructor_version_not_found(self, workspace):
+        config = Config({
+            'file': 'fake.py'
+        })
+        workspace.write('fake.py', '')
+        with pytest.raises(BumprError):
+            Releaser(config)
+
+    def test_constructor_version_bad_format(self, workspace):
+        config = Config({
+            'file': 'fake.py',
+        })
+        workspace.write('fake.py', '__badversion__ = "1.2.3"')
+        with pytest.raises(BumprError):
+            Releaser(config)
 
     def test_constructor_with_hooks(self, workspace):
         config = Config({
