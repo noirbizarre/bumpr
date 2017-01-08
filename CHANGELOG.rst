@@ -1,8 +1,8 @@
 Changelog
 =========
 
-Current
--------
+0.3.1 (2017-01-08)
+------------------
 
 - Ensure push is executed
 - Fix boolean parsing
