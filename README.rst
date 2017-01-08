@@ -2,17 +2,17 @@
 Bump'R
 ======
 
-.. image:: https://secure.travis-ci.org/noirbizarre/bumpr.svg?branch=master
+.. image:: https://secure.travis-ci.org/noirbizarre/bumpr.svg?tag=0.3.2
     :target: https://travis-ci.org/noirbizarre/bumpr
     :alt: Build status
-.. image:: https://coveralls.io/repos/noirbizarre/bumpr/badge.svg?branch=master
-    :target: https://coveralls.io/r/noirbizarre/bumpr?branch=master
+.. image:: https://coveralls.io/repos/noirbizarre/bumpr/badge.svg?tag=0.3.2
+    :target: https://coveralls.io/r/noirbizarre/bumpr?tag=0.3.2
     :alt: Code coverage
-.. image:: https://requires.io/github/noirbizarre/bumpr/requirements.svg?branch=master
-    :target: https://requires.io/github/noirbizarre/bumpr/requirements/?branch=master
+.. image:: https://requires.io/github/noirbizarre/bumpr/requirements.svg?tag=0.3.2
+    :target: https://requires.io/github/noirbizarre/bumpr/requirements/?tag=0.3.2
     :alt: Requirements Status
-.. image:: https://readthedocs.org/projects/bumpr/badge/?version=latest
-    :target: https://bumpr.readthedocs.io/en/latest/
+.. image:: https://readthedocs.org/projects/bumpr/badge/?version=0.3.2
+    :target: https://bumpr.readthedocs.io/en/0.3.2/
     :alt: Documentation status
 .. image:: https://img.shields.io/pypi/l/bumpr.svg
     :target: https://pypi.python.org/pypi/bumpr
@@ -114,4 +114,4 @@ This way you only have to specify which part you want to bump on the command lin
 Documentation
 =============
 
-The documentation is hosted `on Read the Docs <https://bumpr.readthedocs.io/en/latest/>`_
+The documentation is hosted `on Read the Docs <https://bumpr.readthedocs.io/en/0.3.2/>`_

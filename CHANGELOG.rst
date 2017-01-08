@@ -1,8 +1,8 @@
 Changelog
 =========
 
-Current
--------
+0.3.2 (2017-01-08)
+------------------
 
 - Fix some boolean handling from commandline
 
