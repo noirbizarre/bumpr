@@ -32,7 +32,7 @@ class Releaser(object):
                 version_string = match.group('version')
                 self.prev_version = Version.parse(version_string)
             except:
-                raise BumprError('Unable to extract version from {}'.format(config.file))
+                raise BumprError('Unable to extract version from {0}'.format(config.file))
 
         logger.debug('Previous version: {0}'.format(self.prev_version))
 

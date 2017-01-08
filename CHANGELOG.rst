@@ -5,6 +5,8 @@ Current
 -------
 
 - Ensure push is executed
+- Fix boolean parsing
+- Fix error handling on version extraction
 
 0.3.0 (2017-01-08)
 ------------------

@@ -80,7 +80,7 @@ class BumprConfigParser(RawConfigParser):
         sections = self.candidate_sections(section)
         return any(RawConfigParser.has_option(self, section, option) for section in sections)
 
-    def get(self, section, option):
+    def get(self, section, option, **kwargs):
         for section in self.candidate_sections(section):
             if RawConfigParser.has_option(self, section, option):
                 return RawConfigParser.get(self, section, option)
