@@ -156,6 +156,7 @@ class ReplaceHook(Hook):
     This hook perform replacements in files
     '''
     key = 'replace'
+    defaults = {}
 
     def bump(self, replacements):
         replacements.insert(0, (
