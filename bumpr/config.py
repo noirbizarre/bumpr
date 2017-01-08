@@ -164,7 +164,8 @@ class Config(ObjectDict):
         self.commit = not parsed_args.nocommit
         self.bump_only = parsed_args.bump_only
         self.prepare_only = parsed_args.prepare_only
-        self.push = parsed_args.push
+        if hasattr(parsed_args, 'push'):
+            self.push = parsed_args.push
 
         # Bump
         if parsed_args.part is not None:
@@ -230,7 +231,10 @@ class Config(ObjectDict):
         group = parser.add_argument_group('Version control system')
         group.add_argument('--vcs', choices=['git', 'hg'], default=None, help='VCS implementation')
         group.add_argument('-nc', '--nocommit', action='store_true', help='Do not commit')
-        group.add_argument('-P', '--push', action='store_true', help='Push changes to remote repository')
+        group.add_argument('-P', '--push', action='store_true', default=argparse.SUPPRESS,
+                           help='Push changes to remote repository')
+        group.add_argument('-nP', '--no-push', action='store_false', dest='push', default=argparse.SUPPRESS,
+                           help='Push changes to remote repository')
 
         parsed_args = parser.parse_args(args)
         return cls(parsed_args=parsed_args)

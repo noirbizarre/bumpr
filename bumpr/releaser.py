@@ -178,7 +178,7 @@ class Releaser(object):
                 logger.dryrun('commit: {0}'.format(message))
 
     def push(self):
-        if self.config.commit and self.config.push:
+        if self.config.vcs and self.config.commit and self.config.push:
             logger.debug('Push to upstream repository')
             if not self.config.dryrun:
                 self.vcs.push()

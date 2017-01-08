@@ -4,7 +4,7 @@ Changelog
 Current
 -------
 
-- Nothing yet
+- Fix push handling from commandline
 
 0.3.1 (2017-01-08)
 ------------------

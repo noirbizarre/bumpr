@@ -104,7 +104,7 @@ class ConfigTest(object):
         [bumpr]
         file = test.py
         files = README
-        tag = true
+        push = true
         [bump]
         message = test
         '''
@@ -112,7 +112,7 @@ class ConfigTest(object):
         expected = deepcopy(DEFAULTS)
         expected['file'] = 'test.py'
         expected['files'] = ['README']
-        expected['tag'] = True
+        expected['push'] = True
         expected['bump']['message'] = 'test'
         for hook in HOOKS:
             expected[hook.key] = False
@@ -130,7 +130,7 @@ class ConfigTest(object):
                 '[bumpr]',
                 'file = test.py',
                 'files = README',
-                'tag = true',
+                'push = true',
                 '[bumpr:bump]',
                 'message = test',
             ]))
@@ -138,7 +138,7 @@ class ConfigTest(object):
         expected = deepcopy(DEFAULTS)
         expected['file'] = 'test.py'
         expected['files'] = ['README']
-        expected['tag'] = True
+        expected['push'] = True
         expected['bump']['message'] = 'test'
         for hook in HOOKS:
             expected[hook.key] = False
@@ -223,6 +223,60 @@ class ConfigTest(object):
         expected['files'] = ['README']
         expected['bump']['message'] = 'test'
         expected['prepare']['part'] = Version.MINOR
+
+        for hook in HOOKS:
+            expected[hook.key] = False
+
+        assert config == expected
+
+    def test_do_not_override_push_when_not_in_args(self):
+        bumprrc = '''\
+        [bumpr]
+        push = true
+        '''
+
+        with mock_ini(bumprrc):
+            with patch('bumpr.config.exists', return_value=True):
+                config = Config.parse_args(['-c', 'test.rc'])
+
+        expected = deepcopy(DEFAULTS)
+        expected['push'] = True
+
+        for hook in HOOKS:
+            expected[hook.key] = False
+
+        assert config == expected
+
+    def test_override_push_from_args(self):
+        bumprrc = '''\
+        [bumpr]
+        push = true
+        '''
+
+        with mock_ini(bumprrc):
+            with patch('bumpr.config.exists', return_value=True):
+                config = Config.parse_args(['-c', 'test.rc', '--no-push'])
+
+        expected = deepcopy(DEFAULTS)
+        expected['push'] = False
+
+        for hook in HOOKS:
+            expected[hook.key] = False
+
+        assert config == expected
+
+    def test_force_push_from_args(self):
+        bumprrc = '''\
+        [bumpr]
+        push = false
+        '''
+
+        with mock_ini(bumprrc):
+            with patch('bumpr.config.exists', return_value=True):
+                config = Config.parse_args(['-c', 'test.rc', '--push'])
+
+        expected = deepcopy(DEFAULTS)
+        expected['push'] = True
 
         for hook in HOOKS:
             expected[hook.key] = False
