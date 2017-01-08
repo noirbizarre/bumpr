@@ -12,7 +12,7 @@ Bump'R
     :target: https://requires.io/github/noirbizarre/bumpr/requirements/?branch=master
     :alt: Requirements Status
 .. image:: https://readthedocs.org/projects/bumpr/badge/?version=latest
-    :target: https://bumpr.readthedocs.org/en/latest/
+    :target: https://bumpr.readthedocs.io/en/latest/
     :alt: Documentation status
 .. image:: https://img.shields.io/pypi/l/bumpr.svg
     :target: https://pypi.python.org/pypi/bumpr
@@ -114,4 +114,4 @@ This way you only have to specify which part you want to bump on the command lin
 Documentation
 =============
 
-The documentation is hosted `on Read the Docs <http://bumpr.readthedocs.org/en/latest/>`_
+The documentation is hosted `on Read the Docs <https://bumpr.readthedocs.io/en/latest/>`_
