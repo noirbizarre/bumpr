@@ -283,6 +283,78 @@ class ConfigTest(object):
 
         assert config == expected
 
+    def test_do_not_override_commit_when_not_in_args(self):
+        bumprrc = '''\
+        [bumpr]
+        commit = False
+        '''
+
+        with mock_ini(bumprrc):
+            with patch('bumpr.config.exists', return_value=True):
+                config = Config.parse_args(['-c', 'test.rc'])
+
+        expected = deepcopy(DEFAULTS)
+        expected['commit'] = False
+
+        for hook in HOOKS:
+            expected[hook.key] = False
+
+        assert config == expected
+
+    def test_do_not_override_bump_only_when_not_in_args(self):
+        bumprrc = '''\
+        [bumpr]
+        bump_only = True
+        '''
+
+        with mock_ini(bumprrc):
+            with patch('bumpr.config.exists', return_value=True):
+                config = Config.parse_args(['-c', 'test.rc'])
+
+        expected = deepcopy(DEFAULTS)
+        expected['bump_only'] = True
+
+        for hook in HOOKS:
+            expected[hook.key] = False
+
+        assert config == expected
+
+    def test_do_not_override_prepare_only_when_not_in_args(self):
+        bumprrc = '''\
+        [bumpr]
+        prepare_only = True
+        '''
+
+        with mock_ini(bumprrc):
+            with patch('bumpr.config.exists', return_value=True):
+                config = Config.parse_args(['-c', 'test.rc'])
+
+        expected = deepcopy(DEFAULTS)
+        expected['prepare_only'] = True
+
+        for hook in HOOKS:
+            expected[hook.key] = False
+
+        assert config == expected
+
+    def test_do_override_commit(self):
+        bumprrc = '''\
+        [bumpr]
+        commit = True
+        '''
+
+        with mock_ini(bumprrc):
+            with patch('bumpr.config.exists', return_value=True):
+                config = Config.parse_args(['-c', 'test.rc', '-nc'])
+
+        expected = deepcopy(DEFAULTS)
+        expected['commit'] = False
+
+        for hook in HOOKS:
+            expected[hook.key] = False
+
+        assert config == expected
+
     def test_validate(self):
         config = Config({'file': 'version.py'})
         config.validate()

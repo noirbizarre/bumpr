@@ -126,7 +126,7 @@ class Config(ObjectDict):
         # Common options
         if config.has_section('bumpr'):
             for option in config.options('bumpr'):
-                if option in ('tag', 'commit', 'push'):
+                if option in ('tag', 'commit', 'push', 'bump_only', 'prepare_only'):
                     self[option] = config.getboolean('bumpr', option)
                 elif option == 'files':
                     self.files = [name.strip() for name in config.get('bumpr', 'files').split('\n') if name.strip()]
@@ -161,11 +161,11 @@ class Config(ObjectDict):
             if arg in parsed_args and getattr(parsed_args, arg):
                 self[arg] = True
 
-        self.commit = not parsed_args.nocommit
-        self.bump_only = parsed_args.bump_only
-        self.prepare_only = parsed_args.prepare_only
-        if hasattr(parsed_args, 'push'):
-            self.push = parsed_args.push
+        if hasattr(parsed_args, 'nocommit'):
+            self.commit = not parsed_args.nocommit
+        for attr in 'bump_only' 'prepare_only', 'push':
+            if hasattr(parsed_args, attr):
+                self[attr] = getattr(parsed_args, attr)
 
         # Bump
         if parsed_args.part is not None:
@@ -201,8 +201,9 @@ class Config(ObjectDict):
         parser.add_argument('-d', '--dryrun', action='store_true', help='Do not write anything and display a diff')
 
         group = parser.add_mutually_exclusive_group()
-        group.add_argument('-b', '--bump', dest='bump_only', action='store_true', help='Only perform the bump')
-        group.add_argument('-pr', '--prepare', dest='prepare_only', action='store_true',
+        group.add_argument('-b', '--bump', dest='bump_only', action='store_true', default=argparse.SUPPRESS,
+                           help='Only perform the bump')
+        group.add_argument('-pr', '--prepare', dest='prepare_only', action='store_true', default=argparse.SUPPRESS,
                            help='Only perform the prepare')
 
         # Bump behavior for bump
@@ -230,7 +231,8 @@ class Config(ObjectDict):
 
         group = parser.add_argument_group('Version control system')
         group.add_argument('--vcs', choices=['git', 'hg'], default=None, help='VCS implementation')
-        group.add_argument('-nc', '--nocommit', action='store_true', help='Do not commit')
+        group.add_argument('-nc', '--nocommit', action='store_true', default=argparse.SUPPRESS,
+                           help='Do not commit')
         group.add_argument('-P', '--push', action='store_true', default=argparse.SUPPRESS,
                            help='Push changes to remote repository')
         group.add_argument('-nP', '--no-push', action='store_false', dest='push', default=argparse.SUPPRESS,

@@ -4,7 +4,7 @@ Changelog
 Current
 -------
 
-- Fix push handling from commandline
+- Fix some boolean handling from commandline
 
 0.3.1 (2017-01-08)
 ------------------
