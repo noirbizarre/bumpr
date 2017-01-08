@@ -160,3 +160,62 @@ class ChangelogHookTest(object):
         ''').format(self.releaser.timestamp)
 
         self.releaser.perform.assert_called_once_with('changelog', content, expected)
+
+    def test_bump_no_separator(self, workspace):
+        content = dedent('''\
+            ## Dev
+
+            - some changes
+        ''')
+        workspace.write('changelog', content)
+
+        self.releaser.config.__getitem__.return_value = ObjectDict({
+            'file': 'changelog',
+            'separator': '',
+            'bump': '## {version} {date:%Y-%m-%d}',
+            'prepare': '## Dev',
+            'empty': 'Empty',
+        })
+
+        hook = ChangelogHook(self.releaser)
+        hook.bump([])
+
+        expected = dedent('''\
+            ## 1.2.3 {0:%Y-%m-%d}
+
+            - some changes
+        ''').format(self.releaser.timestamp)
+
+        self.releaser.perform.assert_called_once_with('changelog', content, expected)
+
+    def test_prepare_no_separator(self, workspace):
+        content = dedent('''\
+            ## 1.2.3 {0:%Y-%m-%d}
+
+            - some changes
+        ''').format(self.releaser.timestamp)
+
+        workspace.write('changelog', content)
+
+        self.releaser.config.__getitem__.return_value = ObjectDict({
+            'file': 'changelog',
+            'separator': '',
+            'bump': '## {version} {date:%Y-%m-%d}',
+            'prepare': '## Dev',
+            'empty': 'Empty',
+        })
+
+        hook = ChangelogHook(self.releaser)
+        hook.prepare([])
+
+        expected = dedent('''\
+            ## Dev
+
+            - Empty
+
+            ## 1.2.3 {0:%Y-%m-%d}
+
+            - some changes
+        ''').format(self.releaser.timestamp)
+
+        self.releaser.perform.assert_called_once_with('changelog', content, expected)

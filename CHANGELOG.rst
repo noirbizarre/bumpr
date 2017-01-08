@@ -4,6 +4,7 @@ Changelog
 Current
 -------
 
+- Support seprator omission in changelog (for markdown)
 - `setup.cfg` declaration support
 - Optionnal `bumpr:` prefix support
 - Switch to pytest

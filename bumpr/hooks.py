@@ -115,7 +115,10 @@ class ChangelogHook(Hook):
         return self.underline(title)
 
     def underline(self, text):
-        return '\n'.join((text, len(text) * self.config.separator))
+        if self.config.separator:
+            return '\n'.join((text, len(text) * self.config.separator))
+        else:
+            return text
 
 
 class CommandsHook(Hook):
