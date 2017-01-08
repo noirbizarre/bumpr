@@ -74,6 +74,7 @@ class Releaser(object):
             self.bump()
             self.publish()
             self.prepare()
+            self.push()
 
     def test(self):
         if self.config.tests:

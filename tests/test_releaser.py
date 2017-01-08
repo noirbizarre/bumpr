@@ -199,6 +199,74 @@ class ReleaserTest(object):
                 assert '1.2.3' in content
                 assert '1.2.3.dev' not in content
 
+    def test_release(self, workspace):
+        config = Config({
+            'file': 'fake.py',
+            'files': [workspace.readme_filename],
+            'vcs': 'fake',
+            'push': True,
+        })
+        releaser = Releaser(config)
+        with patch.object(releaser, 'clean') as clean:
+            with patch.object(releaser, 'test') as test:
+                with patch.object(releaser, 'bump') as bump:
+                    with patch.object(releaser, 'publish') as publish:
+                        with patch.object(releaser, 'prepare') as prepare:
+                            with patch.object(releaser, 'push') as push:
+                                releaser.release()
+                                assert clean.called
+                                assert test.called
+                                assert bump.called
+                                assert publish.called
+                                assert prepare.called
+                                assert push.called
+
+    def test_release_bump_only(self, workspace):
+        config = Config({
+            'file': 'fake.py',
+            'files': [workspace.readme_filename],
+            'vcs': 'fake',
+            'push': True,
+            'bump_only': True
+        })
+        releaser = Releaser(config)
+        with patch.object(releaser, 'clean') as clean:
+            with patch.object(releaser, 'test') as test:
+                with patch.object(releaser, 'bump') as bump:
+                    with patch.object(releaser, 'publish') as publish:
+                        with patch.object(releaser, 'prepare') as prepare:
+                            with patch.object(releaser, 'push') as push:
+                                releaser.release()
+                                assert not clean.called
+                                assert not test.called
+                                assert bump.called
+                                assert not publish.called
+                                assert not prepare.called
+                                assert not push.called
+
+    def test_release_prepare_only(self, workspace):
+        config = Config({
+            'file': 'fake.py',
+            'files': [workspace.readme_filename],
+            'vcs': 'fake',
+            'push': True,
+            'prepare_only': True
+        })
+        releaser = Releaser(config)
+        with patch.object(releaser, 'clean') as clean:
+            with patch.object(releaser, 'test') as test:
+                with patch.object(releaser, 'bump') as bump:
+                    with patch.object(releaser, 'publish') as publish:
+                        with patch.object(releaser, 'prepare') as prepare:
+                            with patch.object(releaser, 'push') as push:
+                                releaser.release()
+                                assert not clean.called
+                                assert not test.called
+                                assert not bump.called
+                                assert not publish.called
+                                assert prepare.called
+                                assert not push.called
+
     def test_release_dryrun(self, workspace):
         config = Config({
             'file': 'fake.py',

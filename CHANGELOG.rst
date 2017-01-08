@@ -4,7 +4,7 @@ Changelog
 Current
 -------
 
-- Nothing yet
+- Ensure push is executed
 
 0.3.0 (2017-01-08)
 ------------------
