@@ -273,6 +273,7 @@ class ReleaserTest(object):
             'files': [workspace.readme_filename],
             'vcs': 'fake',
             'dryrun': True,
+            'push': True,
         })
         releaser = Releaser(config)
         with patch('bumpr.releaser.execute') as execute:
@@ -281,6 +282,7 @@ class ReleaserTest(object):
                 assert not execute.called
                 assert not vcs.commit.called
                 assert not vcs.tag.called
+                assert not vcs.push.called
 
         for filename in workspace.module_filename, workspace.readme_filename:
             with open(filename) as f:
