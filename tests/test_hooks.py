@@ -13,7 +13,34 @@ from bumpr.version import Version
 import pytest
 
 
-class ReadTheDocHookTest(object):
+class ReadTheDocHookDefaultTest(object):
+    @pytest.fixture(autouse=True)
+    def setUp(self, workspace):
+        self.releaser = MagicMock()
+        self.releaser.version = Version.parse('1.2.3')
+        self.releaser.config = Config({ReadTheDocHook.key: {'id': 'fake'}})
+        self.hook = ReadTheDocHook(self.releaser)
+
+    def test_bump(self):
+        replacements = []
+        self.hook.bump(replacements)
+        assert replacements == [
+            ('https://fake.readthedocs.io/en/latest', 'https://fake.readthedocs.io/en/1.2.3'),
+            ('https://readthedocs.org/projects/fake/badge/?version=latest',
+             'https://readthedocs.org/projects/fake/badge/?version=1.2.3'),
+        ]
+
+    def test_prepare(self):
+        replacements = []
+        self.hook.prepare(replacements)
+        assert replacements == [
+            ('https://fake.readthedocs.io/en/1.2.3', 'https://fake.readthedocs.io/en/latest'),
+            ('https://readthedocs.org/projects/fake/badge/?version=1.2.3',
+             'https://readthedocs.org/projects/fake/badge/?version=latest'),
+        ]
+
+
+class ReadTheDocHookCustomTest(object):
     @pytest.fixture(autouse=True)
     def setUp(self):
         self.releaser = MagicMock()
