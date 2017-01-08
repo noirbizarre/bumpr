@@ -40,7 +40,6 @@ setup(
     description=__import__('bumpr.__about__').__description__,
     long_description=long_description,
     url='https://github.com/noirbizarre/bumpr',
-    download_url='http://pypi.python.org/pypi/bumpr',
     author='Axel Haustant',
     author_email='noirbizarre+github@gmail.com',
     packages=find_packages(),
