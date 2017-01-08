@@ -51,7 +51,7 @@ class ReadTheDocHook(Hook):
     key = 'readthedoc'
     defaults = {
         'id': None,
-        'urls': 'https://{id}.readthedocs.io/en/{tag}',
+        'url': 'https://{id}.readthedocs.io/en/{tag}',
         'badge': 'https://readthedocs.org/projects/{id}/badge/?version={tag}',
         'bump': '{version}',
         'prepare': 'latest',
