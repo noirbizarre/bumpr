@@ -21,6 +21,7 @@ class ReadTheDocHookTest(object):
         self.releaser.config.__getitem__.return_value = ObjectDict({
             'id': 'fake',
             'url': 'http://{id}.somewhere.io/{tag}',
+            'badge': 'http://{id}.somewhere.io/badge/{tag}',
             'bump': '{version}',
             'prepare': 'latest',
         })
@@ -29,12 +30,18 @@ class ReadTheDocHookTest(object):
     def test_bump(self):
         replacements = []
         self.hook.bump(replacements)
-        assert replacements == [('http://fake.somewhere.io/latest', 'http://fake.somewhere.io/1.2.3')]
+        assert replacements == [
+            ('http://fake.somewhere.io/latest', 'http://fake.somewhere.io/1.2.3'),
+            ('http://fake.somewhere.io/badge/latest', 'http://fake.somewhere.io/badge/1.2.3'),
+        ]
 
     def test_prepare(self):
         replacements = []
         self.hook.prepare(replacements)
-        assert replacements == [('http://fake.somewhere.io/1.2.3', 'http://fake.somewhere.io/latest')]
+        assert replacements == [
+            ('http://fake.somewhere.io/1.2.3', 'http://fake.somewhere.io/latest'),
+            ('http://fake.somewhere.io/badge/1.2.3', 'http://fake.somewhere.io/badge/latest'),
+        ]
 
 
 @patch('bumpr.hooks.execute')

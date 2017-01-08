@@ -51,7 +51,8 @@ class ReadTheDocHook(Hook):
     key = 'readthedoc'
     defaults = {
         'id': None,
-        'url': 'http://{id}.readthedocs.org/en/{tag}',
+        'urls': 'https://{id}.readthedocs.io/en/{tag}',
+        'badge': 'https://readthedocs.org/projects/{id}/badge/?version={tag}',
         'bump': '{version}',
         'prepare': 'latest',
     }
@@ -59,13 +60,24 @@ class ReadTheDocHook(Hook):
     def url(self, tag):
         return self.config.url.format(id=self.config.id, tag=tag)
 
+    def badge(self, tag):
+        return self.config.badge.format(id=self.config.id, tag=tag)
+
     def bump(self, replacements):
+        replacements.insert(0, (
+            self.badge('latest'),
+            self.badge(self.releaser.version)
+        ))
         replacements.insert(0, (
             self.url('latest'),
             self.url(self.releaser.version)
         ))
 
     def prepare(self, replacements):
+        replacements.insert(0, (
+            self.badge(self.releaser.version),
+            self.badge('latest')
+        ))
         replacements.insert(0, (
             self.url(self.releaser.version),
             self.url('latest')

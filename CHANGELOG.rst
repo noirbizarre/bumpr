@@ -5,9 +5,12 @@ Current
 -------
 
 - Support seprator omission in changelog (for markdown)
+- Add readthedoc badge support.
+- **Breaking** Use https and readthedocs.io as default
 - `setup.cfg` declaration support
 - Optionnal `bumpr:` prefix support
 - Switch to pytest
+
 
 0.2.1 (2015-11-21)
 ------------------
