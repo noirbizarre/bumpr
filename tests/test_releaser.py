@@ -185,13 +185,20 @@ class ReleaserTest(object):
                 assert '1.2.3.dev' not in content
 
     def test_bump(self, workspace):
-        config = Config({'file': 'fake.py', 'files': [workspace.readme_filename]})
+        config = Config({
+            'file': 'fake.py',
+            'files': [workspace.readme_filename],
+        })
+
         releaser = Releaser(config)
-        with patch.object(releaser, 'commit') as commit:
-            with patch.object(releaser, 'tag') as tag:
-                releaser.bump()
-                assert not commit.called
-                assert not tag.called
+        hook = MagicMock()
+        with patch.object(releaser, 'hooks', [hook]):
+            with patch.object(releaser, 'commit') as commit:
+                with patch.object(releaser, 'tag') as tag:
+                    releaser.bump()
+                    assert not commit.called
+                    assert not tag.called
+                    assert hook.bump.called
 
         for filename in workspace.module_filename, workspace.readme_filename:
             with open(filename) as f:
@@ -320,11 +327,14 @@ class ReleaserTest(object):
             }
         })
         releaser = Releaser(config)
-        with patch.object(releaser, 'commit') as commit:
-            with patch.object(releaser, 'tag') as tag:
-                releaser.prepare()
-                assert not commit.called
-                assert not tag.called
+        hook = MagicMock()
+        with patch.object(releaser, 'hooks', [hook]):
+            with patch.object(releaser, 'commit') as commit:
+                with patch.object(releaser, 'tag') as tag:
+                    releaser.prepare()
+                    assert not commit.called
+                    assert not tag.called
+                    assert hook.prepare.called
 
         for filename in workspace.module_filename, workspace.readme_filename:
             with open(filename) as f:
