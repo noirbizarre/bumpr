@@ -24,6 +24,10 @@ class BaseVCS(object):
         '''Create a tag'''
         raise NotImplementedError
 
+    def push(self):
+        '''Push changes to remote repository'''
+        raise NotImplementedError
+
 
 class Git(BaseVCS):
     def validate(self):
@@ -83,15 +87,9 @@ class Bazaar(BaseVCS):
         self.execute(["bzr", "push"])
 
 
-class Fake(BaseVCS):  # pragma: no cover
+class Fake(BaseVCS):
     def validate(self):
         return True
-
-    def commit(self, message):
-        pass
-
-    def tag(self, name):
-        pass
 
 
 VCS = {

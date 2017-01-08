@@ -94,6 +94,14 @@ class ReleaserTest(object):
             releaser.commit('message')
             vcs.commit.assert_called_with('message')
 
+    def test_commit_no_commit(self, workspace):
+        config = Config({'file': 'fake.py', 'vcs': 'fake', 'commit': False})
+        releaser = Releaser(config)
+
+        with patch.object(releaser, 'vcs') as vcs:
+            releaser.commit('message')
+            assert not vcs.commit.called
+
     def test_tag(self, workspace):
         config = Config({'file': 'fake.py', 'vcs': 'fake'})
         releaser = Releaser(config)
@@ -101,6 +109,22 @@ class ReleaserTest(object):
         with patch.object(releaser, 'vcs') as vcs:
             releaser.tag()
             vcs.tag.assert_called_with(str(releaser.version))
+
+    def test_tag_no_commit(self, workspace):
+        config = Config({'file': 'fake.py', 'vcs': 'fake', 'commit': False})
+        releaser = Releaser(config)
+
+        with patch.object(releaser, 'vcs') as vcs:
+            releaser.tag()
+            assert not vcs.tag.called
+
+    def test_tag_no_tag(self, workspace):
+        config = Config({'file': 'fake.py', 'vcs': 'fake', 'tag': False})
+        releaser = Releaser(config)
+
+        with patch.object(releaser, 'vcs') as vcs:
+            releaser.tag()
+            assert not vcs.tag.called
 
     def test_push_disabled_by_default(self, workspace):
         config = Config({'file': 'fake.py', 'vcs': 'fake'})
@@ -117,6 +141,14 @@ class ReleaserTest(object):
         with patch.object(releaser, 'vcs') as vcs:
             releaser.push()
             assert vcs.push.called
+
+    def test_push_no_commit(self, workspace):
+        config = Config({'file': 'fake.py', 'vcs': 'fake', 'push': True, 'commit': False})
+        releaser = Releaser(config)
+
+        with patch.object(releaser, 'vcs') as vcs:
+            releaser.push()
+            assert not vcs.push.called
 
     def test_release_wihtout_vcs_or_commands(self, workspace):
         config = Config({'file': 'fake.py', 'files': [workspace.readme_filename]})

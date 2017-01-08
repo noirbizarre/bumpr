@@ -161,7 +161,7 @@ class Releaser(object):
             self.execute(self.config.publish)
 
     def tag(self):
-        if self.config.tag:
+        if self.config.commit and self.config.tag:
             logger.debug('Tag: %s', self.version)
             if not self.config.dryrun:
                 self.vcs.tag(str(self.version))
@@ -177,7 +177,7 @@ class Releaser(object):
                 logger.dryrun('commit: {0}'.format(message))
 
     def push(self):
-        if self.config.push:
+        if self.config.commit and self.config.push:
             logger.debug('Push to upstream repository')
             if not self.config.dryrun:
                 self.vcs.push()
