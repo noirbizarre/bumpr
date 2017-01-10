@@ -13,9 +13,9 @@ All mandatory parameters not present in the configuration file should be on comm
 .. code-block:: console
 
     $ bumpr -h
-    usage: bumpr [-h] [--version] [-v] [-c CONFIG] [-d] [-b | -pr] [-M] [-m] [-p]
-                 [-s SUFFIX] [-u] [-pM] [-pm] [-pp] [-ps PREPARE_SUFFIX] [-pu]
-                 [--vcs {git,hg}] [-nc]
+    usage: bumpr [-h] [--version] [-v] [-c CONFIG] [-d] [-st] [-b | -pr] [-M] [-m]
+                 [-p] [-s SUFFIX] [-u] [-pM] [-pm] [-pp] [-ps PREPARE_SUFFIX]
+                 [-pu] [--vcs {git,hg}] [-nc] [-P] [-nP]
                  [file] [files [files ...]]
 
     Version bumper and Python package releaser
@@ -31,6 +31,7 @@ All mandatory parameters not present in the configuration file should be on comm
       -c CONFIG, --config CONFIG
                             Specify a configuration file
       -d, --dryrun          Do not write anything and display a diff
+      -st, --skip-tests     Skip tests
       -b, --bump            Only perform the bump
       -pr, --prepare        Only perform the prepare
 
@@ -54,5 +55,5 @@ All mandatory parameters not present in the configuration file should be on comm
     Version control system:
       --vcs {git,hg}        VCS implementation
       -nc, --nocommit       Do not commit
-
-
+      -P, --push            Push changes to remote repository
+      -nP, --no-push        Don't push changes to remote repository

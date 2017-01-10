@@ -239,7 +239,7 @@ class Config(ObjectDict):
         group.add_argument('-P', '--push', action='store_true', default=argparse.SUPPRESS,
                            help='Push changes to remote repository')
         group.add_argument('-nP', '--no-push', action='store_false', dest='push', default=argparse.SUPPRESS,
-                           help='Push changes to remote repository')
+                           help='Don\'t push changes to remote repository')
 
         parsed_args = parser.parse_args(args)
         return cls(parsed_args=parsed_args)

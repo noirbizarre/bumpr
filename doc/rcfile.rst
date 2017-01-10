@@ -37,6 +37,11 @@ commit
 
     If ``True`` and vcs is defined, commit the changes.
 
+push
+    *Default:* ``False``
+
+    If ``True`` and vcs is defined, push the changes and the tags to the upstream repository.
+
 tag:
     *Default:* ``True``
 
