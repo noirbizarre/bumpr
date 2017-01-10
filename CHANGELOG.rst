@@ -1,8 +1,8 @@
 Changelog
 =========
 
-Current
--------
+0.3.6 (2017-01-10)
+------------------
 
 - Make use of custom `tag_format` in readthedoc hook
 - Expose `{tag}` in replace and command hook
