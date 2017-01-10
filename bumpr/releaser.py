@@ -78,6 +78,9 @@ class Releaser(object):
 
     def test(self):
         if self.config.tests:
+            if self.config.skip_tests:
+                logger.info('Skip test suite')
+                return
             logger.info('Running test suite')
             self.execute(self.config.tests, verbose=True)
 

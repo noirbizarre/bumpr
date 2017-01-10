@@ -31,6 +31,7 @@ DEFAULTS = {
     'dryrun': False,
     'clean': None,
     'tests': None,
+    'skip_tests': False,
     'publish': None,
     'bump_only': False,
     'prepare_only': False,
@@ -126,7 +127,7 @@ class Config(ObjectDict):
         # Common options
         if config.has_section('bumpr'):
             for option in config.options('bumpr'):
-                if option in ('tag', 'commit', 'push', 'bump_only', 'prepare_only'):
+                if option in ('tag', 'commit', 'push', 'bump_only', 'prepare_only', 'skip_tests'):
                     self[option] = config.getboolean('bumpr', option)
                 elif option == 'files':
                     self.files = [name.strip() for name in config.get('bumpr', 'files').split('\n') if name.strip()]
@@ -163,7 +164,7 @@ class Config(ObjectDict):
 
         if hasattr(parsed_args, 'nocommit'):
             self.commit = not parsed_args.nocommit
-        for attr in 'bump_only' 'prepare_only', 'push':
+        for attr in 'bump_only' 'prepare_only', 'push', 'skip_tests':
             if hasattr(parsed_args, attr):
                 self[attr] = getattr(parsed_args, attr)
 
@@ -199,6 +200,7 @@ class Config(ObjectDict):
         parser.add_argument('-v', '--verbose', dest='verbose', action='store_true', help="Verbose output")
         parser.add_argument('-c', '--config', default='bumpr.rc', help='Specify a configuration file')
         parser.add_argument('-d', '--dryrun', action='store_true', help='Do not write anything and display a diff')
+        parser.add_argument('-st', '--skip-tests', action='store_true', default=argparse.SUPPRESS, help='Skip tests')
 
         group = parser.add_mutually_exclusive_group()
         group.add_argument('-b', '--bump', dest='bump_only', action='store_true', default=argparse.SUPPRESS,

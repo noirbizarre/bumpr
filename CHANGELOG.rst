@@ -4,7 +4,7 @@ Changelog
 Current
 -------
 
-- Nothing yet
+- Added `-st/--skip-tests` option
 
 0.3.3 (2017-01-08)
 ------------------

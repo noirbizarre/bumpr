@@ -82,6 +82,18 @@ class ReleaserTest(object):
             releaser.test()
             execute.assert_called_with('test command', replacements=ANY, dryrun=ANY, verbose=ANY)
 
+    def test_skip_test(self, workspace):
+        config = Config({
+            'file': 'fake.py',
+            'tests': 'test command',
+            'skip_tests': True,
+        })
+        releaser = Releaser(config)
+
+        with patch('bumpr.releaser.execute') as execute:
+            releaser.test()
+            assert not execute.called
+
     def test_publish(self, workspace):
         config = Config({
             'file': 'fake.py',

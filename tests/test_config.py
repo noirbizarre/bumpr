@@ -355,6 +355,23 @@ class ConfigTest(object):
 
         assert config == expected
 
+    def test_skip_tests_from_args(self):
+        bumprrc = '''\
+        [bumpr]
+        '''
+
+        with mock_ini(bumprrc):
+            with patch('bumpr.config.exists', return_value=True):
+                config = Config.parse_args(['-c', 'test.rc', '--skip-tests'])
+
+        expected = deepcopy(DEFAULTS)
+        expected['skip_tests'] = True
+
+        for hook in HOOKS:
+            expected[hook.key] = False
+
+        assert config == expected
+
     def test_validate(self):
         config = Config({'file': 'version.py'})
         config.validate()
