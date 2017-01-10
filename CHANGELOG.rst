@@ -1,8 +1,8 @@
 Changelog
 =========
 
-Current
--------
+0.3.5 (2017-01-10)
+------------------
 
 - Allow to specify a custom tag pattern
 
