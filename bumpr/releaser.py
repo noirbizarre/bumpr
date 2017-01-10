@@ -44,6 +44,9 @@ class Releaser(object):
         self.next_version.bump(config.prepare.part, config.prepare.unsuffix, config.prepare.suffix)
         logger.debug('Prepared version: {0}'.format(self.next_version))
 
+        self.tag_label = self.config.tag_format.format(version=self.version)
+        logger.debug('Tag: {0}'.format(self.tag_label))
+
         self.timestamp = None
 
         if config.vcs:
@@ -99,6 +102,7 @@ class Releaser(object):
         if self.config.vcs:
             self.commit(self.config.bump.message.format(
                 version=self.version,
+                tag=self.tag_label,
                 date=self.timestamp,
                 **self.version.__dict__
             ))
@@ -126,6 +130,7 @@ class Releaser(object):
         if self.config.vcs:
             self.commit(self.config.prepare.message.format(
                 version=self.next_version,
+                tag=self.tag_label,
                 date=self.timestamp,
                 **self.next_version.__dict__
             ))
@@ -166,11 +171,11 @@ class Releaser(object):
 
     def tag(self):
         if self.config.commit and self.config.tag:
-            logger.debug('Tag: %s', self.version)
+            logger.debug('Tag: %s', self.tag_label)
             if not self.config.dryrun:
-                self.vcs.tag(self.config.tag_pattern.format(version=self.version))
+                self.vcs.tag(self.tag_label)
             else:
-                logger.dryrun('tag: {0}'.format(self.version))
+                logger.dryrun('tag: {0}'.format(self.tag_label))
 
     def commit(self, message):
         if self.config.commit:

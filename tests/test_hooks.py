@@ -18,6 +18,7 @@ class ReadTheDocHookDefaultTest(object):
     def setUp(self, workspace):
         self.releaser = MagicMock()
         self.releaser.version = Version.parse('1.2.3')
+        self.releaser.tag_label = '1.2.3'
         self.releaser.config = Config({ReadTheDocHook.key: {'id': 'fake'}})
         self.hook = ReadTheDocHook(self.releaser)
 
@@ -45,6 +46,7 @@ class ReadTheDocHookCustomTest(object):
     def setUp(self):
         self.releaser = MagicMock()
         self.releaser.version = Version.parse('1.2.3')
+        self.releaser.tag_label = '1.2.3'
         self.releaser.config.__getitem__.return_value = ObjectDict({
             'id': 'fake',
             'url': 'http://{id}.somewhere.io/{tag}',
@@ -68,6 +70,34 @@ class ReadTheDocHookCustomTest(object):
         assert replacements == [
             ('http://fake.somewhere.io/1.2.3', 'http://fake.somewhere.io/latest'),
             ('http://fake.somewhere.io/badge/1.2.3', 'http://fake.somewhere.io/badge/latest'),
+        ]
+
+
+class ReadTheDocHookCustomTagTest(object):
+    @pytest.fixture(autouse=True)
+    def setUp(self, workspace):
+        self.releaser = MagicMock()
+        self.releaser.version = Version.parse('1.2.3')
+        self.releaser.tag_label = 'v1.2.3'
+        self.releaser.config = Config({ReadTheDocHook.key: {'id': 'fake'}})
+        self.hook = ReadTheDocHook(self.releaser)
+
+    def test_bump(self):
+        replacements = []
+        self.hook.bump(replacements)
+        assert replacements == [
+            ('https://fake.readthedocs.io/en/latest', 'https://fake.readthedocs.io/en/v1.2.3'),
+            ('https://readthedocs.org/projects/fake/badge/?version=latest',
+             'https://readthedocs.org/projects/fake/badge/?version=v1.2.3'),
+        ]
+
+    def test_prepare(self):
+        replacements = []
+        self.hook.prepare(replacements)
+        assert replacements == [
+            ('https://fake.readthedocs.io/en/v1.2.3', 'https://fake.readthedocs.io/en/latest'),
+            ('https://readthedocs.org/projects/fake/badge/?version=v1.2.3',
+             'https://readthedocs.org/projects/fake/badge/?version=latest'),
         ]
 
 
@@ -263,28 +293,29 @@ class ReplaceHookTest(object):
         self.releaser.version = Version.parse('1.2.3')
         self.releaser.next_version = Version.parse('1.2.4.dev')
         self.releaser.timestamp = datetime.now()
+        self.releaser.tag_label = 'v1.2.3'
         self.releaser.config = Config()
 
     def test_bump(self):
         self.releaser.config[ReplaceHook.key] = {
             'dev': 'dev-{version}',
-            'stable': 'stable-{version}',
+            'stable': 'stable-{tag}',
         }
 
         replacements = []
         hook = ReplaceHook(self.releaser)
         hook.bump(replacements)
 
-        assert replacements == [('dev-1.2.3.dev', 'stable-1.2.3')]
+        assert replacements == [('dev-1.2.3.dev', 'stable-v1.2.3')]
 
-    def test_prepare(self):
+    def test_prepare_with_version(self):
         self.releaser.config[ReplaceHook.key] = {
             'dev': 'dev-{version}',
-            'stable': 'stable-{version}',
+            'stable': 'stable-{tag}',
         }
 
         replacements = []
         hook = ReplaceHook(self.releaser)
         hook.prepare(replacements)
 
-        assert replacements == [('stable-1.2.3', 'dev-1.2.4.dev')]
+        assert replacements == [('stable-v1.2.3', 'dev-1.2.4.dev')]

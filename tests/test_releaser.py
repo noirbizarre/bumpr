@@ -21,7 +21,8 @@ def workspace_version(version):
 class ReleaserTest(object):
     def test_constructor(self, workspace):
         config = Config({
-            'file': 'fake.py'
+            'file': 'fake.py',
+            'tag_format': 'v{version}',
         })
         releaser = Releaser(config)
 
@@ -35,6 +36,8 @@ class ReleaserTest(object):
 
         assert not hasattr(releaser, 'vcs')
         assert not hasattr(releaser, 'diffs')
+
+        assert releaser.tag_label == 'v1.2.3'
 
         assert releaser.hooks == []
 
@@ -158,7 +161,7 @@ class ReleaserTest(object):
             assert not vcs.tag.called
 
     def test_tag_custom_pattern(self, workspace):
-        config = Config({'file': 'fake.py', 'vcs': 'fake', 'tag_pattern': 'v{version}'})
+        config = Config({'file': 'fake.py', 'vcs': 'fake', 'tag_format': 'v{version}'})
         releaser = Releaser(config)
 
         with patch.object(releaser, 'vcs') as vcs:

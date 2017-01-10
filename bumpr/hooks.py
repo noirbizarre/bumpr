@@ -66,20 +66,20 @@ class ReadTheDocHook(Hook):
     def bump(self, replacements):
         replacements.insert(0, (
             self.badge('latest'),
-            self.badge(self.releaser.version)
+            self.badge(self.releaser.tag_label)
         ))
         replacements.insert(0, (
             self.url('latest'),
-            self.url(self.releaser.version)
+            self.url(self.releaser.tag_label)
         ))
 
     def prepare(self, replacements):
         replacements.insert(0, (
-            self.badge(self.releaser.version),
+            self.badge(self.releaser.tag_label),
             self.badge('latest')
         ))
         replacements.insert(0, (
-            self.url(self.releaser.version),
+            self.url(self.releaser.tag_label),
             self.url('latest')
         ))
 
@@ -148,6 +148,7 @@ class CommandsHook(Hook):
         if self.config.bump:
             replacements = dict(
                 version=self.releaser.version,
+                tag=self.releaser.tag_label,
                 date=self.releaser.timestamp,
                 **self.releaser.version.__dict__
             )
@@ -157,6 +158,7 @@ class CommandsHook(Hook):
         if self.config.prepare:
             replacements = dict(
                 version=self.releaser.next_version,
+                tag=self.releaser.tag_label,
                 date=self.releaser.timestamp,
                 **self.releaser.next_version.__dict__
             )
@@ -173,9 +175,11 @@ class ReplaceHook(Hook):
     def bump(self, replacements):
         replacements.insert(0, (
             self.config.dev.format(version=self.releaser.prev_version,
+                                   tag=self.releaser.tag_label,
                                    date=self.releaser.timestamp,
                                    **self.releaser.prev_version.__dict__),
             self.config.stable.format(version=self.releaser.version,
+                                      tag=self.releaser.tag_label,
                                       date=self.releaser.timestamp,
                                       **self.releaser.version.__dict__)
         ))
@@ -183,9 +187,11 @@ class ReplaceHook(Hook):
     def prepare(self, replacements):
         replacements.insert(0, (
             self.config.stable.format(version=self.releaser.version,
+                                      tag=self.releaser.tag_label,
                                       date=self.releaser.timestamp,
                                       **self.releaser.version.__dict__),
             self.config.dev.format(version=self.releaser.next_version,
+                                   tag=self.releaser.tag_label,
                                    date=self.releaser.timestamp,
                                    **self.releaser.next_version.__dict__)
         ))

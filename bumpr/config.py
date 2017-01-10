@@ -26,7 +26,7 @@ DEFAULTS = {
     'vcs': None,
     'commit': True,
     'tag': True,
-    'tag_pattern': '{version}',
+    'tag_format': '{version}',
     'push': False,
     'verbose': False,
     'dryrun': False,

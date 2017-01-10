@@ -4,7 +4,9 @@ Changelog
 Current
 -------
 
-- Nothing yet
+- Make use of custom `tag_format` in readthedoc hook
+- Expose `{tag}` in replace and command hook
+- Expose `{tag}` in commit messages
 
 0.3.5 (2017-01-10)
 ------------------
