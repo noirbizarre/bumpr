@@ -168,7 +168,7 @@ class Releaser(object):
         if self.config.commit and self.config.tag:
             logger.debug('Tag: %s', self.version)
             if not self.config.dryrun:
-                self.vcs.tag(str(self.version))
+                self.vcs.tag(self.config.tag_pattern.format(version=self.version))
             else:
                 logger.dryrun('tag: {0}'.format(self.version))
 

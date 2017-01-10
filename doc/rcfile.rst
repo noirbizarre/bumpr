@@ -42,6 +42,11 @@ tag:
 
     If ``True`` and vcs is defined, tag the version.
 
+tag_format:
+    *Default:* ``{version}``
+
+    Specify the format of the tag
+
 verbose
     *Default:* ``False``
 

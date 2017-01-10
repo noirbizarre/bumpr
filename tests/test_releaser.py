@@ -157,6 +157,14 @@ class ReleaserTest(object):
             releaser.tag()
             assert not vcs.tag.called
 
+    def test_tag_custom_pattern(self, workspace):
+        config = Config({'file': 'fake.py', 'vcs': 'fake', 'tag_pattern': 'v{version}'})
+        releaser = Releaser(config)
+
+        with patch.object(releaser, 'vcs') as vcs:
+            releaser.tag()
+            vcs.tag.assert_called_with('v{0}'.format(releaser.version))
+
     def test_push_disabled_by_default(self, workspace):
         config = Config({'file': 'fake.py', 'vcs': 'fake'})
         releaser = Releaser(config)
