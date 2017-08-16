@@ -165,7 +165,7 @@ class Config(ObjectDict):
 
         if hasattr(parsed_args, 'nocommit'):
             self.commit = not parsed_args.nocommit
-        for attr in 'bump_only' 'prepare_only', 'push', 'skip_tests':
+        for attr in 'bump_only', 'prepare_only', 'push', 'skip_tests':
             if hasattr(parsed_args, attr):
                 self[attr] = getattr(parsed_args, attr)
 
