@@ -2,7 +2,6 @@
 from __future__ import print_function, unicode_literals
 
 from datetime import datetime
-from mock import patch, MagicMock, ANY
 from textwrap import dedent
 
 from bumpr.config import ObjectDict, Config
@@ -15,8 +14,8 @@ import pytest
 
 class ReadTheDocHookDefaultTest(object):
     @pytest.fixture(autouse=True)
-    def setUp(self, workspace):
-        self.releaser = MagicMock()
+    def setUp(self, workspace, mocker):
+        self.releaser = mocker.MagicMock()
         self.releaser.version = Version.parse('1.2.3')
         self.releaser.tag_label = '1.2.3'
         self.releaser.config = Config({ReadTheDocHook.key: {'id': 'fake'}})
@@ -43,8 +42,8 @@ class ReadTheDocHookDefaultTest(object):
 
 class ReadTheDocHookCustomTest(object):
     @pytest.fixture(autouse=True)
-    def setUp(self):
-        self.releaser = MagicMock()
+    def setUp(self, mocker):
+        self.releaser = mocker.MagicMock()
         self.releaser.version = Version.parse('1.2.3')
         self.releaser.tag_label = '1.2.3'
         self.releaser.config.__getitem__.return_value = ObjectDict({
@@ -75,8 +74,8 @@ class ReadTheDocHookCustomTest(object):
 
 class ReadTheDocHookCustomTagTest(object):
     @pytest.fixture(autouse=True)
-    def setUp(self, workspace):
-        self.releaser = MagicMock()
+    def setUp(self, workspace, mocker):
+        self.releaser = mocker.MagicMock()
         self.releaser.version = Version.parse('1.2.3')
         self.releaser.tag_label = 'v1.2.3'
         self.releaser.config = Config({ReadTheDocHook.key: {'id': 'fake'}})
@@ -101,11 +100,10 @@ class ReadTheDocHookCustomTagTest(object):
         ]
 
 
-@patch('bumpr.hooks.execute')
 class CommandsHookTest(object):
     @pytest.fixture(autouse=True)
-    def setUp(self):
-        self.releaser = MagicMock()
+    def setUp(self, mocker):
+        self.releaser = mocker.MagicMock()
         self.releaser.version = Version.parse('1.2.3')
         self.releaser.config.__getitem__.return_value = ObjectDict({
             'bump': 'bump command',
@@ -115,29 +113,33 @@ class CommandsHookTest(object):
         self.releaser.config.dryrun = False
         self.hook = CommandsHook(self.releaser)
 
-    def test_bump(self, execute):
+    def test_bump(self, mocker):
+        execute = mocker.patch('bumpr.hooks.execute')
         self.hook.bump([])
-        execute.assert_called_once_with('bump command', replacements=ANY, verbose=ANY, dryrun=False)
+        execute.assert_called_once_with('bump command', replacements=mocker.ANY, verbose=mocker.ANY, dryrun=False)
 
-    def test_prepare(self, execute):
+    def test_prepare(self, mocker):
+        execute = mocker.patch('bumpr.hooks.execute')
         self.hook.prepare([])
-        execute.assert_called_once_with('prepare command', replacements=ANY, verbose=ANY, dryrun=False)
+        execute.assert_called_once_with('prepare command', replacements=mocker.ANY, verbose=mocker.ANY, dryrun=False)
 
-    def test_bump_dryrun(self, execute):
+    def test_bump_dryrun(self, mocker):
+        execute = mocker.patch('bumpr.hooks.execute')
         self.hook.dryrun = True
         self.hook.bump([])
-        execute.assert_called_once_with('bump command', replacements=ANY, verbose=ANY, dryrun=True)
+        execute.assert_called_once_with('bump command', replacements=mocker.ANY, verbose=mocker.ANY, dryrun=True)
 
-    def test_prepare_dryrun(self, execute):
+    def test_prepare_dryrun(self, mocker):
+        execute = mocker.patch('bumpr.hooks.execute')
         self.hook.dryrun = True
         self.hook.prepare([])
-        execute.assert_called_once_with('prepare command', replacements=ANY, verbose=ANY, dryrun=True)
+        execute.assert_called_once_with('prepare command', replacements=mocker.ANY, verbose=mocker.ANY, dryrun=True)
 
 
 class ChangelogHookTest(object):
     @pytest.fixture(autouse=True)
-    def setUp(self):
-        self.releaser = MagicMock()
+    def setUp(self, mocker):
+        self.releaser = mocker.MagicMock()
         self.releaser.prev_version = Version.parse('1.2.3.dev')
         self.releaser.version = Version.parse('1.2.3')
         self.releaser.next_version = Version.parse('1.2.4.dev')
@@ -287,8 +289,8 @@ class ChangelogHookTest(object):
 
 class ReplaceHookTest(object):
     @pytest.fixture(autouse=True)
-    def setUp(self):
-        self.releaser = MagicMock()
+    def setUp(self, mocker):
+        self.releaser = mocker.MagicMock()
         self.releaser.prev_version = Version.parse('1.2.3.dev')
         self.releaser.version = Version.parse('1.2.3')
         self.releaser.next_version = Version.parse('1.2.4.dev')

@@ -3,172 +3,170 @@ from __future__ import print_function, unicode_literals
 
 import pytest
 
-from mock import patch
-
 from bumpr.vcs import BaseVCS, Git, Mercurial, Bazaar
 from bumpr.helpers import BumprError
 
 
 class BaseVCSTest(object):
-    def test_execute_verbose(self):
+    def test_execute_verbose(self, mocker):
         vcs = BaseVCS(verbose=True)
-        with patch('bumpr.vcs.execute') as execute:
-            vcs.execute('cmd arg')
-            execute.assert_called_with('cmd arg', verbose=True)
+        execute = mocker.patch('bumpr.vcs.execute')
+        vcs.execute('cmd arg')
+        execute.assert_called_with('cmd arg', verbose=True)
 
-    def test_execute_quiet(self):
+    def test_execute_quiet(self, mocker):
         vcs = BaseVCS(verbose=False)
-        with patch('bumpr.vcs.execute') as execute:
-            vcs.execute('cmd arg')
-            execute.assert_called_with('cmd arg', verbose=False)
+        execute = mocker.patch('bumpr.vcs.execute')
+        vcs.execute('cmd arg')
+        execute.assert_called_with('cmd arg', verbose=False)
 
 
 class GitTest(object):
-    def test_validate_ok(self, workspace):
+    def test_validate_ok(self, workspace, mocker):
         workspace.mkdir('.git')
         git = Git()
 
-        with patch('bumpr.vcs.execute') as execute:
-            execute.return_value = '?? new.py'
+        execute = mocker.patch('bumpr.vcs.execute')
+        execute.return_value = '?? new.py'
+        git.validate()
+        execute.assert_called_with('git status --porcelain', verbose=False)
+
+    def test_validate_ko_not_git(self, workspace, mocker):
+        git = Git()
+
+        execute = mocker.patch('bumpr.vcs.execute')
+        with pytest.raises(BumprError):
             git.validate()
-            execute.assert_called_with('git status --porcelain', verbose=False)
+        assert execute.called is False
 
-    def test_validate_ko_not_git(self, workspace):
-        git = Git()
-
-        with patch('bumpr.vcs.execute') as execute:
-            with pytest.raises(BumprError):
-                git.validate()
-            assert execute.called is False
-
-    def test_validate_ko_not_clean(self, workspace):
+    def test_validate_ko_not_clean(self, workspace, mocker):
         workspace.mkdir('.git')
         git = Git()
 
-        with patch('bumpr.vcs.execute') as execute:
-            execute.return_value = '\n'.join((' M modified.py', '?? new.py'))
-            with pytest.raises(BumprError):
-                git.validate()
-            execute.assert_called_with('git status --porcelain', verbose=False)
+        execute = mocker.patch('bumpr.vcs.execute')
+        execute.return_value = '\n'.join((' M modified.py', '?? new.py'))
+        with pytest.raises(BumprError):
+            git.validate()
+        execute.assert_called_with('git status --porcelain', verbose=False)
 
-    def test_tag(self):
+    def test_tag(self, mocker):
         git = Git()
 
-        with patch.object(git, 'execute') as execute:
-            git.tag('fake')
-            execute.assert_called_with(['git', 'tag', 'fake'])
+        execute = mocker.patch.object(git, 'execute')
+        git.tag('fake')
+        execute.assert_called_with(['git', 'tag', 'fake'])
 
-    def test_commit(self):
+    def test_commit(self, mocker):
         git = Git()
 
-        with patch.object(git, 'execute') as execute:
-            git.commit('message')
-            execute.assert_called_with(['git', 'commit', '-am', 'message'])
+        execute = mocker.patch.object(git, 'execute')
+        git.commit('message')
+        execute.assert_called_with(['git', 'commit', '-am', 'message'])
 
-    def test_push(self):
+    def test_push(self, mocker):
         git = Git()
 
-        with patch.object(git, 'execute') as execute:
-            git.push()
-            execute.assert_any_call(['git', 'push'])
-            execute.assert_any_call(['git', 'push', '--tags'])
+        execute = mocker.patch.object(git, 'execute')
+        git.push()
+        execute.assert_any_call(['git', 'push'])
+        execute.assert_any_call(['git', 'push', '--tags'])
 
 
 class MercurialTest(object):
-    def test_validate_ok(self, workspace):
+    def test_validate_ok(self, workspace, mocker):
         workspace.mkdir('.hg')
         mercurial = Mercurial()
 
-        with patch('bumpr.vcs.execute') as execute:
-            execute.return_value = '?? new.py'
+        execute = mocker.patch('bumpr.vcs.execute')
+        execute.return_value = '?? new.py'
+        mercurial.validate()
+        execute.assert_called_with('hg status -mard', verbose=False)
+
+    def test_validate_ko_not_mercurial(self, workspace, mocker):
+        mercurial = Mercurial()
+
+        execute = mocker.patch('bumpr.vcs.execute')
+        with pytest.raises(BumprError):
             mercurial.validate()
-            execute.assert_called_with('hg status -mard', verbose=False)
+        assert execute.called is False
 
-    def test_validate_ko_not_mercurial(self, workspace):
-        mercurial = Mercurial()
-
-        with patch('bumpr.vcs.execute') as execute:
-            with pytest.raises(BumprError):
-                mercurial.validate()
-            assert execute.called is False
-
-    def test_validate_ko_not_clean(self, workspace):
+    def test_validate_ko_not_clean(self, workspace, mocker):
         workspace.mkdir('.hg')
         mercurial = Mercurial()
 
-        with patch('bumpr.vcs.execute') as execute:
-            execute.return_value = '\n'.join((' M modified.py', '?? new.py'))
-            with pytest.raises(BumprError):
-                mercurial.validate()
-            execute.assert_called_with('hg status -mard', verbose=False)
+        execute = mocker.patch('bumpr.vcs.execute')
+        execute.return_value = '\n'.join((' M modified.py', '?? new.py'))
+        with pytest.raises(BumprError):
+            mercurial.validate()
+        execute.assert_called_with('hg status -mard', verbose=False)
 
-    def test_tag(self):
+    def test_tag(self, mocker):
         mercurial = Mercurial()
 
-        with patch.object(mercurial, 'execute') as execute:
-            mercurial.tag('fake')
-            execute.assert_called_with(['hg', 'tag', 'fake'])
+        execute = mocker.patch.object(mercurial, 'execute')
+        mercurial.tag('fake')
+        execute.assert_called_with(['hg', 'tag', 'fake'])
 
-    def test_commit(self):
+    def test_commit(self, mocker):
         mercurial = Mercurial()
 
-        with patch.object(mercurial, 'execute') as execute:
-            mercurial.commit('message')
-            execute.assert_called_with(['hg', 'commit', '-A', '-m', 'message'])
+        execute = mocker.patch.object(mercurial, 'execute')
+        mercurial.commit('message')
+        execute.assert_called_with(['hg', 'commit', '-A', '-m', 'message'])
 
-    def test_push(self):
+    def test_push(self, mocker):
         mercurial = Mercurial()
 
-        with patch.object(mercurial, 'execute') as execute:
-            mercurial.push()
-            execute.assert_called_with(['hg', 'push'])
+        execute = mocker.patch.object(mercurial, 'execute')
+        mercurial.push()
+        execute.assert_called_with(['hg', 'push'])
 
 
 class BazaarTest(object):
-    def test_validate_ok(self, workspace):
+    def test_validate_ok(self, workspace, mocker):
         workspace.mkdir('.bzr')
         bazaar = Bazaar()
 
-        with patch('bumpr.vcs.execute') as execute:
-            execute.return_value = '? new.py'
+        execute = mocker.patch('bumpr.vcs.execute')
+        execute.return_value = '? new.py'
+        bazaar.validate()
+        execute.assert_called_with('bzr status --short', verbose=False)
+
+    def test_validate_ko_not_bazaar(self, workspace, mocker):
+        bazaar = Bazaar()
+
+        execute = mocker.patch('bumpr.vcs.execute')
+        with pytest.raises(BumprError):
             bazaar.validate()
-            execute.assert_called_with('bzr status --short', verbose=False)
+        assert execute.called is False
 
-    def test_validate_ko_not_bazaar(self, workspace):
-        bazaar = Bazaar()
-
-        with patch('bumpr.vcs.execute') as execute:
-            with pytest.raises(BumprError):
-                bazaar.validate()
-            assert execute.called is False
-
-    def test_validate_ko_not_clean(self, workspace):
+    def test_validate_ko_not_clean(self, workspace, mocker):
         workspace.mkdir('.bzr')
         bazaar = Bazaar()
 
-        with patch('bumpr.vcs.execute') as execute:
-            execute.return_value = '\n'.join((' M modified.py', '? new.py'))
-            with pytest.raises(BumprError):
-                bazaar.validate()
-            execute.assert_called_with('bzr status --short', verbose=False)
+        execute = mocker.patch('bumpr.vcs.execute')
+        execute.return_value = '\n'.join((' M modified.py', '? new.py'))
+        with pytest.raises(BumprError):
+            bazaar.validate()
+        execute.assert_called_with('bzr status --short', verbose=False)
 
-    def test_tag(self):
+    def test_tag(self, mocker):
         bazaar = Bazaar()
 
-        with patch.object(bazaar, 'execute') as execute:
-            bazaar.tag('fake')
-            execute.assert_called_with(['bzr', 'tag', 'fake'])
+        execute = mocker.patch.object(bazaar, 'execute')
+        bazaar.tag('fake')
+        execute.assert_called_with(['bzr', 'tag', 'fake'])
 
-    def test_commit(self):
+    def test_commit(self, mocker):
         bazaar = Bazaar()
 
-        with patch.object(bazaar, 'execute') as execute:
-            bazaar.commit('message')
-            execute.assert_called_with(['bzr', 'commit', '-m', 'message'])
+        execute = mocker.patch.object(bazaar, 'execute')
+        bazaar.commit('message')
+        execute.assert_called_with(['bzr', 'commit', '-m', 'message'])
 
-    def test_push(self):
+    def test_push(self, mocker):
         bazaar = Bazaar()
 
-        with patch.object(bazaar, 'execute') as execute:
-            bazaar.push()
-            execute.assert_called_with(['bzr', 'push'])
+        execute = mocker.patch.object(bazaar, 'execute')
+        bazaar.push()
+        execute.assert_called_with(['bzr', 'push'])

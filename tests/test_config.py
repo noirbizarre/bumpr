@@ -1,18 +1,12 @@
 # -*- coding: utf-8 -*-
 from __future__ import print_function, unicode_literals
-import os
 import io
-import shutil
 import sys
-import tempfile
 
 import pytest
 
-from contextlib import contextmanager
 from copy import deepcopy
-from mock import patch
 from textwrap import dedent
-
 
 from bumpr.config import DEFAULTS, Config, ValidationError, __name__ as config_module_name
 from bumpr.version import Version
@@ -22,23 +16,32 @@ if sys.version_info[0] == 3:
     unicode = str
 
 
-@contextmanager
-def mock_ini(data):
-    open_name = '{0}.open'.format(config_module_name)
-    with patch(open_name, return_value=io.StringIO(unicode(dedent(data))), create=True) as mock:
-        yield mock
+@pytest.fixture
+def mock_ini(mocker):
+    def inner(data):
+        open_name = '{0}.open'.format(config_module_name)
+        return mocker.patch(open_name, return_value=io.StringIO(unicode(dedent(data))), create=True)
+    return inner
 
 
+@pytest.fixture
+def bumprc(request, mocker, mock_ini):
+    marker = request.node.get_marker('bumprc')
+    if marker:
+        data = marker.args[0]
+        mocker.patch('bumpr.config.exists', return_value=True)
+        yield mock_ini(data)
+    else:
+        yield
+
+
+@pytest.mark.usefixtures('bumprc')
 class ConfigTest(object):
 
     @pytest.fixture(autouse=True)
-    def cleandir(self):
-        self.currentdir = os.getcwd()
-        self.workdir = tempfile.mkdtemp()
-        os.chdir(self.workdir)
+    def cleandir(self, tmpdir):
+        tmpdir.chdir()
         yield
-        os.chdir(self.currentdir)
-        shutil.rmtree(self.workdir)
 
     def test_defaults(self):
         '''It should initialize with default values'''
@@ -99,7 +102,7 @@ class ConfigTest(object):
         config = Config(config_dict)
         assert config == expected
 
-    def test_override_from_config(self):
+    def test_override_from_config(self, mock_ini):
         bumprrc = '''\
         [bumpr]
         file = test.py
@@ -118,8 +121,8 @@ class ConfigTest(object):
             expected[hook.key] = False
 
         config = Config()
-        with mock_ini(bumprrc) as mock:
-            config.override_from_config('test.rc')
+        mock = mock_ini(bumprrc)
+        config.override_from_config('test.rc')
 
         mock.assert_called_once_with('test.rc')
         assert config == expected
@@ -165,7 +168,7 @@ class ConfigTest(object):
         config = Config()
         assert config == expected
 
-    def test_override_hook_from_config(self):
+    def test_override_hook_from_config(self, mock_ini):
         tested_hook = ReadTheDocHook
         bumprrc = '''\
         [{0}]
@@ -181,8 +184,8 @@ class ConfigTest(object):
                 expected[hook.key] = False
 
         config = Config()
-        with mock_ini(bumprrc) as mock:
-            config.override_from_config('test.rc')
+        mock = mock_ini(bumprrc)
+        config.override_from_config('test.rc')
 
         mock.assert_called_once_with('test.rc')
         assert config == expected
@@ -200,19 +203,16 @@ class ConfigTest(object):
 
         assert config == expected
 
-    def test_override_args_keeps_config_values(self):
-        bumprrc = '''\
+    @pytest.mark.bumprc('''\
         [bumpr]
         files = README
         [bump]
         message = test
         [prepare]
         part = minor
-        '''
-
-        with mock_ini(bumprrc):
-            with patch('bumpr.config.exists', return_value=True):
-                config = Config.parse_args(['test.py', '-M', '-v', '-s', 'test-suffix', '-c', 'test.rc'])
+    ''')
+    def test_override_args_keeps_config_values(self):
+        config = Config.parse_args(['test.py', '-M', '-v', '-s', 'test-suffix', '-c', 'test.rc'])
 
         expected = deepcopy(DEFAULTS)
         expected['file'] = 'test.py'
@@ -229,15 +229,12 @@ class ConfigTest(object):
 
         assert config == expected
 
-    def test_do_not_override_push_when_not_in_args(self):
-        bumprrc = '''\
+    @pytest.mark.bumprc('''\
         [bumpr]
         push = true
-        '''
-
-        with mock_ini(bumprrc):
-            with patch('bumpr.config.exists', return_value=True):
-                config = Config.parse_args(['-c', 'test.rc'])
+    ''')
+    def test_do_not_override_push_when_not_in_args(self, mocker, mock_ini):
+        config = Config.parse_args(['-c', 'test.rc'])
 
         expected = deepcopy(DEFAULTS)
         expected['push'] = True
@@ -247,15 +244,12 @@ class ConfigTest(object):
 
         assert config == expected
 
-    def test_override_push_from_args(self):
-        bumprrc = '''\
+    @pytest.mark.bumprc('''\
         [bumpr]
         push = true
-        '''
-
-        with mock_ini(bumprrc):
-            with patch('bumpr.config.exists', return_value=True):
-                config = Config.parse_args(['-c', 'test.rc', '--no-push'])
+    ''')
+    def test_override_push_from_args(self):
+        config = Config.parse_args(['-c', 'test.rc', '--no-push'])
 
         expected = deepcopy(DEFAULTS)
         expected['push'] = False
@@ -265,15 +259,12 @@ class ConfigTest(object):
 
         assert config == expected
 
-    def test_force_push_from_args(self):
-        bumprrc = '''\
+    @pytest.mark.bumprc('''\
         [bumpr]
         push = false
-        '''
-
-        with mock_ini(bumprrc):
-            with patch('bumpr.config.exists', return_value=True):
-                config = Config.parse_args(['-c', 'test.rc', '--push'])
+    ''')
+    def test_force_push_from_args(self):
+        config = Config.parse_args(['-c', 'test.rc', '--push'])
 
         expected = deepcopy(DEFAULTS)
         expected['push'] = True
@@ -283,15 +274,12 @@ class ConfigTest(object):
 
         assert config == expected
 
-    def test_do_not_override_commit_when_not_in_args(self):
-        bumprrc = '''\
+    @pytest.mark.bumprc('''\
         [bumpr]
         commit = False
-        '''
-
-        with mock_ini(bumprrc):
-            with patch('bumpr.config.exists', return_value=True):
-                config = Config.parse_args(['-c', 'test.rc'])
+    ''')
+    def test_do_not_override_commit_when_not_in_args(self):
+        config = Config.parse_args(['-c', 'test.rc'])
 
         expected = deepcopy(DEFAULTS)
         expected['commit'] = False
@@ -301,15 +289,12 @@ class ConfigTest(object):
 
         assert config == expected
 
-    def test_do_not_override_bump_only_when_not_in_args(self):
-        bumprrc = '''\
+    @pytest.mark.bumprc('''\
         [bumpr]
-        bump_only = True
-        '''
-
-        with mock_ini(bumprrc):
-            with patch('bumpr.config.exists', return_value=True):
-                config = Config.parse_args(['-c', 'test.rc'])
+        bump_only = true
+    ''')
+    def test_do_not_override_bump_only_when_not_in_args(self):
+        config = Config.parse_args(['-c', 'test.rc'])
 
         expected = deepcopy(DEFAULTS)
         expected['bump_only'] = True
@@ -319,15 +304,12 @@ class ConfigTest(object):
 
         assert config == expected
 
-    def test_do_not_override_prepare_only_when_not_in_args(self):
-        bumprrc = '''\
+    @pytest.mark.bumprc('''\
         [bumpr]
-        prepare_only = True
-        '''
-
-        with mock_ini(bumprrc):
-            with patch('bumpr.config.exists', return_value=True):
-                config = Config.parse_args(['-c', 'test.rc'])
+        prepare_only = true
+    ''')
+    def test_do_not_override_prepare_only_when_not_in_args(self):
+        config = Config.parse_args(['-c', 'test.rc'])
 
         expected = deepcopy(DEFAULTS)
         expected['prepare_only'] = True
@@ -337,15 +319,12 @@ class ConfigTest(object):
 
         assert config == expected
 
-    def test_do_override_commit(self):
-        bumprrc = '''\
+    @pytest.mark.bumprc('''\
         [bumpr]
-        commit = True
-        '''
-
-        with mock_ini(bumprrc):
-            with patch('bumpr.config.exists', return_value=True):
-                config = Config.parse_args(['-c', 'test.rc', '-nc'])
+        commit = true
+    ''')
+    def test_do_override_commit(self):
+        config = Config.parse_args(['-c', 'test.rc', '-nc'])
 
         expected = deepcopy(DEFAULTS)
         expected['commit'] = False
@@ -355,14 +334,9 @@ class ConfigTest(object):
 
         assert config == expected
 
+    @pytest.mark.bumprc('[bumpr]')
     def test_skip_tests_from_args(self):
-        bumprrc = '''\
-        [bumpr]
-        '''
-
-        with mock_ini(bumprrc):
-            with patch('bumpr.config.exists', return_value=True):
-                config = Config.parse_args(['-c', 'test.rc', '--skip-tests'])
+        config = Config.parse_args(['-c', 'test.rc', '--skip-tests'])
 
         expected = deepcopy(DEFAULTS)
         expected['skip_tests'] = True
