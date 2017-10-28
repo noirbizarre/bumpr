@@ -49,6 +49,16 @@ class GitTest(object):
             git.validate()
         execute.assert_called_with('git status --porcelain', verbose=False)
 
+    def test_validate_not_clean_dryrun(self, workspace, mocker):
+        workspace.mkdir('.git')
+        git = Git()
+        execute = mocker.patch('bumpr.vcs.execute')
+        execute.return_value = '\n'.join((' M modified.py', '?? new.py'))
+
+        git.validate(dryrun=True)
+
+        execute.assert_called_with('git status --porcelain', verbose=False)
+
     def test_tag(self, mocker):
         git = Git()
 
@@ -100,6 +110,15 @@ class MercurialTest(object):
             mercurial.validate()
         execute.assert_called_with('hg status -mard', verbose=False)
 
+    def test_validate_not_clean_dryrun(self, workspace, mocker):
+        workspace.mkdir('.hg')
+        mercurial = Mercurial()
+
+        execute = mocker.patch('bumpr.vcs.execute')
+        execute.return_value = '\n'.join((' M modified.py', '?? new.py'))
+        mercurial.validate(dryrun=True)
+        execute.assert_called_with('hg status -mard', verbose=False)
+
     def test_tag(self, mocker):
         mercurial = Mercurial()
 
@@ -148,6 +167,17 @@ class BazaarTest(object):
         execute.return_value = '\n'.join((' M modified.py', '? new.py'))
         with pytest.raises(BumprError):
             bazaar.validate()
+        execute.assert_called_with('bzr status --short', verbose=False)
+
+    def test_validate_not_clean_dryrun(self, workspace, mocker):
+        workspace.mkdir('.bzr')
+        bazaar = Bazaar()
+
+        execute = mocker.patch('bumpr.vcs.execute')
+        execute.return_value = '\n'.join((' M modified.py', '? new.py'))
+
+        bazaar.validate(dryrun=True)
+
         execute.assert_called_with('bzr status --short', verbose=False)
 
     def test_tag(self, mocker):

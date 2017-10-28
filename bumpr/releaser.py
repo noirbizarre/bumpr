@@ -51,7 +51,7 @@ class Releaser(object):
 
         if config.vcs:
             self.vcs = VCS[config.vcs](verbose=config.verbose)
-            self.vcs.validate()
+            self.vcs.validate(dryrun=config.dryrun)
 
         if config.dryrun:
             self.modified = {}

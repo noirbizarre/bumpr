@@ -4,8 +4,9 @@ Changelog
 Current
 -------
 
-- Properly display dry run `prepare` diff
 - Drop support for Python 2.6 and 3.3
+- Properly display dry run `prepare` diff
+- Warn only for dirty workspace on dry run
 
 0.3.6 (2017-01-10)
 ------------------

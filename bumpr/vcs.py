@@ -1,7 +1,13 @@
 # -*- coding: utf-8 -*-
+import logging
+
 from os.path import isdir
 
 from bumpr.helpers import execute, BumprError
+
+log = logging.getLogger(__name__)
+
+MSG = 'The current repository contains modified files'
 
 
 class BaseVCS(object):
@@ -12,7 +18,7 @@ class BaseVCS(object):
         '''Execute a command'''
         execute(command, verbose=self.verbose)
 
-    def validate(self):
+    def validate(self, dryrun=False):
         '''Ensure the working dir is a repository and there is no modified files'''
         raise NotImplementedError
 
@@ -30,13 +36,17 @@ class BaseVCS(object):
 
 
 class Git(BaseVCS):
-    def validate(self):
+    def validate(self, dryrun=False):
         if not isdir('.git'):
             raise BumprError('Current directory is not a git repopsitory')
 
         for line in execute('git status --porcelain', verbose=False).splitlines():
             if not line.startswith('??'):
-                raise BumprError('The current repository contains modified files')
+                if dryrun:
+                    log.warning(MSG)
+                    break
+                else:
+                    raise BumprError(MSG)
 
     def commit(self, message):
         self.execute(["git", "commit", "-am", message])
@@ -50,13 +60,17 @@ class Git(BaseVCS):
 
 
 class Mercurial(BaseVCS):
-    def validate(self):
+    def validate(self, dryrun=False):
         if not isdir('.hg'):
             raise BumprError('Current directory is not a mercurial repopsitory')
 
         for line in execute('hg status -mard', verbose=False).splitlines():
             if not line.startswith('??'):
-                raise BumprError('The current repository contains modified files')
+                if dryrun:
+                    log.warning(MSG)
+                    break
+                else:
+                    raise BumprError(MSG)
 
     def commit(self, message):
         self.execute(["hg", "commit", "-A", "-m", message])
@@ -69,13 +83,17 @@ class Mercurial(BaseVCS):
 
 
 class Bazaar(BaseVCS):
-    def validate(self):
+    def validate(self, dryrun=False):
         if not isdir('.bzr'):
             raise BumprError('Current directory is not a bazaar repopsitory')
 
         for line in execute('bzr status --short', verbose=False).splitlines():
             if not line.startswith('?'):
-                raise BumprError('The current repository contains modified files')
+                if dryrun:
+                    log.warning(MSG)
+                    break
+                else:
+                    raise BumprError(MSG)
 
     def commit(self, message):
         self.execute(["bzr", "commit", "-m", message])
@@ -88,7 +106,7 @@ class Bazaar(BaseVCS):
 
 
 class Fake(BaseVCS):
-    def validate(self):
+    def validate(self, dryrun=False):
         return True
 
 
