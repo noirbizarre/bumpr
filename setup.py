@@ -25,14 +25,7 @@ long_description = '\n'.join((
 install_requires = []
 tests_require = ['mock', 'pytest', 'pytest-catchlog']
 doc_require = ['sphinx']
-qa_require = ['pytest-cov', 'coverage']
-
-if sys.version_info[0:2] < (2, 7):
-    install_requires.append('argparse')
-    qa_require.append('flake8<3.0')
-else:
-    qa_require.append('flake8')
-
+qa_require = ['pytest-cov', 'coverage', 'qa']
 
 setup(
     name='bumpr',
@@ -65,11 +58,8 @@ setup(
         "Intended Audience :: Developers",
         "Topic :: System :: Software Distribution",
         "Programming Language :: Python",
-        "Programming Language :: Python :: 2.6",
         "Programming Language :: Python :: 2.7",
         "Programming Language :: Python :: 3",
-        "Programming Language :: Python :: 3.2",
-        "Programming Language :: Python :: 3.3",
         "Programming Language :: Python :: 3.4",
         "Programming Language :: Python :: 3.5",
         "Programming Language :: Python :: 3.6",

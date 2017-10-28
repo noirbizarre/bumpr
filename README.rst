@@ -39,7 +39,7 @@ Bump'R intend to be customizable with the following features:
 Compatibility
 =============
 
-Bump'R requires Python 2.6+
+Bump'R requires Python 2.7 or 3.4+
 
 
 Installation
@@ -50,12 +50,6 @@ You can install Bump'R with pip:
 .. code-block:: console
 
     $ pip install bumpr
-
-or with easy_install:
-
-.. code-block:: console
-
-    $ easy_install bumpr
 
 
 Usage
