@@ -4,6 +4,7 @@ Changelog
 Current
 -------
 
+- Properly display dry run `prepare` diff
 - Drop support for Python 2.6 and 3.3
 
 0.3.6 (2017-01-10)

@@ -26,6 +26,7 @@ def test_constructor(workspace):
 
     assert not hasattr(releaser, 'vcs')
     assert not hasattr(releaser, 'diffs')
+    assert not hasattr(releaser, 'modified')
 
     assert releaser.tag_label == 'v1.2.3'
 

@@ -54,6 +54,7 @@ class Releaser(object):
             self.vcs.validate()
 
         if config.dryrun:
+            self.modified = {}
             self.diffs = {}
 
         self.hooks = [hook(self) for hook in HOOKS if self.config[hook.key]]
@@ -148,6 +149,7 @@ class Releaser(object):
         if before == after:
             return
         if self.config.dryrun:
+            self.modified[filename] = after
             diff = unified_diff(before.split('\n'), after.split('\n'), lineterm='')
             self.diffs[filename] = diff
         else:
@@ -156,8 +158,11 @@ class Releaser(object):
 
     def bump_files(self, replacements):
         for filename in [self.config.file] + self.config.files:
-            with open(filename, 'r', encoding=self.config.encoding) as current_file:
-                before = current_file.read()
+            if self.config.dryrun and filename in self.modified:
+                before = self.modified[filename]
+            else:
+                with open(filename, 'r', encoding=self.config.encoding) as current_file:
+                    before = current_file.read()
             after = before
             for token, replacement in replacements:
                 after = after.replace(token, replacement)
