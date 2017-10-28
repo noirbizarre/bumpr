@@ -1,2 +1,0 @@
-invoke>=0.13
--e .[test,qa,doc]

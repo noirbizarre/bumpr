@@ -7,7 +7,7 @@ python:
   - pypy
   - pypy3
 install:
-  - pip install -r develop.pip python-coveralls
+  - pip install -r requiremenst/develop.pip python-coveralls
 script:
   - inv cover qa
 after_success:

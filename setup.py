@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-import sys
+import io
+import os
 
 from setuptools import setup, find_packages
 
@@ -12,7 +13,13 @@ def rst(filename):
      - code-block directive
      - travis ci build badge
     '''
-    return open(filename).read()
+    return io.open(filename).read()
+
+
+def pip(name):
+    '''Parse requirements file'''
+    with io.open(os.path.join('requirements', '{0}.pip'.format(name))) as f:
+        return f.readlines()
 
 
 long_description = '\n'.join((
@@ -22,10 +29,8 @@ long_description = '\n'.join((
 ))
 
 
-install_requires = []
-tests_require = ['mock', 'pytest', 'pytest-catchlog']
-doc_require = ['sphinx']
-qa_require = ['pytest-cov', 'coverage', 'qa']
+install_requires = pip('install')
+tests_require = pip('test')
 
 setup(
     name='bumpr',
@@ -47,8 +52,7 @@ setup(
     tests_require=tests_require,
     extras_require={
         'test': tests_require,
-        'doc': doc_require,
-        'qa': qa_require,
+        'doc': pip('doc'),
     },
     keywords='version bump release tag',
     classifiers=[
