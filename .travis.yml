@@ -7,8 +7,8 @@ python:
   - pypy
   - pypy3
 install:
-  - pip install -r requirements/develop.pip python-coveralls
+  - pip install -r requirements/develop.pip coveralls
 script:
   - inv cover qa
 after_success:
-  - coveralls -c coverage.rc
+  - coveralls --rcfile=coverage.rc
