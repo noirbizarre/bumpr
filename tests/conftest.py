@@ -66,7 +66,8 @@ class Workspace(object):
 
 @pytest.fixture
 def workspace(request):
-    version = getattr(request.function, '__version', DEFAULT_VERSION)
+    marker = request.node.get_marker('version')
+    version = marker.args[0] if marker else DEFAULT_VERSION
     wksp = Workspace(version)
     wksp.chdir()
 

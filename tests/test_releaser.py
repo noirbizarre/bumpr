@@ -11,13 +11,6 @@ from bumpr.releaser import Releaser
 from bumpr.version import Version
 
 
-def workspace_version(version):
-    def wrapper(wrapped):
-        wrapped.__version = version
-        return wrapped
-    return wrapper
-
-
 class ReleaserTest(object):
     def test_constructor(self, workspace):
         config = Config({
@@ -339,7 +332,7 @@ class ReleaserTest(object):
                 assert '1.2.3.dev' in content
                 assert '1.2.4' not in content
 
-    @workspace_version('1.2.3')
+    @pytest.mark.version('1.2.3')
     def test_prepare(self, workspace):
         config = Config({
             'file': 'fake.py',
@@ -365,7 +358,7 @@ class ReleaserTest(object):
                 assert '1.2.4.dev' in content
                 assert '1.2.3' not in content
 
-    @workspace_version('1.2.3')
+    @pytest.mark.version('1.2.3')
     def test_prepare_vcs(self, workspace):
         config = Config({
             'file': 'fake.py',
