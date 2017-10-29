@@ -1,6 +1,7 @@
 [bumpr]
 file = bumpr/__about__.py
 vcs = git
+tag_annotation = version {version}
 push = true
 tests = tox
 publish = python setup.py register sdist bdist_wheel upload
