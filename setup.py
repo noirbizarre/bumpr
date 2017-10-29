@@ -43,7 +43,7 @@ setup(
     packages=find_packages(),
     install_requires=install_requires,
     license='LGPL',
-    use_2to3=True,
+    zip_safe=False,
     entry_points={
         'console_scripts': [
             'bumpr = bumpr:main',
