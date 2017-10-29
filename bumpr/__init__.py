@@ -12,33 +12,5 @@ Bump'R: Version bumper and Python package releaser
 - Extensible with hooks
 '''
 
-from .__about__ import __description__, __version__  # noqa
-
-
-def main():
-    import sys
-    from bumpr import log
-    log.init()
-
-    from bumpr.config import Config, ValidationError
-    from bumpr.releaser import Releaser
-    from bumpr.helpers import BumprError
-    from logging import DEBUG, INFO, getLogger
-
-    config = Config.parse_args()
-    getLogger().setLevel(DEBUG if config.verbose else INFO)
-    logger = getLogger(__name__)
-
-    try:
-        config.validate()
-    except ValidationError as e:
-        msg = 'Invalid configuration: {0}'.format(e)
-        logger.error(msg)
-        sys.exit(1)
-
-    try:
-        releaser = Releaser(config)
-        releaser.release()
-    except BumprError as error:
-        logger.error(str(error))
-        sys.exit(1)
+__version__ = '0.3.8.dev'  # pragma: no cover
+__description__ = 'Version bumper and Python package releaser'  # pragma: no cover

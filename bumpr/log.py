@@ -5,112 +5,114 @@ import os
 import sys
 import logging
 
-from logging import Formatter, StreamHandler, DEBUG, INFO
+import click
 
-__all__ = (
-    'init',
-)
-
-RESET_TERM = '\033[0;m'
-
-COLOR_CODES = {
-    'red': 31,
-    'green': 32,
-    'yellow': 33,
-    'blue': 34,
-    'magenta': 35,
-    'cyan': 36,
-    'white': 37,
-    'bgred': 41,
-    'bggrey': 100,
-}
-
-LEVEL_COLORS = {
-    'DEBUG': 'blue',
-    'WARNING': 'yellow',
-    'ERROR': 'red',
-    'CRITICAL': 'bgred',
-}
+from bumpr.utils import color, yellow, green, red, cyan, white, magenta, ARROW, DEBUG
 
 DRYRUN = 25
 DIFF = 15
 
+LEVEL_COLORS = {
+    logging.DEBUG: cyan,
+    logging.WARNING: yellow,
+    logging.ERROR: red,
+    logging.CRITICAL: color('black', bg='red', bold=True),
+}
 
-def ansi(color, text):
-    """Wrap text in an ansi escape sequence"""
-    code = COLOR_CODES[color]
-    return '\033[1;{0}m{1}{2}'.format(code, text, RESET_TERM)
+IS_TTY = os.isatty(sys.stdout.fileno()) and not sys.platform.startswith('win')
 
 
-class ANSIFormatter(Formatter):
+def format_multiline(string):
+    string = '\n  └ '.join(string.splitlines())
+    string = string.replace('└', '│', (string.count('└') - 1))
+    return '  │ {0}'.format(string)
+
+
+def replace_last(string, char, replacement):
+    return replacement.join(string.rsplit(char, 1))
+
+
+class CliFormatter(logging.Formatter):
     """
     Convert a `logging.LogRecord' object into colored text, using ANSI
     escape sequences.
     """
     def format(self, record):
-        msg = record.getMessage()
-        if record.levelname == 'INFO':
-            return ansi('cyan', '-> ') + msg
-        elif record.levelname == 'DRYRUN':
-            return ansi('magenta', 'dryrun-> ') + msg
-        elif record.levelname == 'DIFF':
-            if msg.startswith('+'):
-                return ansi('green', msg)
-            elif msg.startswith('-'):
-                return ansi('red', msg)
-            else:
-                return msg
+        if not IS_TTY:
+            return super(CliFormatter, self).format(record)
+        if record.levelno == DIFF:
+            if record.msg.startswith('+'):
+                record.msg = green(record.msg)
+            elif record.msg.startswith('-'):
+                record.msg = red(record.msg)
+            return super(CliFormatter, self).format(record)
+        record.msg = replace_last(str(record.msg).replace('\n', '\n│ '), '│', '└')
+        record.msg = ' '.join((self._prefix(record), record.msg))
+        return super(CliFormatter, self).format(record)
+
+    def formatException(self, ei):
+        '''Indent traceback info for better readability'''
+        out = super(CliFormatter, self).formatException(ei)
+        out = '\n'.join('│ {0}'.format(line) for line in out.splitlines())
+        return replace_last(out, '│', '└')
+
+    def _prefix(self, record):
+        if record.levelno == logging.INFO:
+            return cyan(ARROW)
+        elif record.levelno == DRYRUN:
+            return magenta(DEBUG)
         else:
-            color = LEVEL_COLORS.get(record.levelname, 'white')
-            return ansi(color, record.levelname.lower()) + ': ' + msg
+            color = LEVEL_COLORS.get(record.levelno, white)
+            return '{0}:'.format(color(record.levelname.upper()))
 
 
-class TextFormatter(Formatter):
-    """
-    Convert a `logging.LogRecord' object into text.
-    """
-    def format(self, record):
-        if not record.levelname or record.levelname in ('INFO', 'DIFF'):
-            return record.getMessage()
-        elif record.levelname == 'DRYRUN':
-            return 'dryrun-> {0}'.format(record.getMessage())
-        else:
-            return record.levelname.lower() + ': ' + record.getMessage()
+class CliHandler(logging.Handler):
+    def emit(self, record):
+        try:
+            msg = self.format(record)
+            err = record.levelno >= logging.WARNING
+            click.echo(msg, err=err)
+        except (KeyboardInterrupt, SystemExit):
+            raise
+        except Exception:
+            self.handleError(record)
 
 
-class BumprLogger(logging.Logger):
-    def dryrun(self, *args):
-        self.log(DRYRUN, *args)
+def dryrun(self, message, *args, **kwargs):
+    if self.isEnabledFor(DRYRUN):
+        self._log(DRYRUN, message, args, **kwargs)
 
-    def diff(self, *args):
-        self.log(DIFF, *args)
+
+def diff(self, message, *args, **kwargs):
+    if self.isEnabledFor(DIFF):
+        self._log(DIFF, message, args, **kwargs)
 
 
 def declare():
+    '''
+    Declare new log levels.
+
+    Monkypatching is required instead of proper sublcassing
+    to fix logger declared before init.
+    '''
     logging.addLevelName(DRYRUN, 'DRYRUN')
     logging.addLevelName(DIFF, 'DIFF')
-    logging.setLoggerClass(BumprLogger)
+    logging.Logger.dryrun = dryrun
+    logging.Logger.diff = diff
 
 
-def init(level=INFO):
+def init_logging(verbose=False):
     declare()
-
     logger = logging.getLogger()
-    handler = StreamHandler()
-
-    if (os.isatty(sys.stdout.fileno()) and not sys.platform.startswith('win')):
-        fmt = ANSIFormatter()
-    else:
-        fmt = TextFormatter()
-    handler.setFormatter(fmt)
+    handler = CliHandler()
+    handler.setFormatter(CliFormatter())
     logger.addHandler(handler)
 
-    if level:
-        logger.setLevel(level)
+    logger.setLevel(logging.DEBUG if verbose else logging.INFO)
 
 
 if __name__ == '__main__':  # pragma: no cover
-    init(level=DEBUG)
+    init_logging(verbose=True)
 
     logger = logging.getLogger(__name__)
     logger.debug('debug')
@@ -119,6 +121,11 @@ if __name__ == '__main__':  # pragma: no cover
     logger.diff('+ diff')
     logger.diff('- diff')
     logger.info('info')
+    logger.info('info\nmulti\nlines')
     logger.warning('warning')
     logger.error('error')
     logger.critical('critical')
+    try:
+        raise Exception('An exception')
+    except Exception:
+        logger.exception('exception')

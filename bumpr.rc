@@ -1,5 +1,5 @@
 [bumpr]
-file = bumpr/__about__.py
+file = bumpr/__init__.py
 vcs = git
 tag_annotation = version {version}
 push = true

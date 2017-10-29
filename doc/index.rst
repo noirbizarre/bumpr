@@ -109,6 +109,7 @@ Documentation
     rcfile
     commandline
     hooks
+    migration
     changelog
 
 

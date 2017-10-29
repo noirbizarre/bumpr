@@ -70,18 +70,12 @@ class Releaser(object):
 
     def release(self):
         self.timestamp = datetime.now()
-
-        if self.config.bump_only:
-            self.bump()
-        elif self.config.prepare_only:
-            self.prepare()
-        else:
-            self.clean()
-            self.test()
-            self.bump()
-            self.publish()
-            self.prepare()
-            self.push()
+        self.clean()
+        self.test()
+        self.bump()
+        self.publish()
+        self.prepare()
+        self.push()
 
     def test(self):
         if self.config.tests:

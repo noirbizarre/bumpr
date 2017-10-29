@@ -5,10 +5,13 @@ from textwrap import dedent
 
 import pytest
 
+from click.testing import CliRunner
+
+from bumpr.log import init_logging
+
 
 def pytest_configure():
-    from bumpr import log
-    log.init()
+    init_logging()
 
 
 DEFAULT_VERSION = '1.2.3.dev'
@@ -35,14 +38,12 @@ class Workspace(object):
 
     def write(self, filename, content):
         target = self.root / filename
-        # wksp_filename = os.path.join(self.root, filename)
         with target.open('wb') as f:
             content = dedent(content).format(**self.__dict__)
             f.write(content.encode('utf8'))
         return target
 
     def mkdir(self, dirname):
-        # wksp_dirname = os.path.join(self.root, dirname)
         try:
             self.root.mkdir(dirname)
         except FileExistsError as exc:
@@ -50,6 +51,11 @@ class Workspace(object):
 
     def chdir(self):
         self.root.chdir()
+
+    def bumpr(self, params=''):
+        from bumpr.cli import cli
+        runner = CliRunner()
+        return runner.invoke(cli, params.split())
 
 
 @pytest.fixture

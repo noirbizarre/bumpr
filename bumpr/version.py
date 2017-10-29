@@ -1,10 +1,13 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
+from packaging.version import Version as BaseVersion
+
+
 import re
 
 
-class Version(object):
+class Version(BaseVersion):
     MAJOR, MINOR, PATCH = range(3)
 
     PATTERN = re.compile(r'(?P<major>\d+)\.(?P<minor>\d+)\.(?P<patch>\d+)(\.(?P<suffix>[\w\d.]+))?')

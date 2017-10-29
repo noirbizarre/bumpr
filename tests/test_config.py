@@ -191,13 +191,13 @@ class ConfigTest(object):
         assert config == expected
 
     def test_override_from_args(self):
-        config = Config.parse_args(['test.py', '-M', '-v', '-s', 'test-suffix', '-c', 'fake'])
+        config = Config(parsed_args={'verbose': True, 'part': Version.MAJOR, 'suffix': 'rc1', 'unsuffix': True})
 
         expected = deepcopy(DEFAULTS)
-        expected['file'] = 'test.py'
-        expected['bump']['part'] = Version.MAJOR
-        expected['bump']['suffix'] = 'test-suffix'
         expected['verbose'] = True
+        expected['bump']['part'] = Version.MAJOR
+        expected['bump']['suffix'] = 'rc1'
+        expected['bump']['unsuffix'] = True
         for hook in HOOKS:
             expected[hook.key] = False
 
@@ -212,16 +212,14 @@ class ConfigTest(object):
         part = minor
     ''')
     def test_override_args_keeps_config_values(self):
-        config = Config.parse_args(['test.py', '-M', '-v', '-s', 'test-suffix', '-c', 'test.rc'])
+        config = Config(parsed_args={'part': Version.MAJOR, 'verbose': True})
 
         expected = deepcopy(DEFAULTS)
-        expected['file'] = 'test.py'
+        expected['files'] = ['README']
         expected['bump']['part'] = Version.MAJOR
-        expected['bump']['suffix'] = 'test-suffix'
+        expected['bump']['message'] = 'test'
         expected['verbose'] = True
 
-        expected['files'] = ['README']
-        expected['bump']['message'] = 'test'
         expected['prepare']['part'] = Version.MINOR
 
         for hook in HOOKS:
@@ -234,7 +232,7 @@ class ConfigTest(object):
         push = true
     ''')
     def test_do_not_override_push_when_not_in_args(self, mocker, mock_ini):
-        config = Config.parse_args(['-c', 'test.rc'])
+        config = Config(parsed_args={'push': None})
 
         expected = deepcopy(DEFAULTS)
         expected['push'] = True
@@ -249,7 +247,7 @@ class ConfigTest(object):
         push = true
     ''')
     def test_override_push_from_args(self):
-        config = Config.parse_args(['-c', 'test.rc', '--no-push'])
+        config = Config(parsed_args={'push': False})
 
         expected = deepcopy(DEFAULTS)
         expected['push'] = False
@@ -264,7 +262,7 @@ class ConfigTest(object):
         push = false
     ''')
     def test_force_push_from_args(self):
-        config = Config.parse_args(['-c', 'test.rc', '--push'])
+        config = Config(parsed_args={'push': True})
 
         expected = deepcopy(DEFAULTS)
         expected['push'] = True
@@ -279,40 +277,10 @@ class ConfigTest(object):
         commit = False
     ''')
     def test_do_not_override_commit_when_not_in_args(self):
-        config = Config.parse_args(['-c', 'test.rc'])
+        config = Config(parsed_args={'commit': None})
 
         expected = deepcopy(DEFAULTS)
         expected['commit'] = False
-
-        for hook in HOOKS:
-            expected[hook.key] = False
-
-        assert config == expected
-
-    @pytest.mark.bumprc('''\
-        [bumpr]
-        bump_only = true
-    ''')
-    def test_do_not_override_bump_only_when_not_in_args(self):
-        config = Config.parse_args(['-c', 'test.rc'])
-
-        expected = deepcopy(DEFAULTS)
-        expected['bump_only'] = True
-
-        for hook in HOOKS:
-            expected[hook.key] = False
-
-        assert config == expected
-
-    @pytest.mark.bumprc('''\
-        [bumpr]
-        prepare_only = true
-    ''')
-    def test_do_not_override_prepare_only_when_not_in_args(self):
-        config = Config.parse_args(['-c', 'test.rc'])
-
-        expected = deepcopy(DEFAULTS)
-        expected['prepare_only'] = True
 
         for hook in HOOKS:
             expected[hook.key] = False
@@ -323,8 +291,8 @@ class ConfigTest(object):
         [bumpr]
         commit = true
     ''')
-    def test_do_override_commit(self):
-        config = Config.parse_args(['-c', 'test.rc', '-nc'])
+    def test_override_no_commit(self):
+        config = Config(parsed_args={'commit': False})
 
         expected = deepcopy(DEFAULTS)
         expected['commit'] = False
@@ -334,9 +302,24 @@ class ConfigTest(object):
 
         assert config == expected
 
+    @pytest.mark.bumprc('''\
+        [bumpr]
+        commit = false
+    ''')
+    def test_override_commit(self):
+        config = Config(parsed_args={'commit': True})
+
+        expected = deepcopy(DEFAULTS)
+        expected['commit'] = True
+
+        for hook in HOOKS:
+            expected[hook.key] = False
+
+        assert config == expected
+
     @pytest.mark.bumprc('[bumpr]')
     def test_skip_tests_from_args(self):
-        config = Config.parse_args(['-c', 'test.rc', '--skip-tests'])
+        config = Config(parsed_args={'skip_tests': True})
 
         expected = deepcopy(DEFAULTS)
         expected['skip_tests'] = True

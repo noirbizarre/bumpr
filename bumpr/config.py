@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import print_function, unicode_literals
 
-import argparse
 import logging
 import sys
 
@@ -14,7 +13,7 @@ except ImportError:
 
 from bumpr.helpers import ObjectDict
 from bumpr.hooks import HOOKS
-from bumpr.version import Version, PARTS
+from bumpr.version import PARTS
 
 logger = logging.getLogger(__name__)
 IS_PY3 = sys.version_info[0] == 3
@@ -35,8 +34,6 @@ DEFAULTS = {
     'tests': None,
     'skip_tests': False,
     'publish': None,
-    'bump_only': False,
-    'prepare_only': False,
     'files': [],
 
     'bump': {
@@ -115,8 +112,8 @@ class Config(ObjectDict):
             self.override_from_config('setup.cfg')
 
         if parsed_args:
-            if 'config' in parsed_args and exists(parsed_args.config):
-                self.override_from_config(parsed_args.config)
+            if 'config' in parsed_args and exists(parsed_args['config']):
+                self.override_from_config(parsed_args['config'])
             self.override_from_args(parsed_args)
 
     def override_from_config(self, filename):
@@ -129,7 +126,7 @@ class Config(ObjectDict):
         # Common options
         if config.has_section('bumpr'):
             for option in config.options('bumpr'):
-                if option in ('tag', 'commit', 'push', 'bump_only', 'prepare_only', 'skip_tests'):
+                if option in ('tag', 'commit', 'push', 'skip_tests'):
                     self[option] = config.getboolean('bumpr', option)
                 elif option == 'files':
                     self.files = [name.strip() for name in config.get('bumpr', 'files').split('\n') if name.strip()]
@@ -157,90 +154,27 @@ class Config(ObjectDict):
 
     def override_from_args(self, parsed_args):
         for arg in 'file', 'vcs', 'files':
-            if arg in parsed_args and getattr(parsed_args, arg) not in (None, [], tuple()):
-                self[arg] = getattr(parsed_args, arg)
+            if arg in parsed_args and parsed_args.get(arg) not in (None, [], tuple()):
+                self[arg] = parsed_args[arg]
 
         for arg in 'verbose', 'dryrun':
-            if arg in parsed_args and getattr(parsed_args, arg):
+            if arg in parsed_args and parsed_args[arg]:
                 self[arg] = True
 
-        if hasattr(parsed_args, 'nocommit'):
-            self.commit = not parsed_args.nocommit
-        for attr in 'bump_only', 'prepare_only', 'push', 'skip_tests':
-            if hasattr(parsed_args, attr):
-                self[attr] = getattr(parsed_args, attr)
+        if parsed_args.get('commit') is not None:
+            self.commit = parsed_args['commit']
+        for attr in 'push', 'skip_tests':
+            if parsed_args.get(attr) is not None:
+                self[attr] = parsed_args[attr]
 
         # Bump
-        if parsed_args.part is not None:
-            self.bump.part = parsed_args.part
-        if parsed_args.suffix is not None:
-            self.bump.suffix = parsed_args.suffix
-        if parsed_args.unsuffix is not None:
-            self.bump.unsuffix = parsed_args.unsuffix
-
-        # Next
-        if parsed_args.prepare_part is not None:
-            self.prepare.part = parsed_args.prepare_part
-        if parsed_args.prepare_suffix is not None:
-            self.prepare.suffix = parsed_args.prepare_suffix
-        if parsed_args.prepare_unsuffix is not None:
-            self.prepare.unsuffix = parsed_args.prepare_unsuffix
+        if parsed_args.get('part') is not None:
+            self.bump.part = parsed_args['part']
+        if parsed_args.get('suffix') is not None:
+            self.bump.suffix = parsed_args['suffix']
+        if parsed_args.get('unsuffix') is not None:
+            self.bump.unsuffix = parsed_args['unsuffix']
 
     def validate(self):
         if not self.file:
             raise ValidationError('A file is required from the configuration file or the command line')
-
-    @classmethod
-    def parse_args(cls, args=None):
-        from bumpr import __version__, __description__
-        parser = argparse.ArgumentParser(description=__description__)
-
-        parser.add_argument('file', help='Versionned module file', nargs='?')
-        parser.add_argument('files', help='Files to update', nargs='*')
-
-        parser.add_argument('--version', action='version', version=__version__)
-        parser.add_argument('-v', '--verbose', dest='verbose', action='store_true', help="Verbose output")
-        parser.add_argument('-c', '--config', default='bumpr.rc', help='Specify a configuration file')
-        parser.add_argument('-d', '--dryrun', action='store_true', help='Do not write anything and display a diff')
-        parser.add_argument('-st', '--skip-tests', action='store_true', default=argparse.SUPPRESS, help='Skip tests')
-
-        group = parser.add_mutually_exclusive_group()
-        group.add_argument('-b', '--bump', dest='bump_only', action='store_true', default=argparse.SUPPRESS,
-                           help='Only perform the bump')
-        group.add_argument('-pr', '--prepare', dest='prepare_only', action='store_true', default=argparse.SUPPRESS,
-                           help='Only perform the prepare')
-
-        # Bump behavior for bump
-        group = parser.add_argument_group('bump')
-        group.add_argument('-M', '--major', dest='part', action='store_const', const=Version.MAJOR,
-                           help="Bump major version")
-        group.add_argument('-m', '--minor', dest='part', action='store_const', const=Version.MINOR,
-                           help="Bump minor version")
-        group.add_argument('-p', '--patch', dest='part', action='store_const',
-                           const=Version.PATCH, help="Bump patch version")
-        group.add_argument('-s', '--suffix', dest='suffix', type=str, help="Set suffix")
-        group.add_argument('-u', '--unsuffix', dest='unsuffix', action='store_true', default=None, help="Unset suffix")
-
-        # Bump behavior for prepare version
-        group = parser.add_argument_group('prepare')
-        group.add_argument('-pM', '--prepare-major', dest='prepare_part', action='store_const',
-                           const=Version.MAJOR, help="Bump major version")
-        group.add_argument('-pm', '--prepare-minor', dest='prepare_part', action='store_const',
-                           const=Version.MINOR, help="Bump minor version")
-        group.add_argument('-pp', '--prepare-patch', dest='prepare_part', action='store_const',
-                           const=Version.PATCH, help="Bump patch version")
-        group.add_argument('-ps', '--prepare-suffix', dest='prepare_suffix', type=str, help="Set suffix")
-        group.add_argument('-pu', '--prepare-unsuffix', dest='prepare_unsuffix', action='store_true',
-                           help="Unset suffix")
-
-        group = parser.add_argument_group('Version control system')
-        group.add_argument('--vcs', choices=['git', 'hg'], default=None, help='VCS implementation')
-        group.add_argument('-nc', '--nocommit', action='store_true', default=argparse.SUPPRESS,
-                           help='Do not commit')
-        group.add_argument('-P', '--push', action='store_true', default=argparse.SUPPRESS,
-                           help='Push changes to remote repository')
-        group.add_argument('-nP', '--no-push', action='store_false', dest='push', default=argparse.SUPPRESS,
-                           help='Don\'t push changes to remote repository')
-
-        parsed_args = parser.parse_args(args)
-        return cls(parsed_args=parsed_args)

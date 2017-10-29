@@ -103,19 +103,17 @@ def cover(ctx, report=False, verbose=False):
     header(cover.__doc__)
     cmd = [
         'pytest',
-        '--cov-config coverage.rc',
-        '--cov-report term',
-        '--cov-report html:reports/coverage',
-        '--cov-report xml:reports/coverage.xml',
+        '--cov-config=coverage.rc',
+        '--cov-report=term',
         '--cov=bumpr',
     ]
     if verbose:
         cmd.append('-v')
     if report:
         cmd += [
-            '--cov-report html:reports/python/coverage',
-            '--cov-report xml:reports/python/coverage.xml',
-            '--junitxml=reports/python/tests.xml'
+            '--cov-report=html:{0}/reports/coverage'.format(ROOT),
+            '--cov-report=xml:{0}/reports/coverage.xml'.format(ROOT),
+            '--junit-xml=reports/tests.xml'
         ]
     with ctx.cd(ROOT):
         ctx.run(' '.join(cmd), pty=True)

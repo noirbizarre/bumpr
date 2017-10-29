@@ -327,58 +327,6 @@ def test_release(workspace, mocker):
     assert push.called
 
 
-def test_release_bump_only(workspace, mocker):
-    config = Config({
-        'file': 'fake.py',
-        'files': [str(workspace.readme)],
-        'vcs': 'fake',
-        'push': True,
-        'bump_only': True
-    })
-    releaser = Releaser(config)
-    clean = mocker.patch.object(releaser, 'clean')
-    test = mocker.patch.object(releaser, 'test')
-    bump = mocker.patch.object(releaser, 'bump')
-    publish = mocker.patch.object(releaser, 'publish')
-    prepare = mocker.patch.object(releaser, 'prepare')
-    push = mocker.patch.object(releaser, 'push')
-
-    releaser.release()
-
-    assert not clean.called
-    assert not test.called
-    assert bump.called
-    assert not publish.called
-    assert not prepare.called
-    assert not push.called
-
-
-def test_release_prepare_only(workspace, mocker):
-    config = Config({
-        'file': 'fake.py',
-        'files': [str(workspace.readme)],
-        'vcs': 'fake',
-        'push': True,
-        'prepare_only': True
-    })
-    releaser = Releaser(config)
-    clean = mocker.patch.object(releaser, 'clean')
-    test = mocker.patch.object(releaser, 'test')
-    bump = mocker.patch.object(releaser, 'bump')
-    publish = mocker.patch.object(releaser, 'publish')
-    prepare = mocker.patch.object(releaser, 'prepare')
-    push = mocker.patch.object(releaser, 'push')
-
-    releaser.release()
-
-    assert not clean.called
-    assert not test.called
-    assert not bump.called
-    assert not publish.called
-    assert prepare.called
-    assert not push.called
-
-
 def test_release_dryrun(workspace, mocker):
     config = Config({
         'file': 'fake.py',

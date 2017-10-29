@@ -34,8 +34,8 @@ tests_require = pip('test')
 
 setup(
     name='bumpr',
-    version=__import__('bumpr.__about__').__version__,
-    description=__import__('bumpr.__about__').__description__,
+    version=__import__('bumpr').__version__,
+    description=__import__('bumpr').__description__,
     long_description=long_description,
     url='https://github.com/noirbizarre/bumpr',
     author='Axel Haustant',
@@ -46,7 +46,7 @@ setup(
     zip_safe=False,
     entry_points={
         'console_scripts': [
-            'bumpr = bumpr:main',
+            'bumpr = bumpr.cli:cli',
         ],
     },
     tests_require=tests_require,
