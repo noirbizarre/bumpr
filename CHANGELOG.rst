@@ -1,8 +1,8 @@
 Changelog
 =========
 
-Current
--------
+0.3.7 (2017-10-29)
+------------------
 
 - Drop support for Python 2.6 and 3.3
 - Properly display dry run ``prepare`` diff
