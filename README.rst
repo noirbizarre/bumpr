@@ -8,12 +8,12 @@ Bump'R
 .. image:: https://coveralls.io/repos/noirbizarre/bumpr/badge.svg?branch=master
     :target: https://coveralls.io/r/noirbizarre/bumpr?branch=master
     :alt: Code coverage
-.. image:: https://requires.io/github/noirbizarre/bumpr/requirements.svg?branch=master
-    :target: https://requires.io/github/noirbizarre/bumpr/requirements/?branch=master
-    :alt: Requirements Status
 .. image:: https://readthedocs.org/projects/bumpr/badge/?version=latest
     :target: https://bumpr.readthedocs.io/en/latest/
     :alt: Documentation status
+.. image:: https://img.shields.io/pypi/v/bumpr.svg
+    :target: https://pypi.python.org/pypi/bumpr
+    :alt: Last version
 .. image:: https://img.shields.io/pypi/l/bumpr.svg
     :target: https://pypi.python.org/pypi/bumpr
     :alt: License
