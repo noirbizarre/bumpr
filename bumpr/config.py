@@ -27,6 +27,7 @@ DEFAULTS = {
     'commit': True,
     'tag': True,
     'tag_format': '{version}',
+    'tag_annotation': None,
     'push': False,
     'verbose': False,
     'dryrun': False,

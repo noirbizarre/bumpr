@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 from __future__ import print_function, unicode_literals
 
+import logging
+
 import pytest
 
 from bumpr.vcs import BaseVCS, Git, Mercurial, Bazaar
@@ -66,6 +68,13 @@ class GitTest(object):
         git.tag('fake')
         execute.assert_called_with(['git', 'tag', 'fake'])
 
+    def test_tag_annotate(self, mocker):
+        git = Git()
+
+        execute = mocker.patch.object(git, 'execute')
+        git.tag('fake', annotation='some annotation')
+        execute.assert_called_with(['git', 'tag', 'fake', '--annotate', '-m', '"some annotation"'])
+
     def test_commit(self, mocker):
         git = Git()
 
@@ -126,6 +135,13 @@ class MercurialTest(object):
         mercurial.tag('fake')
         execute.assert_called_with(['hg', 'tag', 'fake'])
 
+    def test_tag_annotate(self, mocker):
+        mercurial = Mercurial()
+
+        execute = mocker.patch.object(mercurial, 'execute')
+        mercurial.tag('fake', annotation='some annotation')
+        execute.assert_called_with(['hg', 'tag', 'fake', '-m', '"some annotation"'])
+
     def test_commit(self, mocker):
         mercurial = Mercurial()
 
@@ -180,12 +196,24 @@ class BazaarTest(object):
 
         execute.assert_called_with('bzr status --short', verbose=False)
 
-    def test_tag(self, mocker):
+    def test_tag(self, mocker, caplog):
         bazaar = Bazaar()
 
         execute = mocker.patch.object(bazaar, 'execute')
         bazaar.tag('fake')
         execute.assert_called_with(['bzr', 'tag', 'fake'])
+
+    def test_tag_annotate(self, mocker, caplog):
+        bazaar = Bazaar()
+
+        execute = mocker.patch.object(bazaar, 'execute')
+        bazaar.tag('fake', annotation='some annotation')
+        execute.assert_called_with(['bzr', 'tag', 'fake'])
+
+        record = caplog.record_tuples[0]
+
+        assert record[0] == 'bumpr.vcs'
+        assert record[1] == logging.WARNING
 
     def test_commit(self, mocker):
         bazaar = Bazaar()

@@ -5,8 +5,9 @@ Current
 -------
 
 - Drop support for Python 2.6 and 3.3
-- Properly display dry run `prepare` diff
+- Properly display dry run ``prepare`` diff
 - Warn only for dirty workspace on dry run
+- Optional tag annotation support
 
 0.3.6 (2017-01-10)
 ------------------

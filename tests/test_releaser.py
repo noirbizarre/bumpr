@@ -279,6 +279,29 @@ def test_bump_vcs(workspace, mocker):
             assert '1.2.3.dev' not in content
 
 
+def test_bump_vcs_with_annotation(workspace, mocker):
+    config = Config({
+        'file': 'fake.py',
+        'files': [workspace.readme_filename],
+        'vcs': 'fake',
+        'tag_annotation': 'version {version}'
+    })
+    releaser = Releaser(config)
+    commit = mocker.patch.object(releaser, 'commit')
+    tag = mocker.patch.object(releaser.vcs, 'tag')
+
+    releaser.bump()
+
+    assert commit.call_count == 1
+    tag.assert_called_with(str(releaser.version), 'version {0}'.format(releaser.version))
+
+    for filename in workspace.module_filename, workspace.readme_filename:
+        with open(filename) as f:
+            content = f.read()
+            assert '1.2.3' in content
+            assert '1.2.3.dev' not in content
+
+
 def test_release(workspace, mocker):
     config = Config({
         'file': 'fake.py',

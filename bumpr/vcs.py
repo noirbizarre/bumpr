@@ -26,7 +26,7 @@ class BaseVCS(object):
         '''Commit all modified files'''
         raise NotImplementedError
 
-    def tag(self, name):
+    def tag(self, name, annotation=None):
         '''Create a tag'''
         raise NotImplementedError
 
@@ -51,8 +51,11 @@ class Git(BaseVCS):
     def commit(self, message):
         self.execute(["git", "commit", "-am", message])
 
-    def tag(self, name):
-        self.execute(["git", "tag", name])
+    def tag(self, name, annotation=None):
+        cmd = ["git", "tag", name]
+        if annotation:
+            cmd += ['--annotate', '-m', '"{0}"'.format(annotation)]
+        self.execute(cmd)
 
     def push(self):
         self.execute(["git", "push"])
@@ -75,8 +78,11 @@ class Mercurial(BaseVCS):
     def commit(self, message):
         self.execute(["hg", "commit", "-A", "-m", message])
 
-    def tag(self, name):
-        self.execute(["hg", "tag", name])
+    def tag(self, name, annotation=None):
+        cmd = ["hg", "tag", name]
+        if annotation:
+            cmd += ['-m', '"{0}"'.format(annotation)]
+        self.execute(cmd)
 
     def push(self):
         self.execute(["hg", "push"])
@@ -98,7 +104,9 @@ class Bazaar(BaseVCS):
     def commit(self, message):
         self.execute(["bzr", "commit", "-m", message])
 
-    def tag(self, name):
+    def tag(self, name, annotation=None):
+        if annotation:
+            log.warning('Tag annotation is not supported by Bazaar')
         self.execute(["bzr", "tag", name])
 
     def push(self):

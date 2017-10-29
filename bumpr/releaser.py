@@ -46,6 +46,9 @@ class Releaser(object):
 
         self.tag_label = self.config.tag_format.format(version=self.version)
         logger.debug('Tag: {0}'.format(self.tag_label))
+        if self.config.tag_annotation:
+            self.tag_annotation = self.config.tag_annotation.format(version=self.version)
+            logger.debug('Tag annotation: {0}'.format(self.tag_annotation))
 
         self.timestamp = None
 
@@ -176,11 +179,18 @@ class Releaser(object):
 
     def tag(self):
         if self.config.commit and self.config.tag:
-            logger.debug('Tag: %s', self.tag_label)
-            if not self.config.dryrun:
-                self.vcs.tag(self.tag_label)
+            if self.config.tag_annotation:
+                logger.debug('Tag: %s Annotation: %s', self.tag_label, self.tag_annotation)
+                if not self.config.dryrun:
+                    self.vcs.tag(self.tag_label, self.tag_annotation)
+                else:
+                    logger.dryrun('tag: {0} annotation: {1}'.format(self.tag_label, self.tag_annotation))
             else:
-                logger.dryrun('tag: {0}'.format(self.tag_label))
+                logger.debug('Tag: %s', self.tag_label)
+                if not self.config.dryrun:
+                    self.vcs.tag(self.tag_label)
+                else:
+                    logger.dryrun('tag: {0}'.format(self.tag_label))
 
     def commit(self, message):
         if self.config.commit:

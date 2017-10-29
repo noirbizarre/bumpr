@@ -52,6 +52,11 @@ tag_format:
 
     Specify the format of the tag
 
+tag_annotation:
+    *Default:* ``None``
+
+    Specify an optional tag annotation formatted with the ``{version}`` token
+
 verbose
     *Default:* ``False``
 
