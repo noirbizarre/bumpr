@@ -215,7 +215,7 @@ def test_push_no_commit(workspace, mocker):
 
 
 def test_release_wihtout_vcs_or_commands(workspace, mocker):
-    config = Config({'file': 'fake.py', 'files': [workspace.readme_filename]})
+    config = Config({'file': 'fake.py', 'files': [str(workspace.readme)]})
     releaser = Releaser(config)
     execute = mocker.patch('bumpr.releaser.execute')
     commit = mocker.patch.object(releaser, 'commit')
@@ -225,8 +225,8 @@ def test_release_wihtout_vcs_or_commands(workspace, mocker):
     assert not execute.called
     assert not commit.called
 
-    for filename in workspace.module_filename, workspace.readme_filename:
-        with open(filename) as f:
+    for file in workspace.module, workspace.readme:
+        with file.open() as f:
             content = f.read()
             assert '1.2.3' in content
             assert '1.2.3.dev' not in content
@@ -235,7 +235,7 @@ def test_release_wihtout_vcs_or_commands(workspace, mocker):
 def test_bump(workspace, mocker):
     config = Config({
         'file': 'fake.py',
-        'files': [workspace.readme_filename],
+        'files': [str(workspace.readme)],
     })
 
     releaser = Releaser(config)
@@ -250,8 +250,8 @@ def test_bump(workspace, mocker):
     assert not tag.called
     assert hook.bump.called
 
-    for filename in workspace.module_filename, workspace.readme_filename:
-        with open(filename) as f:
+    for file in workspace.module, workspace.readme:
+        with file.open() as f:
             content = f.read()
             assert '1.2.3' in content
             assert '1.2.3.dev' not in content
@@ -260,7 +260,7 @@ def test_bump(workspace, mocker):
 def test_bump_vcs(workspace, mocker):
     config = Config({
         'file': 'fake.py',
-        'files': [workspace.readme_filename],
+        'files': [str(workspace.readme)],
         'vcs': 'fake',
     })
     releaser = Releaser(config)
@@ -272,8 +272,8 @@ def test_bump_vcs(workspace, mocker):
     assert commit.call_count == 1
     assert tag.called
 
-    for filename in workspace.module_filename, workspace.readme_filename:
-        with open(filename) as f:
+    for file in workspace.module, workspace.readme:
+        with file.open() as f:
             content = f.read()
             assert '1.2.3' in content
             assert '1.2.3.dev' not in content
@@ -282,7 +282,7 @@ def test_bump_vcs(workspace, mocker):
 def test_bump_vcs_with_annotation(workspace, mocker):
     config = Config({
         'file': 'fake.py',
-        'files': [workspace.readme_filename],
+        'files': [str(workspace.readme)],
         'vcs': 'fake',
         'tag_annotation': 'version {version}'
     })
@@ -295,8 +295,8 @@ def test_bump_vcs_with_annotation(workspace, mocker):
     assert commit.call_count == 1
     tag.assert_called_with(str(releaser.version), 'version {0}'.format(releaser.version))
 
-    for filename in workspace.module_filename, workspace.readme_filename:
-        with open(filename) as f:
+    for file in workspace.module, workspace.readme:
+        with file.open() as f:
             content = f.read()
             assert '1.2.3' in content
             assert '1.2.3.dev' not in content
@@ -305,7 +305,7 @@ def test_bump_vcs_with_annotation(workspace, mocker):
 def test_release(workspace, mocker):
     config = Config({
         'file': 'fake.py',
-        'files': [workspace.readme_filename],
+        'files': [str(workspace.readme)],
         'vcs': 'fake',
         'push': True,
     })
@@ -330,7 +330,7 @@ def test_release(workspace, mocker):
 def test_release_bump_only(workspace, mocker):
     config = Config({
         'file': 'fake.py',
-        'files': [workspace.readme_filename],
+        'files': [str(workspace.readme)],
         'vcs': 'fake',
         'push': True,
         'bump_only': True
@@ -356,7 +356,7 @@ def test_release_bump_only(workspace, mocker):
 def test_release_prepare_only(workspace, mocker):
     config = Config({
         'file': 'fake.py',
-        'files': [workspace.readme_filename],
+        'files': [str(workspace.readme)],
         'vcs': 'fake',
         'push': True,
         'prepare_only': True
@@ -382,7 +382,7 @@ def test_release_prepare_only(workspace, mocker):
 def test_release_dryrun(workspace, mocker):
     config = Config({
         'file': 'fake.py',
-        'files': [workspace.readme_filename],
+        'files': [str(workspace.readme)],
         'vcs': 'fake',
         'dryrun': True,
         'push': True,
@@ -396,8 +396,8 @@ def test_release_dryrun(workspace, mocker):
     assert not vcs.tag.called
     assert not vcs.push.called
 
-    for filename in workspace.module_filename, workspace.readme_filename:
-        with open(filename) as f:
+    for file in workspace.module, workspace.readme:
+        with file.open() as f:
             content = f.read()
             assert '1.2.3.dev' in content
             assert '1.2.4' not in content
@@ -407,7 +407,7 @@ def test_release_dryrun(workspace, mocker):
 def test_prepare(workspace, mocker):
     config = Config({
         'file': 'fake.py',
-        'files': [workspace.readme_filename],
+        'files': [str(workspace.readme)],
         'prepare': {
             'part': Version.PATCH,
             'suffix': 'dev',
@@ -425,8 +425,8 @@ def test_prepare(workspace, mocker):
     assert not tag.called
     assert hook.prepare.called
 
-    for filename in workspace.module_filename, workspace.readme_filename:
-        with open(filename) as f:
+    for file in workspace.module, workspace.readme:
+        with file.open() as f:
             content = f.read()
             assert '1.2.4.dev' in content
             assert '1.2.3' not in content
@@ -436,7 +436,7 @@ def test_prepare(workspace, mocker):
 def test_prepare_vcs(workspace, mocker):
     config = Config({
         'file': 'fake.py',
-        'files': [workspace.readme_filename],
+        'files': [str(workspace.readme)],
         'vcs': 'fake',
         'prepare': {
             'part': Version.PATCH,
@@ -452,8 +452,8 @@ def test_prepare_vcs(workspace, mocker):
     assert commit.call_count == 1
     assert not tag.called
 
-    for filename in workspace.module_filename, workspace.readme_filename:
-        with open(filename) as f:
+    for file in workspace.module, workspace.readme:
+        with file.open() as f:
             content = f.read()
             assert '1.2.4.dev' in content
             assert '1.2.3' not in content
