@@ -6,6 +6,7 @@ from textwrap import dedent
 from bumpr.version import Version
 
 import pytest
+import yaml
 
 
 @pytest.fixture
@@ -128,3 +129,14 @@ def test_full_run(workspace):
     '''))
     assert workspace.bumpr().exit_code == 0
     assert "__version__ = '1.2.4.dev'" in workspace.module.open().read()
+
+
+def test_init_with_parameters(workspace):
+    params = 'init -s bumpr/__init__.py -c CHANGELOG.rst'
+    assert workspace.bumpr(params).exit_code == 0
+    assert (workspace.root / 'bumpr.yml').exists()
+
+    data = yaml.load(workspace.read('bumpr.yml'))
+
+    assert data['source'] == 'bumpr/__init__.py'
+    assert data['changelog']['file'] == 'CHANGELOG.rst'

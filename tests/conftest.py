@@ -43,6 +43,11 @@ class Workspace(object):
             f.write(content.encode('utf8'))
         return target
 
+    def read(self, filename):
+        target = self.root / filename
+        with target.open() as f:
+            return f.read()
+
     def mkdir(self, dirname):
         try:
             self.root.mkdir(dirname)

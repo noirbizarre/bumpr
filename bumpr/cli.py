@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
 from __future__ import print_function, unicode_literals
 
+import io
 import logging
+import pkg_resources
 
 import click
 
@@ -13,6 +15,7 @@ from bumpr.releaser import Releaser
 from bumpr.vcs import VCS
 from bumpr.version import Version
 
+click.disable_unicode_literals_warning = True
 
 log = logging.getLogger(__name__)
 
@@ -22,7 +25,7 @@ CONTEXT_SETTINGS = {
 }
 
 
-@click.command(context_settings=CONTEXT_SETTINGS)
+@click.group(context_settings=CONTEXT_SETTINGS, invoke_without_command=True)
 @click.option('-v', '--verbose', is_flag=True, help='Verbose output')
 @click.option('--version', is_flag=True, help='Print the current version')
 @click.option('-c', '--config', default='bumpr.rc', help='Specify a configuration file')
@@ -46,6 +49,9 @@ def cli(ctx, verbose, **kwargs):
         click.echo(__version__)
         ctx.exit()
 
+    if ctx.invoked_subcommand:
+        return
+
     try:
         config = Config(parsed_args=ctx.params)
     except Exception as e:
@@ -66,3 +72,14 @@ def cli(ctx, verbose, **kwargs):
     except BumprError as error:
         log.error(str(error))
         ctx.exit(1)
+
+
+@cli.command()
+@click.option('-s', '--source', prompt='Where are you extracting version from', default='__init__.py')
+@click.option('-c', '--changelog', prompt='Changelog file', default='CHANGELOG.rst')
+def init(**kwargs):
+    '''Initialize a new project configuration'''
+    tpl = pkg_resources.resource_string(__name__, 'template.yml').decode('utf8')
+    with io.open('bumpr.yml', 'wb') as f:
+        f.write(tpl.format(**kwargs).encode('utf8'))
+    log.info('Configuration file initialized in bumpr.cfg')

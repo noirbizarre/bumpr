@@ -1,0 +1,49 @@
+---
+# Base parameters
+#################
+# The version string is extracted from this file
+source: {source}
+# using this regexp
+# regex: (__version__|VERSION)\s*=\s*(\'|")(?P<version>.+?)(\'|")'
+
+# This files are processed for replacements
+files: []
+
+# Version control system
+########################
+vcs:
+  push: true
+  # Annotate tags
+  # tag_annotation: version {{version}}
+
+# Hooks global configuration
+############################
+changelog:
+  file: {changelog}
+
+# Read the doc hook
+# readthedoc:
+#   id: bumpr
+
+# Workflow steps configuration
+##############################
+
+clean: python setup.py clean
+
+test: python setup.py test
+
+bump:
+  unsuffix: true
+  message: Bumped version {{version}}
+  changelog: '{{version}} ({{date:%Y-%m-%d}})'
+  replacements:
+    '?branch=master': '?tag={{version}}'
+
+publish: python setup.py bdist_wheel upload
+
+prepare:
+  part: patch
+  suffix: dev
+  changelog: Current
+  replacements:
+    '?tag={{version}}': '?branch=master'

@@ -41,6 +41,7 @@ setup(
     author='Axel Haustant',
     author_email='noirbizarre+github@gmail.com',
     packages=find_packages(),
+    include_package_data=True,
     install_requires=install_requires,
     license='LGPL',
     zip_safe=False,

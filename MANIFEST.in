@@ -1,2 +1,3 @@
 include README.rst CHANGELOG.rst LICENSE MANIFEST.in
+recursive-include bumpr *.yml
 recursive-include requirements *.pip
