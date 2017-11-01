@@ -29,6 +29,7 @@ pip-log.txt
 .tox
 htmlcov
 nosetests.xml
+reports/
 
 # Translations
 *.mo
