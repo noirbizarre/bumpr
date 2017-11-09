@@ -4,9 +4,6 @@ from __future__ import print_function, unicode_literals
 import logging
 import shlex
 import subprocess
-import sys
-
-IS_PY26 = sys.version_info[:2] == (2, 6)
 
 
 class BumprError(Exception):
@@ -43,8 +40,6 @@ def execute(command, verbose=False, replacements=None, dryrun=False):
             commands.append([part.format(**replacements) for part in cmd])
     else:
         command = command.format(**replacements)
-        if IS_PY26:
-            command = command.encode('utf8')
         commands = [shlex.split(cmd.strip()) for cmd in command.splitlines() if cmd.strip()]
 
     output = ''
