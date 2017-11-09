@@ -92,7 +92,7 @@ def test(ctx, report=False, verbose=False):
     if verbose:
         cmd.append('-v')
     if report:
-        cmd.append('--junitxml=reports/python/tests.xml')
+        cmd.append('--junitxml=reports/tests.xml')
     with ctx.cd(ROOT):
         ctx.run(' '.join(cmd), pty=True)
 
@@ -105,17 +105,15 @@ def cover(ctx, report=False, verbose=False):
         'pytest',
         '--cov-config coverage.rc',
         '--cov-report term',
-        '--cov-report html:reports/coverage',
-        '--cov-report xml:reports/coverage.xml',
         '--cov=bumpr',
     ]
     if verbose:
         cmd.append('-v')
     if report:
         cmd += [
-            '--cov-report html:reports/python/coverage',
-            '--cov-report xml:reports/python/coverage.xml',
-            '--junitxml=reports/python/tests.xml'
+            '--cov-report html:reports/coverage',
+            '--cov-report xml:reports/coverage.xml',
+            '--junitxml=reports/tests.xml'
         ]
     with ctx.cd(ROOT):
         ctx.run(' '.join(cmd), pty=True)

@@ -7,8 +7,8 @@ python:
   - pypy
   - pypy3
 install:
-  - pip install -r requirements/develop.pip coveralls
+  - pip install -r requirements/develop.pip codecov
 script:
-  - inv cover qa
+  - inv qa cover --report
 after_success:
-  - coveralls --rcfile=coverage.rc
+  - codecov --file=reports/coverage.xml

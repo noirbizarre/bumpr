@@ -5,8 +5,8 @@ Bump'R
 .. image:: https://secure.travis-ci.org/noirbizarre/bumpr.svg?branch=master
     :target: https://travis-ci.org/noirbizarre/bumpr
     :alt: Build status
-.. image:: https://coveralls.io/repos/noirbizarre/bumpr/badge.svg?branch=master
-    :target: https://coveralls.io/r/noirbizarre/bumpr?branch=master
+.. image:: https://codecov.io/gh/noirbizarre/bumpr/branch/master/graph/badge.svg
+    :target: https://codecov.io/gh/noirbizarre/bumpr/branch/master
     :alt: Code coverage
 .. image:: https://readthedocs.org/projects/bumpr/badge/?version=latest
     :target: https://bumpr.readthedocs.io/en/latest/
