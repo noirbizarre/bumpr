@@ -1,5 +1,5 @@
 -e .[test]
 flake8==3.5.0
-invoke==0.22.0
+invoke==0.22.1
 readme-renderer==17.2
 wheel==0.30.0
