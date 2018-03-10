@@ -149,5 +149,5 @@ _Exemple:_
 .. code-block:: ini
 
     [commands]
-    bump = echo "{major}.{minor} - {date:%Y-%m-%d)"
+    bump = echo "{major}.{minor} - {date:%Y-%m-%d}"
     prepare = echo "Next version: {version}"
