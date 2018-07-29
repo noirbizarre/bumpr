@@ -3,7 +3,7 @@ pytest-catchlog==1.2.2
 pytest-cov==2.5.1
 pytest-mock==1.10.0
 pytest-sugar==0.9.1
-pytest==3.3.2
+pytest==3.6.4
 
 # Force Py update
 py>=1.5
