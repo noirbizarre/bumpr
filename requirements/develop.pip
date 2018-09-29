@@ -2,4 +2,4 @@
 flake8==3.5.0
 invoke==0.23.0
 readme-renderer==20.0
-wheel==0.31.0
+wheel==0.32.0
