@@ -1,5 +1,5 @@
 -e .[test]
-flake8==3.5.0
+flake8==3.7.7
 invoke==0.23.0
 readme-renderer==20.0
 wheel==0.31.0
