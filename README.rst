@@ -105,6 +105,7 @@ This way you only have to specify which part you want to bump on the command lin
     $ bumpr -M  # Bump the major
     $ bumpr     # Bump the default part aka. patch
 
+
 Documentation
 =============
 
