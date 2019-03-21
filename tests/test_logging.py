@@ -7,6 +7,7 @@ from bumpr.log import BumprLogger, DRYRUN, DIFF
 
 
 def test_bumpr_logger(caplog):
+    caplog.set_level(logging.DEBUG)
     logger = logging.getLogger(__name__)
     assert isinstance(logger, BumprLogger)
     logger.debug('debug')

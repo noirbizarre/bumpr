@@ -26,7 +26,7 @@ def mock_ini(mocker):
 
 @pytest.fixture
 def bumprc(request, mocker, mock_ini):
-    marker = request.node.get_marker('bumprc')
+    marker = request.node.get_closest_marker('bumprc')
     if marker:
         data = marker.args[0]
         mocker.patch('bumpr.config.exists', return_value=True)
