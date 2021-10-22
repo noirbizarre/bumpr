@@ -1,0 +1,31 @@
+[tool.poetry]
+name = "bumpr"
+version = "0.3.8.dev"
+description = "Version bumper and Python package releaser"
+authors = ["Axel H. <noirbizarre@gmail.com>"]
+license = "LGPL"
+
+[tool.poetry.dependencies]
+python = "^3.9"
+
+[tool.poetry.dev-dependencies]
+pytest = "^6.2.5"
+pytest-cov = "^3.0.0"
+pytest-mock = "^3.6.1"
+pytest-sugar = "^0.9.4"
+mock = "^4.0.3"
+flakehell = "^0.9.0"
+invoke = "^1.6.0"
+pytest-pythonpath = "^0.7.3"
+black = {version = "^21.9b0", allow-prereleases = true}
+isort = "^5.9.3"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.pytest.ini_options]
+markers = [
+    "bumprc: marks tests requiring a mock config",
+    "version: specify a defined version"
+]
