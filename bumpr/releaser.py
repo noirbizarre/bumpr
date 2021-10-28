@@ -1,19 +1,14 @@
-# -*- coding: utf-8 -*-
-from __future__ import print_function, unicode_literals
+from __future__ import annotations
 
 import logging
 import re
-import sys
 from datetime import datetime
 from difflib import unified_diff
 
-from bumpr.helpers import BumprError, execute
-from bumpr.hooks import HOOKS
-from bumpr.vcs import VCS
-from bumpr.version import Version
-
-if sys.version_info < (3, 0):
-    from io import open
+from .helpers import BumprError, execute
+from .hooks import HOOKS
+from .vcs import VCS
+from .version import Version
 
 logger = logging.getLogger(__name__)
 

@@ -1,14 +1,8 @@
-# -*- coding: utf-8 -*-
-from __future__ import print_function, unicode_literals
-
-import sys
 from subprocess import CalledProcessError
 
 import pytest
 
 from bumpr.helpers import BumprError, check_output, execute
-
-IS_PY3 = sys.version_info[0] == 3
 
 
 @pytest.fixture
@@ -92,8 +86,7 @@ class ExecuteTest(object):
         check_output.side_effect = error
 
         with pytest.raises(BumprError):
-            to_patch = "{0}.print".format("builtins" if IS_PY3 else "__builtin__")
-            mocker.patch(to_patch)
+            mocker.patch("builtins.print")
             execute("some failed command")
 
     def test_execute_error_verbose(self, check_call):

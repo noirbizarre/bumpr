@@ -1,5 +1,4 @@
-# -*- coding: utf-8 -*-
-from __future__ import print_function, unicode_literals
+from __future__ import annotations
 
 import logging
 import shlex
@@ -11,26 +10,10 @@ class BumprError(Exception):
 
 
 def check_output(*args, **kwargs):
-    """Compatibility wrapper for Python 2.6 missin g subprocess.check_output"""
-    if hasattr(subprocess, "check_output"):
-        return subprocess.check_output(
-            stderr=subprocess.STDOUT, universal_newlines=True, *args, **kwargs
-        )
-    else:
-        process = subprocess.Popen(
-            *args,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.STDOUT,
-            universal_newlines=True,
-            **kwargs,
-        )
-        output, _ = process.communicate()
-        retcode = process.poll()
-        if retcode:
-            error = subprocess.CalledProcessError(retcode, args[0])
-            error.output = output
-            raise error
-        return output
+    """A wrapper for preconfigured calls to subprocess.check_output"""
+    return subprocess.check_output(
+        stderr=subprocess.STDOUT, universal_newlines=True, *args, **kwargs
+    )
 
 
 def execute(command, verbose=False, replacements=None, dryrun=False):

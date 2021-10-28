@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import argparse
 import logging
-import sys
 from configparser import RawConfigParser
 from os.path import exists
 from typing import TYPE_CHECKING
@@ -15,7 +14,6 @@ if TYPE_CHECKING:
     from typing import Any
 
 logger = logging.getLogger(__name__)
-IS_PY3 = sys.version_info[0] == 3
 
 DEFAULTS: dict[str, Any] = {
     "file": None,
@@ -118,10 +116,7 @@ class Config(ObjectDict):
 
     def override_from_config(self, filename):
         config = BumprConfigParser()
-        if IS_PY3:
-            config.read_file(open(filename))
-        else:
-            config.readfp(open(filename))
+        config.read_file(open(filename))
 
         # Common options
         if config.has_section("bumpr"):

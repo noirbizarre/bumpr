@@ -1,8 +1,9 @@
-# -*- coding: utf-8 -*-
+from __future__ import annotations
+
 import logging
 from os.path import isdir
 
-from bumpr.helpers import BumprError, execute
+from .helpers import BumprError, execute
 
 log = logging.getLogger(__name__)
 

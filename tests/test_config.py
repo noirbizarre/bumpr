@@ -1,8 +1,4 @@
-# -*- coding: utf-8 -*-
-from __future__ import print_function, unicode_literals
-
 import io
-import sys
 from copy import deepcopy
 from textwrap import dedent
 
@@ -13,15 +9,12 @@ from bumpr.config import __name__ as config_module_name
 from bumpr.hooks import HOOKS, ReadTheDocHook
 from bumpr.version import Version
 
-if sys.version_info[0] == 3:
-    unicode = str
-
 
 @pytest.fixture
 def mock_ini(mocker):
     def inner(data):
         open_name = "{0}.open".format(config_module_name)
-        return mocker.patch(open_name, return_value=io.StringIO(unicode(dedent(data))), create=True)
+        return mocker.patch(open_name, return_value=io.StringIO(str(dedent(data))), create=True)
 
     return inner
 

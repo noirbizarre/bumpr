@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 from bumpr.version import Version
 
 
