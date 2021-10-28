@@ -7,9 +7,9 @@ import re
 class Version(object):
     MAJOR, MINOR, PATCH = range(3)
 
-    PATTERN = re.compile(r'(?P<major>\d+)\.(?P<minor>\d+)\.(?P<patch>\d+)(\.(?P<suffix>[\w\d.]+))?')
-    FORMAT = r'{major}.{minor}.{patch}'
-    FORMAT_SUFFIXED = r'{major}.{minor}.{patch}.{suffix}'
+    PATTERN = re.compile(r"(?P<major>\d+)\.(?P<minor>\d+)\.(?P<patch>\d+)(\.(?P<suffix>[\w\d.]+))?")
+    FORMAT = r"{major}.{minor}.{patch}"
+    FORMAT_SUFFIXED = r"{major}.{minor}.{patch}.{suffix}"
 
     def __init__(self, major=0, minor=0, patch=0, suffix=None):
         self.major = int(major)
@@ -35,7 +35,7 @@ class Version(object):
 
     def copy(self, **kwargs):
         version = Version(**self.__dict__)
-        unsuffix = kwargs.pop('unsuffix', False)
+        unsuffix = kwargs.pop("unsuffix", False)
         version.bump(unsuffix=unsuffix, **kwargs)
         return version
 
@@ -60,7 +60,7 @@ class Version(object):
 
 
 PARTS = {
-    'major': Version.MAJOR,
-    'minor': Version.MINOR,
-    'patch': Version.PATCH,
+    "major": Version.MAJOR,
+    "minor": Version.MINOR,
+    "patch": Version.PATCH,
 }

@@ -1,13 +1,12 @@
 # -*- coding: utf-8 -*-
 import logging
-
 from os.path import isdir
 
-from bumpr.helpers import execute, BumprError
+from bumpr.helpers import BumprError, execute
 
 log = logging.getLogger(__name__)
 
-MSG = 'The current repository contains modified files'
+MSG = "The current repository contains modified files"
 
 
 class BaseVCS(object):
@@ -15,33 +14,33 @@ class BaseVCS(object):
         self.verbose = verbose
 
     def execute(self, command):
-        '''Execute a command'''
+        """Execute a command"""
         execute(command, verbose=self.verbose)
 
     def validate(self, dryrun=False):
-        '''Ensure the working dir is a repository and there is no modified files'''
+        """Ensure the working dir is a repository and there is no modified files"""
         raise NotImplementedError
 
     def commit(self, message):
-        '''Commit all modified files'''
+        """Commit all modified files"""
         raise NotImplementedError
 
     def tag(self, name, annotation=None):
-        '''Create a tag'''
+        """Create a tag"""
         raise NotImplementedError
 
     def push(self):
-        '''Push changes to remote repository'''
+        """Push changes to remote repository"""
         raise NotImplementedError
 
 
 class Git(BaseVCS):
     def validate(self, dryrun=False):
-        if not isdir('.git'):
-            raise BumprError('Current directory is not a git repopsitory')
+        if not isdir(".git"):
+            raise BumprError("Current directory is not a git repopsitory")
 
-        for line in execute('git status --porcelain', verbose=False).splitlines():
-            if not line.startswith('??'):
+        for line in execute("git status --porcelain", verbose=False).splitlines():
+            if not line.startswith("??"):
                 if dryrun:
                     log.warning(MSG)
                     break
@@ -54,7 +53,7 @@ class Git(BaseVCS):
     def tag(self, name, annotation=None):
         cmd = ["git", "tag", name]
         if annotation:
-            cmd += ['--annotate', '-m', '"{0}"'.format(annotation)]
+            cmd += ["--annotate", "-m", '"{0}"'.format(annotation)]
         self.execute(cmd)
 
     def push(self):
@@ -64,11 +63,11 @@ class Git(BaseVCS):
 
 class Mercurial(BaseVCS):
     def validate(self, dryrun=False):
-        if not isdir('.hg'):
-            raise BumprError('Current directory is not a mercurial repopsitory')
+        if not isdir(".hg"):
+            raise BumprError("Current directory is not a mercurial repopsitory")
 
-        for line in execute('hg status -mard', verbose=False).splitlines():
-            if not line.startswith('??'):
+        for line in execute("hg status -mard", verbose=False).splitlines():
+            if not line.startswith("??"):
                 if dryrun:
                     log.warning(MSG)
                     break
@@ -81,7 +80,7 @@ class Mercurial(BaseVCS):
     def tag(self, name, annotation=None):
         cmd = ["hg", "tag", name]
         if annotation:
-            cmd += ['-m', '"{0}"'.format(annotation)]
+            cmd += ["-m", '"{0}"'.format(annotation)]
         self.execute(cmd)
 
     def push(self):
@@ -90,11 +89,11 @@ class Mercurial(BaseVCS):
 
 class Bazaar(BaseVCS):
     def validate(self, dryrun=False):
-        if not isdir('.bzr'):
-            raise BumprError('Current directory is not a bazaar repopsitory')
+        if not isdir(".bzr"):
+            raise BumprError("Current directory is not a bazaar repopsitory")
 
-        for line in execute('bzr status --short', verbose=False).splitlines():
-            if not line.startswith('?'):
+        for line in execute("bzr status --short", verbose=False).splitlines():
+            if not line.startswith("?"):
                 if dryrun:
                     log.warning(MSG)
                     break
@@ -106,7 +105,7 @@ class Bazaar(BaseVCS):
 
     def tag(self, name, annotation=None):
         if annotation:
-            log.warning('Tag annotation is not supported by Bazaar')
+            log.warning("Tag annotation is not supported by Bazaar")
         self.execute(["bzr", "tag", name])
 
     def push(self):
@@ -119,8 +118,8 @@ class Fake(BaseVCS):
 
 
 VCS = {
-    'git': Git,
-    'hg': Mercurial,
-    'bzr': Bazaar,
-    'fake': Fake,
+    "git": Git,
+    "hg": Mercurial,
+    "bzr": Bazaar,
+    "fake": Fake,
 }
