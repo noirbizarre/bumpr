@@ -4,28 +4,124 @@ version = "0.3.8.dev"
 description = "Version bumper and Python package releaser"
 authors = ["Axel H. <noirbizarre@gmail.com>"]
 license = "LGPL"
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "Intended Audience :: Developers",
+  "License :: OSI Approved :: GNU Library or Lesser General Public License (LGPL)",
+  "Operating System :: OS Independent",
+  "Topic :: Software Development :: Build Tools",
+  "Topic :: Software Development :: Libraries :: Python Modules",
+  "Topic :: System :: Software Distribution",
+]
+keywords = [
+  "version",
+  "bump",
+  "release",
+  "tag",
+]
+repository = "https://github.com/noirbizarre/bumpr"
+documentation = "https://bumpr.readthedocs.io/en/stable/"
+include = [
+  "README.rst",
+  "CHANGELOG.rst",
+  "LICENSE"
+]
 
 [tool.poetry.dependencies]
-python = "^3.9"
+python = ">=3.7,<4.0"
 
 [tool.poetry.dev-dependencies]
+black = {version = "^21.9b0", allow-prereleases = true}
+flake8 = "^4.0.1"
+invoke = "^1.6.0"
+isort = "^5.9.3"
+mock = "^4.0.3"
+mypy = "^0.910"
+nox = "^2021.10.1"
+nox-poetry = "^0.8.6"
 pytest = "^6.2.5"
 pytest-cov = "^3.0.0"
 pytest-mock = "^3.6.1"
-pytest-sugar = "^0.9.4"
-mock = "^4.0.3"
-flakehell = "^0.9.0"
-invoke = "^1.6.0"
 pytest-pythonpath = "^0.7.3"
-black = {version = "^21.9b0", allow-prereleases = true}
-isort = "^5.9.3"
+pytest-sugar = "^0.9.4"
+sphinx = {version = "^4.2.0", optional = true}
+sphinx-autobuild = {version = "^2021.3.14", optional = true}
+sphinx-rtd-theme = {version = "^1.0.0", optional = true}
+readme-renderer = {version = "^30.0", optional = true}
+
+[tool.poetry.scripts]
+poetry = 'bumpr:main'
+
+[tool.poetry.extras]
+test = [
+  "mock",
+  "pytest",
+  "pytest-cov",
+  "pytest-mock",
+  "pytest-sugar",
+  "pytest-pythonpath",
+]
+lint = [
+  "flake8",
+  "mypy",
+  "readme-renderer",
+  "black",
+  "isort",
+]
+doc = [
+  "sphinx",
+  "sphinx-autobuild",
+  "sphinx-rtd-theme",
+]
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
 
 [tool.pytest.ini_options]
+norecursedirs = ".git build dist"
+testpaths = "tests"
+python_classes="*Test"
+mock_use_standalone_module = true
 markers = [
-    "bumprc: marks tests requiring a mock config",
-    "version: specify a defined version"
+  "bumprc: marks tests requiring a mock config",
+  "version: specify a defined version"
+]
+
+[tool.isort]
+# See: https://pycqa.github.io/isort/docs/configuration/black_compatibility/
+profile = "black"
+multi_line_output = 3
+
+[tool.black]
+line-length = 100
+experimental-string-processing = true
+target-version = ['py39']
+include = '\.pyi?$'
+exclude = '''
+(
+  /(
+      \.eggs        # exclude a few common directories in the
+    | \.git         # root of the project
+    | \.mypy_cache
+    | \.venv
+    | \venv
+    | updates       # Mostly generated files and SQL
+  )/
+  | foo.py          # also separately exclude a file named foo.py in
+                    # the root of the project
+)
+'''
+
+[tool.mypy]
+python_version = "3.9"
+exclude = "doc/*.py"
+
+[tool.flakehell]
+max-line-length = 110
+exclude = [
+  "doc",
+  "build",
+  "dist",
+  ".git",
 ]

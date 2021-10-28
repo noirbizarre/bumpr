@@ -1,0 +1,40 @@
+# See https://pre-commit.com for more information
+# See https://pre-commit.com/hooks.html for more hooks
+repos:
+  - # Generic file formatting (not python-specific)
+    repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.0.1
+    hooks:
+      - id: check-json
+      - id: check-toml
+      - id: check-yaml
+      - id: end-of-file-fixer
+      - id: trailing-whitespace
+      - id: check-executables-have-shebangs
+      - id: check-shebang-scripts-are-executable
+  - # Sorted imports
+    repo: https://github.com/pycqa/isort
+    rev: 5.9.3
+    hooks:
+      - id: isort
+        name: isort (python)
+  - # Nazi-mode (aka. almost strict PEP8) formatting
+    repo: https://github.com/psf/black
+    rev: 21.9b0
+    hooks:
+      - id: black
+        language_version: python3.9
+  - # Static analysis
+    repo: https://github.com/PyCQA/flake8
+    rev: 4.0.1
+    hooks:
+      - id: flake8
+        # See: https://github.com/pre-commit/pre-commit-hooks/issues/112
+        args: ["--config=.flake8"]
+        exclude: doc
+  - # Type hinting/checking
+    repo: https://github.com/pre-commit/mirrors-mypy
+    rev: v0.910-1
+    hooks:
+      - id: mypy
+        exclude: doc
