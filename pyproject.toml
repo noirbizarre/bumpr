@@ -38,6 +38,7 @@ mkdocs = {version = "^1.2.3", optional = true}
 mkdocs-material = {version = "^7.3.5", optional = true}
 mkdocstrings = {version = "^0.16.2", optional = true}
 mkdocs-include-markdown-plugin = {version = "^3.2.3", optional = true}
+invoke = "^1.6.0"
 
 [tool.poetry.dev-dependencies]
 black = {version = "^21.9b0", allow-prereleases = true}
