@@ -16,9 +16,10 @@ TEST_DEPENDENCIES = [
     "pytest-pythonpath",
 ]
 DOC_DEPENDENCIES = [
-    "sphinx",
-    "sphinx-autobuild",
-    "sphinx-rtd-theme",
+    "mkdocs",
+    "mkdocs-material",
+    "mkdocstrings",
+    "mkdocs-include-markdown-plugin",
 ]
 CLEAN_PATTERNS = [
     "**/*.pyc",
@@ -86,12 +87,13 @@ def lint(session: Session) -> None:
     session.install(".[lint]", "flake8", "readme-renderer", "mypy")
     session.run("flake8", "bumpr")
     session.run("mypy", "bumpr")
-    session.run("python", "-m", "readme_renderer", "README.rst", silent=True)
 
 
 @session
 def doc(session: Session) -> None:
     """Build the documentation"""
     session.install(".[doc]", *DOC_DEPENDENCIES)
-    session.chdir("doc")
-    session.run("sphinx-build", "-b", "html", ".", "build/html")
+    if "--serve" in session.posargs:
+        session.run("mkdocs", "serve")
+    else:
+        session.run("mkdocs", "build")

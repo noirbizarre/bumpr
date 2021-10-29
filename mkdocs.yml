@@ -1,0 +1,49 @@
+site_name: Bump'R
+
+# Repository
+repo_name: noirbizarre/bumpr
+repo_url: https://github.com/noirbizarre/bumpr
+
+theme:
+  name: material
+  icon:
+    logo: material/update
+
+  features:
+    - navigation.indexes
+    - navigation.tabs
+    - navigation.tabs.sticky
+    - navigation.top
+    - navigation.tracking
+
+extra_css:
+  - style.css
+
+markdown_extensions:
+  - meta
+  - admonition
+  - def_list
+  - pymdownx.details
+  - pymdownx.highlight
+  - pymdownx.snippets
+  - pymdownx.superfences
+
+plugins:
+  - search
+  - mkdocstrings
+  - include-markdown
+
+
+nav:
+  - Home: index.md
+  - Usage:
+    - Workflow: workflow.md
+    - Configuration: rcfile.md
+    - Hooks: hooks.md
+    - Command line: commandline.md
+  - Development:
+    - Contributing: contributing.md
+    - Extending: extending.md
+    - API: api.md
+  - FAQ: faq.md
+  - Changelog: changelog.md

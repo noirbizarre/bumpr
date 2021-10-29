@@ -31,6 +31,7 @@ pip-log.txt
 htmlcov
 nosetests.xml
 reports/
+.nox
 
 # Translations
 *.mo
@@ -41,4 +42,9 @@ reports/
 .pydevproject
 *.sublime-*
 
-doc/_build
+# MKDocs
+site/
+
+# Virtualenvs
+venv
+.venv

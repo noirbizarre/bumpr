@@ -18,7 +18,7 @@ repos:
     hooks:
       - id: isort
         name: isort (python)
-  - # Nazi-mode (aka. almost strict PEP8) formatting
+  - # Format code
     repo: https://github.com/psf/black
     rev: 21.9b0
     hooks:
@@ -38,3 +38,11 @@ repos:
     hooks:
       - id: mypy
         exclude: doc
+  - # Markdown
+    repo: https://github.com/jackdewinter/pymarkdown
+    rev: 0.9.2
+    hooks:
+      - id: pymarkdown
+        # Exclude import-only files
+        exclude: ^docs/(index|changelog|contributing)\.md
+        args: ["--config=pymarkdown.json", "scan"]

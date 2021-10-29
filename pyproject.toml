@@ -19,16 +19,25 @@ keywords = [
   "release",
   "tag",
 ]
+readme = "README.md"
 repository = "https://github.com/noirbizarre/bumpr"
 documentation = "https://bumpr.readthedocs.io/en/stable/"
 include = [
-  "README.rst",
-  "CHANGELOG.rst",
+  "README.md",
+  "CHANGELOG.md",
   "LICENSE"
 ]
 
+[tool.poetry.urls]
+"Bug Tracker" = "https://github.com/noirbizarre/bumpr/issues"
+
 [tool.poetry.dependencies]
 python = ">=3.7,<4.0"
+# Doc dependencies here until https://github.com/python-poetry/poetry/issues/1644
+mkdocs = {version = "^1.2.3", optional = true}
+mkdocs-material = {version = "^7.3.5", optional = true}
+mkdocstrings = {version = "^0.16.2", optional = true}
+mkdocs-include-markdown-plugin = {version = "^3.2.3", optional = true}
 
 [tool.poetry.dev-dependencies]
 black = {version = "^21.9b0", allow-prereleases = true}
@@ -44,10 +53,6 @@ pytest-cov = "^3.0.0"
 pytest-mock = "^3.6.1"
 pytest-pythonpath = "^0.7.3"
 pytest-sugar = "^0.9.4"
-sphinx = {version = "^4.2.0", optional = true}
-sphinx-autobuild = {version = "^2021.3.14", optional = true}
-sphinx-rtd-theme = {version = "^1.0.0", optional = true}
-readme-renderer = {version = "^30.0", optional = true}
 
 [tool.poetry.scripts]
 bumpr = 'bumpr:main'
@@ -64,14 +69,14 @@ test = [
 lint = [
   "flake8",
   "mypy",
-  "readme-renderer",
   "black",
   "isort",
 ]
 doc = [
-  "sphinx",
-  "sphinx-autobuild",
-  "sphinx-rtd-theme",
+  "mkdocs",
+  "mkdocs-material",
+  "mkdocstrings",
+  "mkdocs-include-markdown-plugin",
 ]
 
 [build-system]

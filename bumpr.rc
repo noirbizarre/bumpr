@@ -10,7 +10,7 @@ tests =
 publish = poetry publish
 clean = poetry run nox -s clean
 files =
-    README.rst
+    README.md
     bumpr/__about__.py
 
 [bump]
@@ -22,9 +22,10 @@ part = patch
 suffix = dev
 
 [changelog]
-file = CHANGELOG.rst
-bump = {version} ({date:%Y-%m-%d})
-prepare = Current
+file = CHANGELOG.md
+bump = ## {version} ({date:%Y-%m-%d})
+prepare = ## Current
+separator =
 
 [readthedoc]
 id = bumpr

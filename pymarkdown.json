@@ -1,0 +1,20 @@
+{
+    "plugins": {
+        "line-length": {
+            "line_length": 100,
+            "heading_line_length": 100,
+            "code_block_line_length": 120
+        },
+        "code-block-style": {
+            "style": "fenced"
+        },
+        "no-duplicate-heading": {
+          "allow_different_nesting": true
+        }
+    },
+    "extensions": {
+      "front-matter": {
+        "enabled": true
+      }
+    }
+}

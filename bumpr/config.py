@@ -4,14 +4,11 @@ import argparse
 import logging
 from configparser import RawConfigParser
 from os.path import exists
-from typing import TYPE_CHECKING
+from typing import Any
 
 from bumpr.helpers import ObjectDict
 from bumpr.hooks import HOOKS
 from bumpr.version import PARTS, Version
-
-if TYPE_CHECKING:
-    from typing import Any
 
 logger = logging.getLogger(__name__)
 
