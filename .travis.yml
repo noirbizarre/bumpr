@@ -10,7 +10,6 @@ install:
   - poetry install
   - poetry run pip install codecov
 script:
-  - poetry run nox -s lint
-  - poetry run nox -s cover -- --cover
+  - poetry run inv qa cover --report
 after_success:
   - poetry run codecov --file=reports/coverage.xml
