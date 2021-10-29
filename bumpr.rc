@@ -1,14 +1,17 @@
 [bumpr]
-file = bumpr/__about__.py
+file = pyproject.toml
+regex = version\s*=\s*"(?P<version>.+?)"
 vcs = git
 tag_annotation = version {version}
 push = true
-tests = tox
-publish = python setup.py register sdist bdist_wheel upload
-clean =
-    python setup.py clean
-    inv clean
-files = README.rst
+tests =
+    poetry check
+    poetry run nox
+publish = poetry publish
+clean = poetry run nox -s clean
+files =
+    README.rst
+    bumpr/__about__.py
 
 [bump]
 unsuffix = true

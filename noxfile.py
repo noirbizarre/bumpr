@@ -1,8 +1,7 @@
 import os
 
 import nox
-
-from nox_poetry import session, Session
+from nox_poetry import Session, session
 
 # nox.options.reuse_existing_virtualenvs = True
 
@@ -21,15 +20,43 @@ DOC_DEPENDENCIES = [
     "sphinx-autobuild",
     "sphinx-rtd-theme",
 ]
+CLEAN_PATTERNS = [
+    "**/*.pyc",
+    "**/__pycache__",
+    "**/.pytest_cache",
+    "**/,mypy_cache",
+    "*.egg-info",
+    ".cache",
+    ".nox",
+    "build",
+    "dist",
+    "docs/_build",
+    "reports",
+]
 
 nox.options.sessions = "lint", "test", "doc"
+
+
+@session
+def clean(session: Session) -> None:
+    """Cleanup all build artifacts"""
+    session.cd(ROOT)
+    for pattern in CLEAN_PATTERNS:
+        session.run("rm", "-rf", pattern, external=True)
 
 
 @session(python=PYTHON_VERSIONS)
 def test(session: Session) -> None:
     """Run the test suite"""
     session.install(".[test]", *TEST_DEPENDENCIES)
-    session.run("pytest", *session.posargs)
+    cmd = ["pytest"]
+    posargs = session.posargs
+    if session._runner.global_config.verbose:
+        cmd.append("-v")
+    if "--report" in session.posargs:
+        posargs = [arg for arg in posargs if arg != "--report"]
+        cmd.append("--junitxml=reports/tests.xml")
+    session.run(*cmd, *posargs)
 
 
 @session(python=PYTHON_VERSIONS)

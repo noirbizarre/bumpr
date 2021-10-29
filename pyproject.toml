@@ -50,7 +50,7 @@ sphinx-rtd-theme = {version = "^1.0.0", optional = true}
 readme-renderer = {version = "^30.0", optional = true}
 
 [tool.poetry.scripts]
-poetry = 'bumpr:main'
+bumpr = 'bumpr:main'
 
 [tool.poetry.extras]
 test = [
