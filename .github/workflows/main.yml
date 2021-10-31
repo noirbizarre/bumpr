@@ -57,7 +57,7 @@ jobs:
         run: poetry run inv cover --report
 
       - name: Send coverage results to Codecov
-        uses: codecov/codecov-action@v2.0.3
+        uses: codecov/codecov-action@v2.1.0
         with:
           files: reports/coverage.xml
           flags: unittests
