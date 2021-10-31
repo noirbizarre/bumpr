@@ -23,8 +23,7 @@ The community looks forward to your contributions. 🎉
 - [I Want To Contribute](#i-want-to-contribute)
   - [Reporting Bugs](#reporting-bugs)
   - [Suggesting Enhancements](#suggesting-enhancements)
-  - [Your First Code Contribution](#your-first-code-contribution)
-  - [Improving The Documentation](#improving-the-documentation)
+  - [Your First Contribution](#your-first-contribution)
 - [Styleguides](#styleguides)
   - [Commit Messages](#commit-messages)
 - [Join The Project Team](#join-the-project-team)
@@ -32,7 +31,7 @@ The community looks forward to your contributions. 🎉
 ## Code of Conduct
 
 This project and everyone participating in it is governed by the
-[bumpr Code of Conduct](https://github.com/noirbizarre/bumprblob/master/CODE_OF_CONDUCT.md).
+[bumpr Code of Conduct](https://github.com/noirbizarre/bumpr/blob/master/CODE_OF_CONDUCT.md).
 By participating, you are expected to uphold this code. Please report unacceptable behavior
 to <>.
 
@@ -40,11 +39,11 @@ to <>.
 
 > If you want to ask a question, we assume that you have read the available [Documentation](https://bumpr.readthedocs.io/).
 
-Before you ask a question, it is best to search for existing [Issues](https://github.com/noirbizarre/bumprissues) that might help you. In case you have found a suitable issue and still need clarification, you can write your question in this issue. It is also advisable to search the internet for answers first.
+Before you ask a question, it is best to search for existing [Issues](https://github.com/noirbizarre/bumpr/issues) that might help you. In case you have found a suitable issue and still need clarification, you can write your question in this issue. It is also advisable to search the internet for answers first.
 
 If you then still feel the need to ask a question and need clarification, we recommend the following:
 
-- Open an [Issue](https://github.com/noirbizarre/bumprissues/new).
+- Open an [Issue](https://github.com/noirbizarre/bumpr/issues/new).
 - Provide as much context as you can about what you're running into.
 - Provide project and platform versions (nodejs, npm, etc), depending on what seems relevant.
 
@@ -79,7 +78,7 @@ A good bug report shouldn't leave others needing to chase you up for more inform
 
 - Make sure that you are using the latest version.
 - Determine if your bug is really a bug and not an error on your side e.g. using incompatible environment components/versions (Make sure that you have read the [documentation](https://bumpr.readthedocs.io/). If you are looking for support, you might want to check [this section](#i-have-a-question)).
-- To see if other users have experienced (and potentially already solved) the same issue you are having, check if there is not already a bug report existing for your bug or error in the [bug tracker](https://github.com/noirbizarre/bumprissues?q=label%3Abug).
+- To see if other users have experienced (and potentially already solved) the same issue you are having, check if there is not already a bug report existing for your bug or error in the [bug tracker](https://github.com/noirbizarre/bumpr/issues?q=label%3Abug).
 - Also make sure to search the internet (including Stack Overflow) to see if users outside of the GitHub community have discussed the issue.
 - Collect information about the bug:
   - Stack trace (Traceback)
@@ -95,7 +94,7 @@ A good bug report shouldn't leave others needing to chase you up for more inform
 
 We use GitHub issues to track bugs and errors. If you run into an issue with the project:
 
-- Open an [Issue](https://github.com/noirbizarre/bumprissues/new). (Since we can't be sure at this point whether it is a bug or not, we ask you not to talk about a bug yet and not to label the issue.)
+- Open an [Issue](https://github.com/noirbizarre/bumpr/issues/new). (Since we can't be sure at this point whether it is a bug or not, we ask you not to talk about a bug yet and not to label the issue.)
 - Explain the behavior you would expect and the actual behavior.
 - Please provide as much context as possible and describe the *reproduction steps* that someone else can follow to recreate the issue on their own. This usually includes your code. For good bug reports you should isolate the problem and create a reduced test case.
 - Provide the information you collected in the previous section.
@@ -104,7 +103,7 @@ Once it's filed:
 
 - The project team will label the issue accordingly.
 - A team member will try to reproduce the issue with your provided steps. If there are no reproduction steps or no obvious way to reproduce the issue, the team will ask you for those steps and mark the issue as `needs-repro`. Bugs with the `needs-repro` tag will not be addressed until they are reproduced.
-- If the team is able to reproduce the issue, it will be marked `needs-fix`, as well as possibly other tags (such as `critical`), and the issue will be left to be [implemented by someone](#your-first-code-contribution).
+- If the team is able to reproduce the issue, it will be marked `needs-fix`, as well as possibly other tags (such as `critical`), and the issue will be left to be [implemented by someone](#your-first-contribution).
 
 <!-- You might want to create an issue template for bugs and errors that can be used as a guide and that defines the structure of the information to be included. If you do so, reference it here in the description. -->
 
@@ -116,12 +115,12 @@ This section guides you through submitting an enhancement suggestion for bumpr, 
 
 - Make sure that you are using the latest version.
 - Read the [documentation](https://bumpr.readthedocs.io/) carefully and find out if the functionality is already covered, maybe by an individual configuration.
-- Perform a [search](https://github.com/noirbizarre/bumprissues) to see if the enhancement has already been suggested. If it has, add a comment to the existing issue instead of opening a new one.
+- Perform a [search](https://github.com/noirbizarre/bumpr/issues) to see if the enhancement has already been suggested. If it has, add a comment to the existing issue instead of opening a new one.
 - Find out whether your idea fits with the scope and aims of the project. It's up to you to make a strong case to convince the project's developers of the merits of this feature. Keep in mind that we want features that will be useful to the majority of our users and not just a small subset. If you're just targeting a minority of users, consider writing an add-on/plugin library.
 
 #### How Do I Submit a Good Enhancement Suggestion?
 
-Enhancement suggestions are tracked as [GitHub issues](https://github.com/noirbizarre/bumprissues).
+Enhancement suggestions are tracked as [GitHub issues](https://github.com/noirbizarre/bumpr/issues).
 
 - Use a **clear and descriptive title** for the issue to identify the suggestion.
 - Provide a **step-by-step description of the suggested enhancement** in as many details as possible.
@@ -131,33 +130,60 @@ Enhancement suggestions are tracked as [GitHub issues](https://github.com/noirbi
 
 <!-- You might want to create an issue template for enhancement suggestions that can be used as a guide and that defines the structure of the information to be included. If you do so, reference it here in the description. -->
 
-### Your First Code Contribution
+### Your First Contribution
 
-<!-- TODO
-include Setup of env, IDE and typical getting started instructions?
+#### Prerequisites
 
--->
+To contribute you need a working development environment.
+We use [Poetry](https://python-poetry.org/) to manage build lifecycle and [pre-commit](https://pre-commit.com) to validate changes on commit.
+Both tools are required and should be installed on your system.
+
+#### Setting up your environment
+
+- Clone the project: `git clone git@github.com:noirbizarre/bumpr.git`
+- Install pre-commit hooks: `pre-commit install`
+- Install dependencies: `poetry install`
+- List available tasks: `pre-commit run inv -l`
+
+You are now ready to contribute.
+
+#### Code contribution
+
+Any code contribution should pass tests. If adding feature, please also provide matching tests to avoid regression later.
+You can run the test suite with:
+
+```console
+poetry run inv test
+```
+
+If you are doing a major change, I strongly advise to run the [Tox](https://tox.wiki/) suite to ensure multiplatform compatibility. Tox installation is up to you and is not provided by Poetry.
+
+Your code should also pass the `lint`suite. If you have installed pre-commit, it will be run for each commit.
+If not, you can manually run the Python lints parts with:
+
+```console
+poetry run inv lint
+```
+
+To ensure everything is working, you can run lints, tests and check docuemtation is still building with a single commad:
+
+```console
+poetry run inv
+```
 
 ### Improving The Documentation
 
-<!-- TODO
-Updating, improving and correcting the documentation
+The documentation is built using [MkDocs](https://www.mkdocs.org/).
+You can submit changes on any `docs/*.md` file as long as they comply to the expected style (See `pymarkdown.json`).
+If you have installed `pre-commit` on this repository, markdown files will be automaticcaly checked against the rules on commit.
 
--->
+You need to install documentation dependencies with `poetry install --extras doc` to be able to build the documentation.
 
 ## Styleguides
 
 ### Commit Messages
 
-<!-- TODO
-
--->
-
-## Join The Project Team
-
-<!-- TODO -->
-
-<!-- omit in toc -->
+Commits should be formatted using [Conventional Commits](https://www.conventionalcommits.org/) (surrently using the [version 1.0.0](https://www.conventionalcommits.org/en/v1.0.0/))
 
 ## Attribution
 
