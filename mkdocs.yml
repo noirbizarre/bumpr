@@ -42,8 +42,9 @@ nav:
     - Hooks: hooks.md
     - Command line: commandline.md
   - Development:
-    - Contributing: contributing.md
-    - Extending: extending.md
     - API: api.md
+    - Extending: extending.md
+    - Contributing: contributing.md
+    - Code of conduct: code-of-conduct.md
   - FAQ: faq.md
   - Changelog: changelog.md
