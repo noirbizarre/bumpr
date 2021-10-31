@@ -46,13 +46,12 @@ invoke = "^1.6.0"
 isort = "^5.9.3"
 mock = "^4.0.3"
 mypy = "^0.910"
-nox = "^2021.10.1"
-nox-poetry = "^0.8.6"
 pytest = "^6.2.5"
 pytest-cov = "^3.0.0"
 pytest-mock = "^3.6.1"
 pytest-pythonpath = "^0.7.3"
 pytest-sugar = "^0.9.4"
+coverage = {extras = ["toml"], version = "^6.1.1"}
 
 [tool.poetry.scripts]
 bumpr = 'bumpr:main'
@@ -130,3 +129,30 @@ exclude = [
   "dist",
   ".git",
 ]
+
+[tool.coverage.run]
+source = ["bumpr"]
+branch = true
+omit = [
+  "tests/*",
+]
+
+[tool.coverage.report]
+# Regexes for lines to exclude from consideration
+exclude_lines = [
+    # Have to re-enable the standard pragma
+    'pragma: no cover',
+
+    # Don't complain about missing debug-only code:
+    'def __repr__',
+    'if self\.debug',
+
+    # Don't complain if tests don't hit defensive assertion code:
+    'raise AssertionError',
+    'raise NotImplementedError',
+
+    # Don't complain if non-runnable code isn't run:
+    'if 0:',
+    'if __name__ == .__main__.:',
+]
+ignore_errors = true

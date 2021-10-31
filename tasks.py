@@ -102,7 +102,6 @@ def cover(ctx, report=False, verbose=False):
     header(cover.__doc__)
     cmd = [
         "pytest",
-        "--cov-config=coverage.rc",
         "--cov-report=term",
         "--cov=bumpr",
     ]
