@@ -2,7 +2,7 @@
 
 [![Build Status](https://github.com/noirbizarre/bumpr/actions/workflows/main.yml/badge.svg?branch=master)](https://github.com/noirbizarre/bumpr/actions/workflows/main.yml)
 [![codecov](https://codecov.io/gh/noirbizarre/bumpr/branch/master/graph/badge.svg?token=G8u0QBT1Sj)](https://codecov.io/gh/noirbizarre/bumpr)
-[![Documentation Status](https://readthedocs.org/projects/bumpr/badge/?version=latest)](https://bumpr.readthedocs.io/en/stable/?badge=latest)
+[![Documentation Status](https://readthedocs.org/projects/bumpr/badge/?version=latest)](https://bumpr.readthedocs.io/en/latest/?badge=latest)
 ![PyPI - Last version](https://img.shields.io/pypi/v/bumpr)
 ![PyPI - License](https://img.shields.io/pypi/l/bumpr)
 ![PyPI - Python Version](https://img.shields.io/pypi/pyversions/bumpr)
@@ -90,5 +90,5 @@ bumpr     # Bump the default part aka. patch
 
 The documentation is hosted on Read the Docs:
 
-- [Stable](https://bumpr.readthedocs.io/en/stable/)
-- [Development](https://bumpr.readthedocs.io/en/latest/)
+- [Stable](https://bumpr.readthedocs.io/en/stable/) [![Stable documentation status](https://readthedocs.org/projects/bumpr/badge/?version=stable)](https://bumpr.readthedocs.io/en/stable/?badge=stable)
+- [Development](https://bumpr.readthedocs.io/en/latest/) [![Latest documentation Status](https://readthedocs.org/projects/bumpr/badge/?version=latest)](https://bumpr.readthedocs.io/en/latest/?badge=latest)
