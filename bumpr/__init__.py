@@ -11,35 +11,3 @@ Bump'R: Version bumper and Python package releaser
 """
 
 from .__about__ import __description__, __version__  # noqa
-
-
-def main():
-    import sys
-
-    from bumpr import log
-
-    log.init()
-
-    from logging import DEBUG, INFO, getLogger
-
-    from bumpr.config import Config, ValidationError
-    from bumpr.helpers import BumprError
-    from bumpr.releaser import Releaser
-
-    config = Config.parse_args()
-    getLogger().setLevel(DEBUG if config.verbose else INFO)
-    logger = getLogger(__name__)
-
-    try:
-        config.validate()
-    except ValidationError as e:
-        msg = "Invalid configuration: {0}".format(e)
-        logger.error(msg)
-        sys.exit(1)
-
-    try:
-        releaser = Releaser(config)
-        releaser.release()
-    except BumprError as error:
-        logger.error(str(error))
-        sys.exit(1)

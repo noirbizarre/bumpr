@@ -54,7 +54,7 @@ pytest-sugar = "^0.9.4"
 coverage = {extras = ["toml"], version = "^6.1.1"}
 
 [tool.poetry.scripts]
-bumpr = 'bumpr:main'
+bumpr = 'bumpr.__main__:main'
 
 [tool.poetry.extras]
 test = [
