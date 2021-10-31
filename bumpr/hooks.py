@@ -21,7 +21,7 @@ __all_ = (
 )
 
 
-class Hook(object):
+class Hook:
     key: str = ""
     defaults: dict[str, Optional[str]] = {}
 

@@ -9,7 +9,7 @@ from bumpr.hooks import ChangelogHook, CommandsHook, ReadTheDocHook, ReplaceHook
 from bumpr.version import Version
 
 
-class ReadTheDocHookDefaultTest(object):
+class ReadTheDocHookDefaultTest:
     @pytest.fixture(autouse=True)
     def setUp(self, workspace, mocker):
         self.releaser = mocker.MagicMock()
@@ -47,7 +47,7 @@ class ReadTheDocHookDefaultTest(object):
         ]
 
 
-class ReadTheDocHookCustomTest(object):
+class ReadTheDocHookCustomTest:
     @pytest.fixture(autouse=True)
     def setUp(self, mocker):
         self.releaser = mocker.MagicMock()
@@ -87,7 +87,7 @@ class ReadTheDocHookCustomTest(object):
         ]
 
 
-class ReadTheDocHookCustomTagTest(object):
+class ReadTheDocHookCustomTagTest:
     @pytest.fixture(autouse=True)
     def setUp(self, workspace, mocker):
         self.releaser = mocker.MagicMock()
@@ -125,7 +125,7 @@ class ReadTheDocHookCustomTagTest(object):
         ]
 
 
-class CommandsHookTest(object):
+class CommandsHookTest:
     @pytest.fixture(autouse=True)
     def setUp(self, mocker):
         self.releaser = mocker.MagicMock()
@@ -171,7 +171,7 @@ class CommandsHookTest(object):
         )
 
 
-class ChangelogHookTest(object):
+class ChangelogHookTest:
     @pytest.fixture(autouse=True)
     def setUp(self, mocker):
         self.releaser = mocker.MagicMock()
@@ -346,7 +346,7 @@ class ChangelogHookTest(object):
         self.releaser.perform.assert_called_once_with("changelog", content, expected)
 
 
-class ReplaceHookTest(object):
+class ReplaceHookTest:
     @pytest.fixture(autouse=True)
     def setUp(self, mocker):
         self.releaser = mocker.MagicMock()

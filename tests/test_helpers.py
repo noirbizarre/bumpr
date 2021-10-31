@@ -15,7 +15,7 @@ def check_output_mock(mocker):
     yield mocker.patch("bumpr.helpers.check_output")
 
 
-class ExecuteTest(object):
+class ExecuteTest:
     def test_execute_quiet(self, check_call, check_output):
         output = "some output"
         check_output.return_value = output

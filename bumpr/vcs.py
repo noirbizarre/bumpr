@@ -10,7 +10,7 @@ log = logging.getLogger(__name__)
 MSG = "The current repository contains modified files"
 
 
-class BaseVCS(object):
+class BaseVCS:
     def __init__(self, verbose=False):
         self.verbose = verbose
 

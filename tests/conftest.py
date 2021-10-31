@@ -12,7 +12,7 @@ def pytest_configure():
 DEFAULT_VERSION = "1.2.3.dev"
 
 
-class Workspace(object):
+class Workspace:
     def __init__(self, root, version):
         self.module_name = "fake"
         self.root = root

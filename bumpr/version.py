@@ -3,7 +3,7 @@ from __future__ import annotations
 import re
 
 
-class Version(object):
+class Version:
     MAJOR, MINOR, PATCH = range(3)
 
     PATTERN = re.compile(r"(?P<major>\d+)\.(?P<minor>\d+)\.(?P<patch>\d+)(\.(?P<suffix>[\w\d.]+))?")

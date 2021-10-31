@@ -6,7 +6,7 @@ from bumpr.helpers import BumprError
 from bumpr.vcs import BaseVCS, Bazaar, Git, Mercurial
 
 
-class BaseVCSTest(object):
+class BaseVCSTest:
     def test_execute_verbose(self, mocker):
         vcs = BaseVCS(verbose=True)
         execute = mocker.patch("bumpr.vcs.execute")
@@ -20,7 +20,7 @@ class BaseVCSTest(object):
         execute.assert_called_with("cmd arg", verbose=False)
 
 
-class GitTest(object):
+class GitTest:
     def test_validate_ok(self, workspace, mocker):
         workspace.mkdir(".git")
         git = Git()
@@ -88,7 +88,7 @@ class GitTest(object):
         execute.assert_any_call(["git", "push", "--tags"])
 
 
-class MercurialTest(object):
+class MercurialTest:
     def test_validate_ok(self, workspace, mocker):
         workspace.mkdir(".hg")
         mercurial = Mercurial()
@@ -154,7 +154,7 @@ class MercurialTest(object):
         execute.assert_called_with(["hg", "push"])
 
 
-class BazaarTest(object):
+class BazaarTest:
     def test_validate_ok(self, workspace, mocker):
         workspace.mkdir(".bzr")
         bazaar = Bazaar()

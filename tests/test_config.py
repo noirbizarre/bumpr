@@ -31,7 +31,7 @@ def bumprc(request, mocker, mock_ini):
 
 
 @pytest.mark.usefixtures("bumprc")
-class ConfigTest(object):
+class ConfigTest:
     @pytest.fixture(autouse=True)
     def cleandir(self, tmpdir):
         tmpdir.chdir()
