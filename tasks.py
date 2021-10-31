@@ -3,6 +3,7 @@ import sys
 
 from invoke import task
 
+PTY = sys.platform != "win32"
 ROOT = os.path.dirname(__file__)
 
 CLEAN_PATTERNS = [
@@ -79,7 +80,7 @@ def deps(ctx):
     """Install or update development dependencies"""
     header(deps.__doc__)
     with ctx.cd(ROOT):
-        ctx.run("pip install -r requirements/develop.pip -r requirements/doc.pip", pty=True)
+        ctx.run("pip install -r requirements/develop.pip -r requirements/doc.pip", pty=PTY)
 
 
 @task
@@ -92,7 +93,7 @@ def test(ctx, report=False, verbose=False):
     if report:
         cmd.append("--junitxml=reports/tests.xml")
     with ctx.cd(ROOT):
-        ctx.run(" ".join(cmd), pty=True)
+        ctx.run(" ".join(cmd), pty=PTY)
 
 
 @task
@@ -114,7 +115,7 @@ def cover(ctx, report=False, verbose=False):
             "--junitxml=reports/tests.xml",
         ]
     with ctx.cd(ROOT):
-        ctx.run(" ".join(cmd), pty=True)
+        ctx.run(" ".join(cmd), pty=PTY)
 
 
 @task
@@ -123,13 +124,13 @@ def qa(ctx):
     header(qa.__doc__)
     with ctx.cd(ROOT):
         info("Python Static Analysis")
-        flake8_results = ctx.run("flake8 bumpr", pty=True, warn=True)
+        flake8_results = ctx.run("flake8 bumpr", pty=PTY, warn=True)
         if flake8_results.failed:
             error("There is some lints to fix")
         else:
             success("No lint to fix")
         info("Type checking")
-        mypy_results = ctx.run("mypy bumpr", pty=True, warn=True)
+        mypy_results = ctx.run("mypy bumpr", pty=PTY, warn=True)
         if mypy_results.failed:
             print(mypy_results.stdout)
             error("There is some typing to fix")
@@ -144,7 +145,7 @@ def qa(ctx):
 def tox(ctx):
     """Run test in all Python versions"""
     header(tox.__doc__)
-    ctx.run("tox", pty=True)
+    ctx.run("tox", pty=PTY)
 
 
 @task
@@ -155,7 +156,7 @@ def doc(ctx, serve=False):
         if serve:
             ctx.run("mkdocs serve")
         else:
-            ctx.run("mkdocs build", pty=True)
+            ctx.run("mkdocs build", pty=PTY)
             success("Documentation available in site/")
 
 
@@ -164,7 +165,7 @@ def completion(ctx):
     """Generate bash completion script"""
     header(completion.__doc__)
     with ctx.cd(ROOT):
-        ctx.run("_bumpr_COMPLETE=source bumpr > bumpr-complete.sh", pty=True)
+        ctx.run("_bumpr_COMPLETE=source bumpr > bumpr-complete.sh", pty=PTY)
     success("Completion generated in bumpr-complete.sh")
 
 
@@ -173,7 +174,7 @@ def dist(ctx):
     """Package for distribution"""
     header(dist.__doc__)
     with ctx.cd(ROOT):
-        ctx.run("poetry build", pty=True)
+        ctx.run("poetry build", pty=PTY)
     success("Distribution is available in dist directory")
 
 

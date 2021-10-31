@@ -1,0 +1,91 @@
+name: Tests
+
+on:
+  push:
+    paths-ignore:
+      - 'docs/**'
+    branches:
+      - master
+  pull_request:
+    paths-ignore:
+      - 'docs/**'
+    branches:
+      - '**'
+
+env:
+  default_python_version: "3.9"
+
+jobs:
+  lint:
+    name: Static analysis
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - uses: actions/setup-python@v2
+        with:
+          python-version: ${{ env.default_python_version }}
+
+      - name: Run pre-commit
+        uses: pre-commit/action@v2.0.3
+
+  tests:
+    name: Tests (OS=${{ matrix.os }} Python=${{ matrix.python }} )
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        python: ["3.7", "3.8", "3.9", "3.10"]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v2
+
+      - uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python }}
+
+      - name: Install Poetry
+        uses: snok/install-poetry@v1
+
+      - name: Install project dependencies
+        run: |
+          # See: https://github.com/python-poetry/poetry/issues/4210
+          poetry config experimental.new-installer false
+          poetry install
+
+      - name: Run tests with coverage
+        run: poetry run inv cover --report
+
+      - name: Send coverage results to Codecov
+        uses: codecov/codecov-action@v2.0.3
+        with:
+          files: reports/coverage.xml
+          flags: unittests
+          name: Python ${{ matrix.python }}
+
+  docs:
+    name: Documentation
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - uses: actions/setup-python@v2
+        with:
+          python-version: ${{ env.default_python_version }}
+
+      - name: Install Poetry
+        uses: snok/install-poetry@v1
+
+      - name: Install project dependencies
+        run: poetry install --extras doc
+
+      - name: Generate documentation
+        run: poetry run inv doc
+
+  success:
+    name: Main Workflow Succeeded
+    runs-on: ubuntu-latest
+    needs: [lint, tests, docs]
+    steps:
+      - name: Empty job for easier merge condition
+        run: echo "✔ Success"
