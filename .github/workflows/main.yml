@@ -30,7 +30,7 @@ jobs:
         uses: pre-commit/action@v2.0.3
 
   tests:
-    name: Tests (OS=${{ matrix.os }} Python=${{ matrix.python }} )
+    name: Tests (${{ matrix.os }} / Python ${{ matrix.python }})
     strategy:
       fail-fast: false
       matrix:
