@@ -5,10 +5,10 @@ vcs = git
 tag_annotation = version {version}
 push = true
 tests =
-    poetry check
-    poetry build
+    poetry check -n
+    poetry build -n
     tox
-publish = poetry publish
+publish = poetry publish --build -vv -n
 clean = poetry run inv clean
 files =
     README.md
