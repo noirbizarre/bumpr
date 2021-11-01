@@ -1,5 +1,9 @@
 # Changelog
 
+## Current
+
+- Nothing yet
+
 ## 0.3.8 (2021-11-01)
 
 - Drop compatibility for Python 2.x
