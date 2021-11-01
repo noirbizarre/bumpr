@@ -1,15 +1,15 @@
 import sys
 from logging import DEBUG, INFO, getLogger
 
-from . import log
-from .config import Config, ValidationError
-from .helpers import BumprError
-from .releaser import Releaser
-
 
 def main():
+    from . import log
 
     log.init()
+
+    from .config import Config, ValidationError
+    from .helpers import BumprError
+    from .releaser import Releaser
 
     config = Config.parse_args()
     getLogger().setLevel(DEBUG if config.verbose else INFO)
