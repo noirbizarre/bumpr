@@ -1,6 +1,6 @@
 # Changelog
 
-## Current
+## 0.3.8 (2021-11-01)
 
 - Drop compatibility for Python 2.x
 - Supports Python `>=3.7,<4.0`
