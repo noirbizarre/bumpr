@@ -6,9 +6,10 @@ tag_annotation = version {version}
 push = true
 tests =
     poetry check
-    poetry run nox
+    poetry build
+    tox
 publish = poetry publish
-clean = poetry run nox -s clean
+clean = poetry run inv clean
 files =
     README.md
     bumpr/__about__.py
