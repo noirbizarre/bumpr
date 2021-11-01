@@ -14,11 +14,23 @@ CLEAN_PATTERNS = [
     "*.egg-info",
     ".cache",
     ".nox",
+    ".tox",
     "build",
     "dist",
     "docs/_build",
     "reports",
+    "site",
 ]
+
+LINTERS = (
+    ("pyproject.toml validation", "poetry check"),
+    ("Static Analysis", "flake8 bumpr"),
+    ("Type checking", "mypy bumpr"),
+)
+FORMATTERS = (
+    ("Sort imports using isort", "isort"),
+    ("Format code using black", "black"),
+)
 
 
 def color(code):
@@ -76,14 +88,6 @@ def clean(ctx):
 
 
 @task
-def deps(ctx):
-    """Install or update development dependencies"""
-    header(deps.__doc__)
-    with ctx.cd(ROOT):
-        ctx.run("pip install -r requirements/develop.pip -r requirements/doc.pip", pty=PTY)
-
-
-@task
 def test(ctx, report=False, verbose=False):
     """Run tests suite"""
     header(test.__doc__)
@@ -118,26 +122,33 @@ def cover(ctx, report=False, verbose=False):
 
 
 @task
-def qa(ctx):
-    """Run a quality report"""
-    header(qa.__doc__)
+def lint(ctx):
+    """Run linters"""
+    header(lint.__doc__)
     with ctx.cd(ROOT):
-        info("Python Static Analysis")
-        flake8_results = ctx.run("flake8 bumpr", pty=PTY, warn=True)
-        if flake8_results.failed:
-            error("There is some lints to fix")
-        else:
-            success("No lint to fix")
-        info("Type checking")
-        mypy_results = ctx.run("mypy bumpr", pty=PTY, warn=True)
-        if mypy_results.failed:
-            print(mypy_results.stdout)
-            error("There is some typing to fix")
-        else:
-            success("Typing is correct")
-    if flake8_results.failed or mypy_results.failed:
-        exit("Quality check failed", flake8_results.return_code or mypy_results.return_code)
-    success("Quality check OK")
+        results = {}
+        for name, cmd in LINTERS:
+            info(name)
+            result = results[name] = ctx.run(cmd, pty=PTY, warn=True)
+
+            if result.failed:
+                error(f"{name} failed")
+            else:
+                success(f"{name} succeeded")
+
+        if any(r.failed for r in results.values()):
+            exit("some linters failed")
+        success("All linters succeeded")
+
+
+@task
+def format(ctx):
+    """Format code"""
+    header(format.__doc__)
+    with ctx.cd(ROOT):
+        for name, cmd in FORMATTERS:
+            info(name)
+            ctx.run(f"{cmd} *.py bumpr tests", pty=PTY, warn=True)
 
 
 @task
@@ -177,7 +188,7 @@ def dist(ctx):
     success("Distribution is available in dist directory")
 
 
-@task(clean, test, qa, doc, dist, default=True)
+@task(clean, lint, test, doc, dist, default=True)
 def all(ctx):
     """Run all tasks (default)"""
     pass
