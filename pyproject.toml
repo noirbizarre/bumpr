@@ -43,7 +43,7 @@ mkdocs-include-markdown-plugin = {version = "^3.2.3", optional = true}
 black = {version = "^21.9b0", allow-prereleases = true}
 flake8 = "^4.0.1"
 invoke = "^1.6.0"
-isort = "^5.9.3"
+isort = "^5.10.0"
 mock = "^4.0.3"
 mypy = "^0.910"
 pytest = "^6.2.5"
