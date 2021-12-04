@@ -35,7 +35,7 @@ include = [
 python = ">=3.7,<4.0"
 # Doc dependencies here until https://github.com/python-poetry/poetry/issues/1644
 mkdocs = {version = "^1.2.3", optional = true}
-mkdocs-material = {version = "^7.3.5", optional = true}
+mkdocs-material = {version = ">=7.3.5,<9.0.0", optional = true}
 mkdocstrings = {version = "^0.16.2", optional = true}
 mkdocs-include-markdown-plugin = {version = "^3.2.3", optional = true}
 
