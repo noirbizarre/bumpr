@@ -22,7 +22,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - uses: actions/setup-python@v2
+      - uses: actions/setup-python@v4.1.0
         with:
           python-version: ${{ env.default_python_version }}
 
@@ -40,7 +40,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - uses: actions/setup-python@v2
+      - uses: actions/setup-python@v4.1.0
         with:
           python-version: ${{ matrix.python }}
 
@@ -69,7 +69,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - uses: actions/setup-python@v2
+      - uses: actions/setup-python@v4.1.0
         with:
           python-version: ${{ env.default_python_version }}
 
