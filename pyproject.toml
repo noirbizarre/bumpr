@@ -94,7 +94,7 @@ multi_line_output = 3
 
 
 [tool.mypy]
-python_version = "3.9"
+python_version = "3.11"
 exclude = "doc/*.py"
 
 [tool.flakehell]
