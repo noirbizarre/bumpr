@@ -33,21 +33,21 @@ include = [
 
 [tool.poetry.dependencies]
 python = ">=3.7,<4.0"
-# Doc dependencies here until https://github.com/python-poetry/poetry/issues/1644
+
+[tool.poetry.group.doc.dependencies]
 mkdocs = {version = "^1.2.3", optional = true}
-mkdocs-material = {version = ">=7.3.5,<9.0.0", optional = true}
-mkdocstrings = {version = ">=0.16.2,<0.18.0", optional = true}
+mkdocs-material = {version = ">=8.2.9,<9.0.0", optional = true}
+mkdocstrings = {version = ">=0.20.0,<0.21.0", optional = true}
 mkdocs-include-markdown-plugin = {version = "^3.2.3", optional = true}
 
 [tool.poetry.group.dev.dependencies]
-coverage = {extras = ["toml"], version = "^6.3"}
+coverage = {extras = ["toml"], version = "^7.2.1"}
 invoke = "^1.6.0"
 mock = "^4.0.3"
 mypy = "^0.931"
-pytest = "^6.2.5"
+pytest = "^7.2.2"
 pytest-cov = "^3.0.0"
 pytest-mock = "^3.7.0"
-pytest-pythonpath = "^0.7.3"
 pytest-sugar = "^0.9.4"
 ruff = "^0.6.8"
 
@@ -61,7 +61,6 @@ test = [
   "pytest-cov",
   "pytest-mock",
   "pytest-sugar",
-  "pytest-pythonpath",
 ]
 lint = [
   "mypy",
