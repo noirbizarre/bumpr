@@ -34,7 +34,7 @@ Optionnal phase that simply execute the commands provided by the `publish` confi
 
 Most of the time for Python project, you will want to execute:
 
-```console
+```bash
 python setup.py sdist register upload
 ```
 

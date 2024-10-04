@@ -24,7 +24,7 @@ CLEAN_PATTERNS = [
 
 LINTERS = (
     ("pyproject.toml validation", "poetry check"),
-    ("Static Analysis", "flake8 bumpr"),
+    ("Static Analysis", "ruff bumpr"),
     ("Type checking", "mypy bumpr"),
 )
 FORMATTERS = (

@@ -11,7 +11,7 @@ it with the `-c` option.
 All mandatory parameters not present in the configuration file should be
 on command line.
 
-```console
+```bash
 $ bumpr -h
 usage: bumpr [-h] [--version] [-v] [-c CONFIG] [-d] [-st] [-b | -pr] [-M] [-m]
              [-p] [-s SUFFIX] [-u] [-pM] [-pm] [-pp] [-ps PREPARE_SUFFIX]
