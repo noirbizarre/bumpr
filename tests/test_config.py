@@ -171,9 +171,7 @@ class ConfigTest:
         bumprrc = """\
         [{0}]
         bump = test
-        """.format(
-            tested_hook.key
-        )
+        """.format(tested_hook.key)
 
         expected = deepcopy(DEFAULTS)
         for hook in HOOKS:

@@ -45,6 +45,9 @@ reports/
 # MKDocs
 site/
 
+# Ruff
+.ruff_cache/
+
 # Virtualenvs
 venv
 .venv

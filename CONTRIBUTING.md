@@ -152,7 +152,7 @@ You are now ready to contribute.
 Any code contribution should pass tests. If adding feature, please also provide matching tests to avoid regression later.
 You can run the test suite with:
 
-```console
+```bash
 poetry run inv test
 ```
 
@@ -161,13 +161,13 @@ If you are doing a major change, I strongly advise to run the [Tox](https://tox.
 Your code should also pass the `lint`suite. If you have installed pre-commit, it will be run for each commit.
 If not, you can manually run the Python lints parts with:
 
-```console
+```bash
 poetry run inv lint
 ```
 
 To ensure everything is working, you can run lints, tests and check docuemtation is still building with a single commad:
 
-```console
+```bash
 poetry run inv
 ```
 
