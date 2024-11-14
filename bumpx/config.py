@@ -15,6 +15,7 @@ DEFAULTS: dict[str, Any] = {
     "regex": r'(__version__|VERSION)\s*=\s*(\'|")(?P<version>.+?)(\'|")',
     "encoding": "utf8",
     "vcs": None,
+    "forge": None,
     "commit": True,
     "tag": True,
     "tag_format": "{version}",
@@ -155,7 +156,7 @@ class Config(ObjectDict):
                 self[hook.key] = False
 
     def override_from_args(self, parsed_args):
-        for arg in "file", "vcs", "files":
+        for arg in "file", "vcs", "forge", "files":
             if arg in parsed_args and getattr(parsed_args, arg) not in (
                 None,
                 [],
